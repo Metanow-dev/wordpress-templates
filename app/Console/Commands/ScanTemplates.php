@@ -6,6 +6,8 @@ use App\Models\Template;
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
 use Symfony\Component\Finder\Finder;
+use App\Support\UrlBuilder;
+
 
 class ScanTemplates extends Command
 {
@@ -42,13 +44,16 @@ class ScanTemplates extends Command
 
             // Find a screenshot
             $screenshot = null;
+            $relPath = null;
             foreach (config('templates.screenshot_candidates') as $pattern) {
                 foreach (glob($docroot . '/' . $pattern) as $file) {
-                    $rel = Str::after($file, $docroot);
-                    $rel = ltrim($rel, '/');
-                    $screenshot = rtrim($demoUrl, '/') . '/' . $rel;
+                    $relPath = ltrim(Str::after($file, $docroot), '/');
                     break 2;
                 }
+            }
+
+            if ($relPath) {
+                $screenshot = UrlBuilder::screenshot($slug, $relPath, config('templates.demo_url_pattern'));
             }
 
             // Very basic name (we can improve later from site title)
