@@ -1,27 +1,25 @@
-Here’s a **starter README.md** tailored for your `wordpress-templates` project. It captures setup, dev workflow, production notes, and key paths/commands — useful both for you and new contributors.
-
----
-
-````markdown
 # WordPress Templates Catalog
 
-A Laravel + Livewire app that indexes and displays WordPress demo sites hosted under  
-`https://wordpress.metanow.dev/{slug}/`.
-
-The app scans WordPress installations on disk, stores metadata in MySQL,  
-and shows them in a searchable/browsable catalog with English + German UI.
+A Laravel + Livewire application that indexes and displays WordPress demo sites with automated screenshot generation. The app scans WordPress installations, captures browser screenshots, and presents them in a searchable catalog with bilingual support (EN/DE).
 
 ---
 
 ## Features
 
-- 🗂️ **Catalog UI** with search, sorting, pagination (`/en/templates` and `/de/vorlagen`)
-- 🔄 **Scanner** command (`templates:scan`) to auto-detect WP installs under a root path
-- 🖼️ **Theme screenshot detection** (from `wp-content/themes/<theme>/screenshot.png`)
-- 🌍 **Bilingual support** (EN/DE routes and labels)
-- ⚙️ **API endpoint** for automated registration (`POST /api/import-template`)
-- 🚀 **Production ready** with Nginx rule mapping `/slug/` → `/srv/templates/{slug}/public`
-- 🧩 Extensible for AI classification (via n8n + LLM integration, planned)
+- 🗂️ **Interactive Catalog** with search, filtering by categories/tags, and pagination
+- 🔄 **Automated Scanner** to detect WordPress installations and metadata
+- 📸 **Screenshot Generation** using Puppeteer/Chrome for live site captures
+- 🖼️ **Theme Screenshot Detection** from WordPress themes
+- 🌍 **Bilingual Support** with English (`/en/templates`) and German (`/de/vorlagen`) routes
+- ⚙️ **RESTful API** for programmatic template management
+- 🚀 **Production Ready** with Plesk/cPanel deployment support
+- 🎨 **Modern UI** with Tailwind CSS and responsive design
+
+---
+
+## Screenshots & Demo
+
+The application automatically captures screenshots of WordPress sites and displays them in a modern, responsive gallery interface with filtering capabilities.
 
 ---
 
@@ -29,209 +27,306 @@ and shows them in a searchable/browsable catalog with English + German UI.
 
 ### Requirements
 - Docker + Docker Compose (via [Laravel Sail](https://laravel.com/docs/sail))
-- Node.js + npm (for assets)
+- Node.js 18+ with npm
+- Chrome/Chromium browser (managed automatically by Puppeteer)
 
-### Setup
+### Quick Start
+
 ```bash
-# clone repo
-git clone git@github.com:<your-org>/wordpress-templates.git
+# Clone repository
+git clone <your-repo-url>
 cd wordpress-templates
 
-# install PHP deps
+# Install PHP dependencies
 composer install
 
-# bring up containers (PHP + MySQL)
-./vendor/bin/sail up -d laravel.test mysql
+# Install Node.js dependencies (includes Puppeteer)
+npm install
 
-# generate app key
-./vendor/bin/sail php artisan key:generate
+# Copy environment file
+cp .env.example .env
 
-# install JS deps
-./vendor/bin/sail npm install
+# Start Docker containers
+./vendor/bin/sail up -d
+
+# Generate application key
+./vendor/bin/sail artisan key:generate
+
+# Run database migrations
+./vendor/bin/sail artisan migrate
+
+# Build frontend assets
 ./vendor/bin/sail npm run dev
-````
+```
 
-App runs at [http://localhost](http://localhost).
+Access the application at [http://localhost](http://localhost)
 
-### Database
-
-Run migrations:
+### Setting up Test Data
 
 ```bash
-./vendor/bin/sail php artisan migrate
-```
+# Scan for WordPress installations (uses fixtures by default)
+./vendor/bin/sail artisan templates:scan
 
-### Scanning fixtures
-
-By default, local templates are read from:
-
-```
-storage/fixtures/templates/<slug>/public/wp-config.php
-```
-
-Example fixture:
-
-```bash
-mkdir -p storage/fixtures/templates/hotel-classic/public/wp-content/themes/minimal
-touch storage/fixtures/templates/hotel-classic/public/wp-config.php
-touch storage/fixtures/templates/hotel-classic/public/wp-content/themes/minimal/screenshot.png
-```
-
-Scan and populate DB:
-
-```bash
-./vendor/bin/sail php artisan templates:scan
-```
-
-Check in Tinker:
-
-```bash
-./vendor/bin/sail php artisan tinker
->>> \App\Models\Template::select('slug','demo_url','screenshot_url')->get()->toArray();
+# Generate screenshots for all templates
+./vendor/bin/sail artisan templates:screenshot --force
 ```
 
 ---
 
-## Useful Commands
+## Screenshot System
 
-* **Re-scan all templates**
-  `./vendor/bin/sail php artisan templates:scan`
+### How it Works
 
-* **Inspect DB via Tinker**
-  `./vendor/bin/sail php artisan tinker`
+1. **Theme Screenshots**: First tries to use WordPress theme's built-in screenshot
+2. **Browser Capture**: If no theme screenshot exists, uses Puppeteer to capture live site
+3. **Automated Processing**: Optimizes images and stores in `storage/app/public/screenshots/`
+4. **Smart Updates**: Only re-captures when forced or when sites change
 
-* **Clear caches**
+### Screenshot Commands
 
-  ```bash
-  ./vendor/bin/sail php artisan route:clear
-  ./vendor/bin/sail php artisan config:clear
-  ```
+```bash
+# Capture screenshots for all templates
+./vendor/bin/sail artisan templates:screenshot
 
-* **Run scheduler (dev)**
-  `./vendor/bin/sail php artisan schedule:run`
+# Force re-capture (ignores existing screenshots)
+./vendor/bin/sail artisan templates:screenshot --force
 
----
+# Capture specific template
+./vendor/bin/sail artisan templates:screenshot --slug=template-name
 
-## Routes
+# Full-page screenshots
+./vendor/bin/sail artisan templates:screenshot --fullpage
 
-* Catalog EN: `http://localhost/en/templates`
-* Catalog DE: `http://localhost/de/vorlagen`
-* Media proxy (local only): `/media/{slug}/{path}` serves files from fixtures
+# Custom dimensions
+./vendor/bin/sail artisan templates:screenshot --w=1920 --h=1080
+```
 
----
+### Testing Screenshots Locally
 
-## Project Structure
+For local development without real WordPress sites:
 
-* `app/Livewire/TemplatesIndex.php` — Livewire component for listing
-* `app/Console/Commands/ScanTemplates.php` — scanner command
-* `app/Models/Template.php` — Eloquent model
-* `config/templates.php` — scanner config (paths, URL pattern)
-* `storage/fixtures/templates/` — local fake WP installs for dev
-* `routes/web.php` — locale-aware routes
-* `routes/api.php` — API endpoints
+```bash
+# Option 1: Start local WordPress container
+./vendor/bin/sail up -d wordpress
+# WordPress available at http://localhost:8080
+
+# Option 2: Use public websites for testing
+./vendor/bin/sail artisan tinker --execute="App\Models\Template::query()->update(['demo_url' => 'https://example.com']);"
+```
 
 ---
 
 ## Production Deployment
 
-### Server Layout
+### Server Requirements
+- PHP 8.2+
+- MySQL 8.0+
+- Nginx/Apache
+- Node.js 18+
+- Chrome/Chromium browser
+- Sufficient memory for browser automation (2GB+ recommended)
 
-* Laravel app:
-  `/var/www/vhosts/wordpress.metanow.dev/httpdocs` → `public/`
-* WordPress demos:
-  `/srv/templates/<slug>/public`
+### Plesk Configuration
 
-### Env config (`.env`)
-
-```dotenv
+#### Environment Variables (`.env`)
+```env
 APP_ENV=production
 APP_DEBUG=false
-APP_URL=https://wordpress.metanow.dev
+APP_URL=https://your-domain.com
 
+# Database
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
-DB_PORT=3306
 DB_DATABASE=wordpress_templates
-DB_USERNAME=...
-DB_PASSWORD=...
+DB_USERNAME=your_db_user
+DB_PASSWORD=your_db_password
 
-TEMPLATES_ROOT=/srv/templates
-DEMO_URL_PATTERN=https://wordpress.metanow.dev/{slug}/
-API_TOKEN=<generate-random-long-secret>
+# Templates Configuration
+TEMPLATES_ROOT=/var/www/vhosts
+DEMO_URL_PATTERN=https://{slug}/
+
+# Screenshot Configuration
+CHROME_BINARY_PATH=/usr/bin/google-chrome
+NODE_BINARY_PATH=/usr/bin/node
+
+# API Security
+API_TOKEN=your-secure-random-token
 ```
 
-### Nginx Rule (Plesk > Additional directives)
-
+#### Nginx Additional Directives (in Plesk)
 ```nginx
+# Serve WordPress sites directly
 location ~ ^/([a-zA-Z0-9\-_]+)/?(.*)$ {
-    set $wp_root "/srv/templates/$1/public";
+    set $wp_root "/var/www/vhosts/$1/httpdocs";
     if (-d $wp_root) {
         root $wp_root;
         try_files /$2 /$2/ /index.php?$args;
-
+        
         location ~ \.php$ {
             try_files $uri =404;
             include fastcgi_params;
             fastcgi_param SCRIPT_FILENAME $wp_root$fastcgi_script_name;
-            fastcgi_pass unix:/var/www/vhosts/system/wordpress.metanow.dev/php-fpm.sock;
+            fastcgi_pass unix:/var/www/vhosts/system/your-domain.com/php-fpm.sock;
         }
         break;
     }
 }
 ```
 
-### Cron (Plesk Scheduled Task)
+#### Scheduled Tasks (Cron)
+```bash
+# Scan for new WordPress installations every 15 minutes
+*/15 * * * * cd /var/www/vhosts/your-domain.com/httpdocs && php artisan templates:scan
 
-```
-* * * * * /opt/plesk/php/8.3/bin/php /var/www/vhosts/wordpress.metanow.dev/httpdocs/artisan schedule:run >> /dev/null 2>&1
+# Update screenshots daily at 2 AM
+0 2 * * * cd /var/www/vhosts/your-domain.com/httpdocs && php artisan templates:screenshot
+
+# Clean up old files weekly
+0 3 * * 0 cd /var/www/vhosts/your-domain.com/httpdocs && php artisan storage:link
 ```
 
-### Test Demo Mapping
+### Production Workflow
+
+1. **Initial Setup**: Scanner discovers all WordPress installations in your hosting directory
+2. **Automated Updates**: Cron jobs regularly check for new sites and update screenshots
+3. **Manual Triggers**: Use commands to force updates when needed
 
 ```bash
-sudo mkdir -p /srv/templates/demo-wp/public
-echo "<?php echo 'OK demo-wp';" | sudo tee /srv/templates/demo-wp/public/index.php
+# Production commands
+php artisan templates:scan --path=/var/www/vhosts
+php artisan templates:screenshot --force
+php artisan queue:work # If using queued jobs
 ```
-
-Visit `https://wordpress.metanow.dev/demo-wp/` → should show `OK demo-wp`.
 
 ---
 
 ## API Endpoints
 
 ### Import Template
-
-```
+```http
 POST /api/import-template
-Headers:
-  X-Api-Token: <API_TOKEN>
-Body JSON:
+X-Api-Token: your-api-token
+Content-Type: application/json
+
 {
-  "slug": "hotel-classic",
-  "docroot": "/srv/templates/hotel-classic/public",
-  "demo_url": "https://wordpress.metanow.dev/hotel-classic/"
+    "slug": "new-wordpress-site",
+    "docroot": "/var/www/vhosts/new-site.com/httpdocs",
+    "demo_url": "https://new-site.com"
 }
 ```
 
----
-
-## Conventions
-
-* **Slug** = folder name under `/srv/templates/` (used in demo URL and DB)
-* **Screenshot** = must exist under `wp-content/themes/<active>/screenshot.png`
-* **Scanner** = safe to re-run, will upsert records
-* **Languages** = routes `/en/templates` and `/de/vorlagen`; labels from `lang/`
+### Get Templates
+```http
+GET /api/templates
+X-Api-Token: your-api-token
+```
 
 ---
 
-## Roadmap
+## Configuration
 
-* 🔜 Registrar script to auto-symlink WP docroots and POST to `/api/import-template`
-* 🔜 n8n automation for AI classification
-* 🔜 Admin UI to review / override AI results
+### Templates Config (`config/templates.php`)
+```php
+return [
+    'root' => env('TEMPLATES_ROOT', storage_path('fixtures/templates')),
+    'demo_url_pattern' => env('DEMO_URL_PATTERN', 'https://your-domain.com/{slug}/'),
+    'screenshot_candidates' => [
+        'wp-content/themes/*/screenshot.png',
+        'wp-content/themes/*/screenshot.jpg',
+        'screenshot.png',
+    ],
+];
+```
+
+### Browser Configuration
+The system automatically detects Chrome installations. Override if needed:
+```env
+CHROME_BINARY_PATH=/usr/bin/chromium-browser
+NODE_BINARY_PATH=/usr/local/bin/node
+```
+
+---
+
+## Key Commands
+
+```bash
+# Development
+./vendor/bin/sail up -d                    # Start containers
+./vendor/bin/sail artisan templates:scan  # Scan for WordPress sites
+./vendor/bin/sail artisan templates:screenshot --force  # Generate screenshots
+./vendor/bin/sail npm run dev             # Watch frontend assets
+
+# Production
+php artisan templates:scan                # Scan for new installations
+php artisan templates:screenshot          # Update screenshots
+php artisan config:cache                  # Cache configuration
+php artisan route:cache                   # Cache routes
+```
+
+---
+
+## Project Structure
+
+```
+app/
+├── Console/Commands/
+│   ├── ScanTemplates.php         # WordPress site scanner
+│   └── CaptureTemplateScreenshots.php  # Screenshot generator
+├── Http/
+│   └── Middleware/SetLocale.php  # Language detection
+├── Livewire/
+│   └── TemplatesIndex.php        # Main catalog component
+├── Models/
+│   └── Template.php              # Template model
+└── Support/
+    └── Screenshotter.php         # Screenshot service
+
+config/templates.php              # Scanner configuration
+resources/views/livewire/         # Blade templates
+storage/fixtures/templates/       # Local test data
+routes/web.php                   # Web routes (bilingual)
+routes/api.php                   # API routes
+```
+
+---
+
+## Troubleshooting
+
+### Screenshot Issues
+```bash
+# Test screenshot functionality
+./vendor/bin/sail artisan templates:screenshot --slug=test-site --force
+
+# Check Chrome installation
+./vendor/bin/sail node -e "console.log(require('puppeteer').executablePath())"
+
+# Debug browser issues
+./vendor/bin/sail artisan templates:screenshot --slug=test-site --force -vvv
+```
+
+### Common Issues
+- **Memory errors**: Increase PHP memory limit for screenshot generation
+- **Permission issues**: Ensure storage directories are writable
+- **Network timeouts**: Adjust timeout settings for slow WordPress sites
+
+---
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
 
 ---
 
 ## License
 
+This project is open-sourced software licensed under the [MIT license](LICENSE).
 
+---
+
+## Support
+
+For issues and feature requests, please use the [GitHub issue tracker](https://github.com/your-org/wordpress-templates/issues).

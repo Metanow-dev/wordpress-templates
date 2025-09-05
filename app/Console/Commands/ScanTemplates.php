@@ -11,7 +11,8 @@ use App\Support\UrlBuilder;
 
 class ScanTemplates extends Command
 {
-    protected $signature = 'templates:scan {--path=} {--limit=0}';
+    protected $signature = 'templates:scan {--path=} {--limit=0} {--capture : If no theme screenshot found, capture a browser screenshot}';
+
     protected $description = 'Scan templates root for WordPress installs and upsert into DB';
 
     public function handle(): int
@@ -68,6 +69,17 @@ class ScanTemplates extends Command
                     'last_scanned_at' => now(),
                 ]
             );
+
+            // Optional auto-capture if no theme screenshot was found
+            if (!$screenshot && $this->option('capture')) {
+                try {
+                    $url = \App\Support\Screenshotter::for($slug, $demoUrl)->capture();
+                    \App\Models\Template::where('slug', $slug)->update(['screenshot_url' => $url]);
+                    $this->info(" → Captured screenshot for {$slug}");
+                } catch (\Throwable $e) {
+                    $this->warn(" → Capture failed for {$slug}: " . $e->getMessage());
+                }
+            }
 
             $this->info("Indexed {$slug} -> {$demoUrl}");
             $count++;

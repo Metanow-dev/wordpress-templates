@@ -1,0 +1,101 @@
+# WordPress Templates Catalog - Plesk Scheduled Tasks Configuration
+# Add these scheduled tasks in Plesk > Tools & Settings > Scheduled Tasks
+
+# =============================================================================
+# TEMPLATE SCANNING
+# =============================================================================
+# Run every 15 minutes to scan for new WordPress installations
+# Command type: Run a PHP script
+# Script path: /var/www/vhosts/your-domain.com/httpdocs/artisan
+# Arguments: templates:scan
+# Use PHP version: 8.2 (or your preferred version)
+# Schedule: Every 15 minutes
+*/15 * * * *
+
+# Alternative command line version:
+# */15 * * * * /opt/plesk/php/8.2/bin/php /var/www/vhosts/your-domain.com/httpdocs/artisan templates:scan >/dev/null 2>&1
+
+# =============================================================================
+# SCREENSHOT GENERATION
+# =============================================================================
+# Run daily at 2 AM to update screenshots
+# Command type: Run a PHP script  
+# Script path: /var/www/vhosts/your-domain.com/httpdocs/artisan
+# Arguments: templates:screenshot
+# Use PHP version: 8.2 (or your preferred version)
+# Schedule: Daily at 2:00 AM
+0 2 * * *
+
+# Alternative command line version:
+# 0 2 * * * /opt/plesk/php/8.2/bin/php /var/www/vhosts/your-domain.com/httpdocs/artisan templates:screenshot >/dev/null 2>&1
+
+# =============================================================================
+# MAINTENANCE TASKS
+# =============================================================================
+# Run weekly on Sunday at 3 AM for maintenance
+# Command type: Run a PHP script
+# Script path: /var/www/vhosts/your-domain.com/httpdocs/artisan
+# Arguments: storage:link
+# Use PHP version: 8.2 (or your preferred version)  
+# Schedule: Weekly on Sunday at 3:00 AM
+0 3 * * 0
+
+# Clear application cache weekly (optional)
+# 0 4 * * 0 /opt/plesk/php/8.2/bin/php /var/www/vhosts/your-domain.com/httpdocs/artisan cache:clear >/dev/null 2>&1
+
+# =============================================================================
+# LOG ROTATION (handled by logrotate, but backup command)
+# =============================================================================
+# Clean up old log files (if not using logrotate)
+# 0 5 * * 0 find /var/www/vhosts/your-domain.com/httpdocs/storage/logs -name "*.log" -mtime +30 -delete
+
+# =============================================================================
+# BACKUP CLEANUP (handled by deployment script, but backup command)
+# =============================================================================
+# Clean up old deployment backups (keep last 10)
+# 0 6 * * 0 cd /var/www/vhosts/your-domain.com/backups && ls -t | tail -n +11 | xargs -r rm -rf
+
+# =============================================================================
+# QUEUE PROCESSING (if using queues)
+# =============================================================================
+# If you decide to use Laravel queues for screenshot processing:
+# * * * * * /opt/plesk/php/8.2/bin/php /var/www/vhosts/your-domain.com/httpdocs/artisan queue:work --stop-when-empty >/dev/null 2>&1
+
+# =============================================================================
+# HEALTH CHECK (optional)
+# =============================================================================
+# Check if application is responding (optional monitoring)
+# */5 * * * * curl -f -s -o /dev/null https://your-domain.com/en/templates || echo "Site down: $(date)" >> /var/log/site-monitor.log
+
+# =============================================================================
+# INSTRUCTIONS FOR PLESK INTERFACE
+# =============================================================================
+
+1. Go to Plesk Panel > Tools & Settings > Scheduled Tasks
+2. Click "Add Task"
+3. Fill in the form:
+   - Task type: "Run a PHP script"
+   - Script path: /var/www/vhosts/your-domain.com/httpdocs/artisan
+   - Arguments: templates:scan (for example)
+   - Use web server PHP: No
+   - PHP version: 8.2 (or your version)
+   - Run: Use cron style entry
+   - Cron style entry: */15 * * * * (for every 15 minutes)
+   - Description: Template Scanner
+   - Notify: (optional, set email for errors)
+
+4. Repeat for each scheduled task above
+
+# =============================================================================
+# MONITORING AND LOGGING
+# =============================================================================
+
+# You can monitor the scheduled tasks by checking:
+# - Plesk logs: Tools & Settings > Logs > Scheduled Tasks
+# - Application logs: /var/www/vhosts/your-domain.com/httpdocs/storage/logs/
+# - System logs: /var/log/messages or /var/log/syslog
+
+# To manually test commands:
+# cd /var/www/vhosts/your-domain.com/httpdocs
+# /opt/plesk/php/8.2/bin/php artisan templates:scan -v
+# /opt/plesk/php/8.2/bin/php artisan templates:screenshot --slug=test-site -v

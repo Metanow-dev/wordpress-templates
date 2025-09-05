@@ -15,8 +15,16 @@ class SetLocale
      */
     public function handle($request, \Closure $next)
     {
-        $locale = $request->route('locale') ?? 'en';
-        app()->setLocale(in_array($locale, ['en', 'de']) ? $locale : 'en');
+        $path = $request->path();
+        $locale = 'en'; // default
+        
+        if (str_starts_with($path, 'de/')) {
+            $locale = 'de';
+        } elseif (str_starts_with($path, 'en/')) {
+            $locale = 'en';
+        }
+        
+        app()->setLocale($locale);
         return $next($request);
     }
 }

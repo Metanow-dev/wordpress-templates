@@ -101,6 +101,21 @@ services:
             - '/dev/shm:/dev/shm'
         networks:
             - sail
+    wordpress:
+        image: wordpress:latest
+        ports:
+            - '8080:80'
+        environment:
+            WORDPRESS_DB_HOST: mysql
+            WORDPRESS_DB_USER: '${DB_USERNAME}'
+            WORDPRESS_DB_PASSWORD: '${DB_PASSWORD}'
+            WORDPRESS_DB_NAME: wordpress_test
+        volumes:
+            - 'sail-wordpress:/var/www/html'
+        networks:
+            - sail
+        depends_on:
+            - mysql
 networks:
     sail:
         driver: bridge
@@ -110,4 +125,6 @@ volumes:
     sail-redis:
         driver: local
     sail-meilisearch:
+        driver: local
+    sail-wordpress:
         driver: local

@@ -1,0 +1,206 @@
+name: Deploy to Plesk Production
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch: # Allow manual triggering
+
+env:
+  NODE_VERSION: '18'
+  PHP_VERSION: '8.2'
+
+jobs:
+  deploy:
+    name: Deploy to Production Server
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ env.PHP_VERSION }}
+        extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv
+        coverage: none
+        
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        
+    - name: Install Composer dependencies
+      run: composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader --no-progress
+      
+    - name: Install NPM dependencies
+      run: npm ci --production=false
+      
+    - name: Build assets
+      run: npm run build
+      
+    - name: Create deployment archive
+      run: |
+        tar --exclude='.git' \
+            --exclude='.github' \
+            --exclude='node_modules' \
+            --exclude='tests' \
+            --exclude='storage/app' \
+            --exclude='storage/framework/cache' \
+            --exclude='storage/framework/sessions' \
+            --exclude='storage/framework/testing' \
+            --exclude='storage/framework/views' \
+            --exclude='storage/logs' \
+            --exclude='.env' \
+            --exclude='.env.example' \
+            -czf deployment.tar.gz .
+            
+    - name: Deploy to server
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.PLESK_HOST }}
+        username: ${{ secrets.PLESK_USERNAME }}
+        key: ${{ secrets.PLESK_SSH_KEY }}
+        port: ${{ secrets.PLESK_SSH_PORT || 22 }}
+        script_stop: true
+        script: |
+          set -e
+          
+          # Configuration
+          APP_PATH="/var/www/vhosts/${{ secrets.DOMAIN_NAME }}/httpdocs"
+          BACKUP_PATH="/var/www/vhosts/${{ secrets.DOMAIN_NAME }}/backups/$(date +%Y%m%d_%H%M%S)"
+          
+          echo "🚀 Starting deployment to $APP_PATH"
+          
+          # Create backup directory
+          mkdir -p "$(dirname "$BACKUP_PATH")"
+          
+          # Backup current deployment (if exists)
+          if [ -d "$APP_PATH" ]; then
+            echo "📦 Creating backup..."
+            cp -r "$APP_PATH" "$BACKUP_PATH"
+            echo "✅ Backup created at $BACKUP_PATH"
+          fi
+          
+          # Create application directory
+          mkdir -p "$APP_PATH"
+          cd "$APP_PATH"
+          
+          # Download and extract deployment
+          echo "⬇️  Downloading deployment archive..."
+          
+    - name: Upload and extract deployment
+      uses: appleboy/scp-action@v0.1.7
+      with:
+        host: ${{ secrets.PLESK_HOST }}
+        username: ${{ secrets.PLESK_USERNAME }}
+        key: ${{ secrets.PLESK_SSH_KEY }}
+        port: ${{ secrets.PLESK_SSH_PORT || 22 }}
+        source: "deployment.tar.gz"
+        target: "/var/www/vhosts/${{ secrets.DOMAIN_NAME }}/httpdocs/"
+        
+    - name: Complete deployment
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.PLESK_HOST }}
+        username: ${{ secrets.PLESK_USERNAME }}
+        key: ${{ secrets.PLESK_SSH_KEY }}
+        port: ${{ secrets.PLESK_SSH_PORT || 22 }}
+        script_stop: true
+        script: |
+          set -e
+          
+          APP_PATH="/var/www/vhosts/${{ secrets.DOMAIN_NAME }}/httpdocs"
+          cd "$APP_PATH"
+          
+          # Extract deployment
+          echo "📤 Extracting deployment..."
+          tar -xzf deployment.tar.gz
+          rm deployment.tar.gz
+          
+          # Set permissions
+          echo "🔒 Setting permissions..."
+          find . -type f -exec chmod 644 {} \;
+          find . -type d -exec chmod 755 {} \;
+          chmod -R 775 storage bootstrap/cache
+          chown -R www-data:www-data storage bootstrap/cache
+          
+          # Laravel deployment commands
+          echo "⚡ Running Laravel commands..."
+          
+          # Generate app key if not exists
+          if [ ! -f .env ]; then
+            echo "⚠️  .env file not found! Please create it manually."
+            exit 1
+          fi
+          
+          # Cache configuration and routes
+          /opt/plesk/php/8.2/bin/php artisan config:cache
+          /opt/plesk/php/8.2/bin/php artisan route:cache
+          /opt/plesk/php/8.2/bin/php artisan view:cache
+          
+          # Run database migrations
+          /opt/plesk/php/8.2/bin/php artisan migrate --force --no-interaction
+          
+          # Link storage
+          /opt/plesk/php/8.2/bin/php artisan storage:link
+          
+          # Restart queues if running
+          /opt/plesk/php/8.2/bin/php artisan queue:restart || true
+          
+          # Clear application cache
+          /opt/plesk/php/8.2/bin/php artisan cache:clear
+          
+          echo "✅ Deployment completed successfully!"
+          
+          # Test the application
+          echo "🧪 Testing application..."
+          curl -f -s -o /dev/null https://${{ secrets.DOMAIN_NAME }}/en/templates || {
+            echo "❌ Application test failed!"
+            exit 1
+          }
+          echo "✅ Application is responding correctly!"
+          
+  post-deploy:
+    name: Post-deployment tasks
+    runs-on: ubuntu-latest
+    needs: deploy
+    if: success()
+    
+    steps:
+    - name: Trigger template scan
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.PLESK_HOST }}
+        username: ${{ secrets.PLESK_USERNAME }}
+        key: ${{ secrets.PLESK_SSH_KEY }}
+        port: ${{ secrets.PLESK_SSH_PORT || 22 }}
+        script: |
+          APP_PATH="/var/www/vhosts/${{ secrets.DOMAIN_NAME }}/httpdocs"
+          cd "$APP_PATH"
+          
+          echo "🔍 Running template scan..."
+          /opt/plesk/php/8.2/bin/php artisan templates:scan
+          
+          echo "📸 Updating screenshots..."
+          /opt/plesk/php/8.2/bin/php artisan templates:screenshot --timeout=300
+          
+          echo "✅ Post-deployment tasks completed!"
+          
+    - name: Cleanup old backups
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.PLESK_HOST }}
+        username: ${{ secrets.PLESK_USERNAME }}
+        key: ${{ secrets.PLESK_SSH_KEY }}
+        port: ${{ secrets.PLESK_SSH_PORT || 22 }}
+        script: |
+          BACKUP_DIR="/var/www/vhosts/${{ secrets.DOMAIN_NAME }}/backups"
+          
+          if [ -d "$BACKUP_DIR" ]; then
+            echo "🧹 Cleaning up old backups (keeping last 5)..."
+            cd "$BACKUP_DIR"
+            ls -t | tail -n +6 | xargs -r rm -rf
+            echo "✅ Backup cleanup completed!"
+          fi
