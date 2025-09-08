@@ -331,3 +331,8 @@ This project is open-sourced software licensed under the [MIT license](LICENSE).
 
 For issues and feature requests, please use the [GitHub issue tracker](https://github.com/your-org/wordpress-templates/issues).# Deployment test
 🚀 **Deployment Status**: Ready for production deployment to wp-templates.metanow.dev
+## Deployment Notes
+
+- Fixed .env file format issues with API_TOKEN
+- Database password properly quoted for special characters
+- Ready for successful deployment
