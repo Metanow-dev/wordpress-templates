@@ -133,6 +133,12 @@ jobs:
           tar -xzf deployment.tar.gz
           rm deployment.tar.gz
           
+          # Create Laravel directory structure
+          echo "📁 Creating Laravel directories..."
+          mkdir -p storage/{app,framework/{cache,sessions,testing,views},logs}
+          mkdir -p bootstrap/cache
+          touch storage/logs/laravel.log
+          
           # Set permissions
           echo "🔒 Setting permissions..."
           find . -type f -exec chmod 644 {} \;
