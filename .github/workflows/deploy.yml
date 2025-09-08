@@ -138,7 +138,20 @@ jobs:
           find . -type f -exec chmod 644 {} \;
           find . -type d -exec chmod 755 {} \;
           chmod -R 775 storage bootstrap/cache
-          chown -R www-data:www-data storage bootstrap/cache
+          
+          # Detect and set correct web user (CloudLinux/CentOS uses apache, Ubuntu uses www-data)
+          if id -u apache >/dev/null 2>&1; then
+            echo "Using apache:apache ownership"
+            chown -R apache:apache storage bootstrap/cache
+          elif id -u www-data >/dev/null 2>&1; then
+            echo "Using www-data:www-data ownership"
+            chown -R www-data:www-data storage bootstrap/cache
+          elif id -u nginx >/dev/null 2>&1; then
+            echo "Using nginx:nginx ownership"
+            chown -R nginx:nginx storage bootstrap/cache
+          else
+            echo "⚠️  Could not detect web user, skipping chown"
+          fi
           
           # Laravel deployment commands
           echo "⚡ Running Laravel commands..."
