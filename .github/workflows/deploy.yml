@@ -156,6 +156,24 @@ jobs:
           # Laravel deployment commands
           echo "⚡ Running Laravel commands..."
           
+          # Detect PHP binary path
+          if [ -x "/opt/plesk/php/8.3/bin/php" ]; then
+            PHP_BIN="/opt/plesk/php/8.3/bin/php"
+            echo "Using PHP 8.3: $PHP_BIN"
+          elif [ -x "/opt/plesk/php/8.2/bin/php" ]; then
+            PHP_BIN="/opt/plesk/php/8.2/bin/php"
+            echo "Using PHP 8.2: $PHP_BIN"
+          elif [ -x "/opt/plesk/php/8.1/bin/php" ]; then
+            PHP_BIN="/opt/plesk/php/8.1/bin/php"
+            echo "Using PHP 8.1: $PHP_BIN"
+          elif command -v php >/dev/null 2>&1; then
+            PHP_BIN="php"
+            echo "Using system PHP: $(php --version | head -n1)"
+          else
+            echo "❌ PHP not found!"
+            exit 1
+          fi
+          
           # Generate app key if not exists
           if [ ! -f .env ]; then
             echo "⚠️  .env file not found! Please create it manually."
@@ -163,21 +181,21 @@ jobs:
           fi
           
           # Cache configuration and routes
-          /opt/plesk/php/8.2/bin/php artisan config:cache
-          /opt/plesk/php/8.2/bin/php artisan route:cache
-          /opt/plesk/php/8.2/bin/php artisan view:cache
+          $PHP_BIN artisan config:cache
+          $PHP_BIN artisan route:cache
+          $PHP_BIN artisan view:cache
           
           # Run database migrations
-          /opt/plesk/php/8.2/bin/php artisan migrate --force --no-interaction
+          $PHP_BIN artisan migrate --force --no-interaction
           
           # Link storage
-          /opt/plesk/php/8.2/bin/php artisan storage:link
+          $PHP_BIN artisan storage:link
           
           # Restart queues if running
-          /opt/plesk/php/8.2/bin/php artisan queue:restart || true
+          $PHP_BIN artisan queue:restart || true
           
           # Clear application cache
-          /opt/plesk/php/8.2/bin/php artisan cache:clear
+          $PHP_BIN artisan cache:clear
           
           echo "✅ Deployment completed successfully!"
           
@@ -207,11 +225,25 @@ jobs:
           APP_PATH="/var/www/vhosts/${{ secrets.DOMAIN_NAME }}/httpdocs"
           cd "$APP_PATH"
           
+          # Detect PHP binary path
+          if [ -x "/opt/plesk/php/8.3/bin/php" ]; then
+            PHP_BIN="/opt/plesk/php/8.3/bin/php"
+          elif [ -x "/opt/plesk/php/8.2/bin/php" ]; then
+            PHP_BIN="/opt/plesk/php/8.2/bin/php"
+          elif [ -x "/opt/plesk/php/8.1/bin/php" ]; then
+            PHP_BIN="/opt/plesk/php/8.1/bin/php"
+          elif command -v php >/dev/null 2>&1; then
+            PHP_BIN="php"
+          else
+            echo "❌ PHP not found!"
+            exit 1
+          fi
+          
           echo "🔍 Running template scan..."
-          /opt/plesk/php/8.2/bin/php artisan templates:scan
+          $PHP_BIN artisan templates:scan
           
           echo "📸 Updating screenshots..."
-          /opt/plesk/php/8.2/bin/php artisan templates:screenshot --timeout=300
+          $PHP_BIN artisan templates:screenshot --timeout=300
           
           echo "✅ Post-deployment tasks completed!"
           
