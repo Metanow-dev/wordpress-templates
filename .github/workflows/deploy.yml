@@ -180,11 +180,83 @@ jobs:
             exit 1
           fi
           
-          # Generate app key if not exists
-          if [ ! -f .env ]; then
-            echo "⚠️  .env file not found! Please create it manually."
-            exit 1
-          fi
+          # Create .env file from secrets
+          echo "📝 Creating .env file..."
+          cat > .env << 'EOF'
+          # WordPress Templates Catalog - Production Environment
+          APP_NAME="WordPress Templates Catalog"
+          APP_ENV=production
+          APP_KEY=base64:GENERATE_WITH_php_artisan_key:generate
+          APP_DEBUG=false
+          APP_URL=${{ secrets.APP_URL }}
+          APP_TIMEZONE=Europe/Berlin
+          
+          # Database Configuration
+          DB_CONNECTION=mysql
+          DB_HOST=${{ secrets.DB_HOST }}
+          DB_PORT=3306
+          DB_DATABASE=${{ secrets.DB_DATABASE }}
+          DB_USERNAME=${{ secrets.DB_USERNAME }}
+          DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+          
+          # Templates Configuration
+          TEMPLATES_ROOT=/srv/templates
+          DEMO_URL_PATTERN=${{ secrets.APP_URL }}/{slug}/
+          
+          # Screenshot System Configuration
+          CHROME_BINARY_PATH=/usr/bin/google-chrome-stable
+          NODE_BINARY_PATH=/usr/bin/node
+          SCREENSHOT_TIMEOUT=30000
+          SCREENSHOT_WAIT_FOR_NETWORK_IDLE=true
+          SCREENSHOT_DELAY=700
+          
+          # API Security
+          API_TOKEN=${{ secrets.API_TOKEN }}
+          
+          # Cache and Session
+          CACHE_DRIVER=file
+          CACHE_PREFIX=wptemplates
+          SESSION_DRIVER=file
+          SESSION_LIFETIME=120
+          SESSION_ENCRYPT=false
+          
+          # Queue Configuration
+          QUEUE_CONNECTION=sync
+          
+          # Mail Configuration
+          MAIL_MAILER=smtp
+          MAIL_HOST=localhost
+          MAIL_PORT=25
+          MAIL_ENCRYPTION=null
+          MAIL_FROM_ADDRESS=noreply@${{ secrets.DOMAIN_NAME }}
+          MAIL_FROM_NAME="${APP_NAME}"
+          
+          # Logging
+          LOG_CHANNEL=daily
+          LOG_LEVEL=error
+          
+          # Security
+          BCRYPT_ROUNDS=12
+          
+          # Localization
+          DEFAULT_LOCALE=en
+          FALLBACK_LOCALE=en
+          
+          # Performance
+          OPTIMIZE_IMAGES=true
+          COMPRESS_RESPONSES=true
+          
+          # Rate Limiting
+          API_RATE_LIMIT=60
+          WEB_RATE_LIMIT=1000
+          
+          # Browser Configuration
+          PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+          PUPPETEER_EXECUTABLE_PATH=/usr/bin/google-chrome-stable
+          EOF
+          
+          # Generate application key
+          $PHP_BIN artisan key:generate --force
           
           # Cache configuration and routes
           $PHP_BIN artisan config:cache
