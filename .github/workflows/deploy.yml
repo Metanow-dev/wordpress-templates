@@ -58,7 +58,6 @@ jobs:
           --exclude='storage/framework/views/' \
           --exclude='storage/logs/' \
           --exclude='.env' \
-          --exclude='.env.example' \
           --exclude='deployment-build/' \
           ./ deployment-build/
         
@@ -179,49 +178,23 @@ jobs:
             exit 1
           fi
           
-          # Create .env file from secrets (without script_stop interference)
-          echo "📝 Creating .env file..."
-          echo 'APP_NAME="WordPress Templates Catalog"' > .env
-          echo 'APP_ENV=production' >> .env
-          echo 'APP_KEY=' >> .env
-          echo 'APP_DEBUG=false' >> .env
-          echo 'APP_URL=${{ secrets.APP_URL }}' >> .env
-          echo 'APP_TIMEZONE=Europe/Berlin' >> .env
-          echo '' >> .env
-          echo 'DB_CONNECTION=mysql' >> .env
-          echo 'DB_HOST=${{ secrets.DB_HOST }}' >> .env
-          echo 'DB_PORT=3306' >> .env
-          echo 'DB_DATABASE=${{ secrets.DB_DATABASE }}' >> .env
-          echo 'DB_USERNAME=${{ secrets.DB_USERNAME }}' >> .env
-          echo 'DB_PASSWORD=${{ secrets.DB_PASSWORD }}' >> .env
-          echo '' >> .env
-          echo 'TEMPLATES_ROOT=/srv/templates' >> .env
-          echo 'DEMO_URL_PATTERN=${{ secrets.APP_URL }}/{slug}/' >> .env
-          echo '' >> .env
-          echo 'CHROME_BINARY_PATH=/usr/bin/google-chrome-stable' >> .env
-          echo 'NODE_BINARY_PATH=/usr/bin/node' >> .env
-          echo 'SCREENSHOT_TIMEOUT=30000' >> .env
-          echo 'SCREENSHOT_WAIT_FOR_NETWORK_IDLE=true' >> .env
-          echo 'SCREENSHOT_DELAY=700' >> .env
-          echo '' >> .env
-          echo 'API_TOKEN=${{ secrets.API_TOKEN }}' >> .env
-          echo '' >> .env
-          echo 'CACHE_DRIVER=file' >> .env
-          echo 'SESSION_DRIVER=file' >> .env
-          echo 'SESSION_LIFETIME=120' >> .env
-          echo 'QUEUE_CONNECTION=sync' >> .env
-          echo '' >> .env
-          echo 'LOG_CHANNEL=daily' >> .env
-          echo 'LOG_LEVEL=error' >> .env
-          echo '' >> .env
-          echo 'DEFAULT_LOCALE=en' >> .env
-          echo 'FALLBACK_LOCALE=en' >> .env
-          echo '' >> .env
-          echo 'PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true' >> .env
-          echo 'PUPPETEER_EXECUTABLE_PATH=/usr/bin/google-chrome-stable' >> .env
+          # Handle production environment file
+          if [ ! -f .env ]; then
+            if [ -f .env.production ]; then
+              echo "📝 Creating .env from .env.production template..."
+              cp .env.production .env
+            else
+              echo "❌ Neither .env nor .env.production found!"
+              echo "Please ensure .env.production exists in your repository."
+              exit 1
+            fi
+          fi
           
-          # Generate application key
-          $PHP_BIN artisan key:generate --force
+          # Generate app key if not set
+          if ! grep -q "APP_KEY=base64:" .env; then
+            echo "🔑 Generating application key..."
+            $PHP_BIN artisan key:generate --no-interaction
+          fi
           
           # Cache configuration and routes
           $PHP_BIN artisan config:cache
