@@ -338,4 +338,4 @@ For issues and feature requests, please use the [GitHub issue tracker](https://g
 - Ready for successful deployment
 # .env file manually recreated on server Mon Sep  8 10:06:59 CEST 2025
 
-chage
+chagee
