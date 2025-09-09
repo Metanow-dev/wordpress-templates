@@ -160,16 +160,16 @@ jobs:
           # Laravel deployment commands
           echo "⚡ Running Laravel commands..."
           
-          # Detect PHP binary path
-          if [ -x "/opt/plesk/php/8.3/bin/php" ]; then
+          # Use CloudLinux alt-php for consistency (deployment-proof)
+          if [ -x "/opt/alt/php83/usr/bin/php" ]; then
+            PHP_BIN="/opt/alt/php83/usr/bin/php"
+            echo "Using CloudLinux alt-php 8.3: $PHP_BIN"
+          elif [ -x "/opt/plesk/php/8.3/bin/php" ]; then
             PHP_BIN="/opt/plesk/php/8.3/bin/php"
-            echo "Using PHP 8.3: $PHP_BIN"
+            echo "Using Plesk PHP 8.3: $PHP_BIN"
           elif [ -x "/opt/plesk/php/8.2/bin/php" ]; then
             PHP_BIN="/opt/plesk/php/8.2/bin/php"
-            echo "Using PHP 8.2: $PHP_BIN"
-          elif [ -x "/opt/plesk/php/8.1/bin/php" ]; then
-            PHP_BIN="/opt/plesk/php/8.1/bin/php"
-            echo "Using PHP 8.1: $PHP_BIN"
+            echo "Using Plesk PHP 8.2: $PHP_BIN"
           elif command -v php >/dev/null 2>&1; then
             PHP_BIN="php"
             echo "Using system PHP: $(php --version | head -n1)"
@@ -227,26 +227,46 @@ jobs:
           
           echo "✅ Deployment completed successfully!"
           
-          # Test the application
-          echo "🧪 Testing application..."
+          # Health check deployment (fail fast if 403 returns)
+          echo "🧪 Running deployment health checks..."
           
-          # Try HTTPS first, then HTTP as fallback
-          if curl -f -s -o /dev/null https://${{ secrets.DOMAIN_NAME }}/en/templates; then
-            echo "✅ Application is responding correctly on HTTPS!"
-          elif curl -f -s -o /dev/null http://${{ secrets.DOMAIN_NAME }}/en/templates; then
-            echo "✅ Application is responding correctly on HTTP!"
-            echo "⚠️  Note: HTTPS may need SSL certificate setup"
+          # Wait a moment for web server to process changes
+          sleep 5
+          
+          # Test 1: Static file (tests docroot and basic access)
+          echo "📄 Testing static file access..."
+          if curl -f -s https://${{ secrets.DOMAIN_NAME }}/health.txt | grep -q "OK"; then
+            echo "✅ Static files working correctly"
+          elif curl -f -s http://${{ secrets.DOMAIN_NAME }}/health.txt | grep -q "OK"; then
+            echo "✅ Static files working (HTTP only - SSL may need setup)"
           else
-            echo "⚠️  HTTP test failed, trying basic Laravel route..."
-            # Test if Laravel is working at all
-            if curl -f -s -o /dev/null http://${{ secrets.DOMAIN_NAME }}/; then
-              echo "✅ Laravel is running, but templates route may need configuration"
-            else
-              echo "❌ Application is not responding. Check logs:"
-              echo "- Application logs: storage/logs/"
-              echo "- Web server logs: /var/log/"
-              # Don't fail deployment for this - app is deployed successfully
-            fi
+            echo "❌ Static file test FAILED - docroot or permissions issue"
+            echo "This indicates a deployment problem that needs fixing before continuing"
+            exit 1
+          fi
+          
+          # Test 2: PHP processing (tests PHP handler mapping)
+          echo "🐘 Testing PHP processing..."
+          if curl -f -s https://${{ secrets.DOMAIN_NAME }}/test.php | grep -q "PHP Version: 8."; then
+            echo "✅ PHP processing working correctly"
+          elif curl -f -s http://${{ secrets.DOMAIN_NAME }}/test.php | grep -q "PHP Version: 8."; then
+            echo "✅ PHP processing working (HTTP only)"
+          else
+            echo "❌ PHP processing test FAILED - handler mapping issue"
+            echo "The 403 error is likely back. Check PHP handler configuration."
+            exit 1
+          fi
+          
+          # Test 3: Laravel application
+          echo "🚀 Testing Laravel application..."
+          if curl -f -s -o /dev/null https://${{ secrets.DOMAIN_NAME }}/en/templates; then
+            echo "✅ Laravel application responding correctly (HTTPS)"
+          elif curl -f -s -o /dev/null http://${{ secrets.DOMAIN_NAME }}/en/templates; then
+            echo "✅ Laravel application responding correctly (HTTP)"
+          else
+            echo "⚠️  Laravel application test failed - may need manual configuration"
+            echo "Static and PHP work, so this might be Laravel-specific routing"
+            # Don't fail deployment for this - basic deployment succeeded
           fi
           
   post-deploy:

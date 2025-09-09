@@ -1,14 +1,15 @@
 #!/bin/bash
-# Fix Plesk 403 error for Laravel application
-# This script automates the PHP handler mapping fix
+# DEPLOYMENT-PROOF Fix for Plesk 403 error
+# This script uses the correct Plesk domain user and survives deployments
 
 set -e
 
 DOMAIN="wp-templates.metanow.dev"
+SYSUSER="wp-templates.metanow_r6s2v1oe7wr"  # Plesk domain system user
 APP_PATH="/var/www/vhosts/$DOMAIN/httpdocs"
 PUBLIC_PATH="$APP_PATH/public"
 
-echo "🚨 Fixing Plesk 403 error for $DOMAIN..."
+echo "🚨 Applying deployment-proof Plesk 403 fix for $DOMAIN..."
 
 # Step 1: Ensure public directory exists and has correct structure
 echo "📁 Setting up Laravel public directory..."
@@ -19,8 +20,9 @@ if [ ! -d "public" ]; then
     exit 1
 fi
 
-# Step 2: Create/update .htaccess with correct PHP handler mapping
-echo "⚙️  Configuring PHP handler mapping..."
+# Step 2: Create/update .htaccess with correct PHP handler mapping (fallback)
+# Note: Primary fix should be in Apache vhost directives, this is backup
+echo "⚙️  Configuring .htaccess as fallback..."
 cat > "$PUBLIC_PATH/.htaccess" << 'EOF'
 # Force CloudLinux alt-php 8.3 for this vhost
 <IfModule mime_module>
@@ -58,36 +60,20 @@ EOF
 
 echo "✅ Created .htaccess with PHP handler mapping"
 
-# Step 3: Set correct permissions and ownership
-echo "🔒 Setting permissions and ownership..."
+# Step 3: Set CORRECT Plesk ownership (deployment-proof)
+echo "🔒 Setting Plesk-correct permissions and ownership..."
 
-# Detect the correct web user
-WEB_USER=""
-if id -u apache >/dev/null 2>&1; then
-    WEB_USER="apache:apache"
-elif id -u www-data >/dev/null 2>&1; then
-    WEB_USER="www-data:www-data"
-elif id -u nginx >/dev/null 2>&1; then
-    WEB_USER="nginx:nginx"
-else
-    # Try to detect from the domain path ownership
-    DOMAIN_OWNER=$(stat -c "%U" "/var/www/vhosts/$DOMAIN" 2>/dev/null || echo "")
-    if [ -n "$DOMAIN_OWNER" ] && id -u "$DOMAIN_OWNER" >/dev/null 2>&1; then
-        WEB_USER="$DOMAIN_OWNER:$DOMAIN_OWNER"
-        echo "📍 Detected domain owner: $DOMAIN_OWNER"
-    fi
-fi
+# FORCE correct Plesk ownership (domain system user : psacln)
+echo "👤 Setting ownership to: $SYSUSER:psacln"
+chown -R "$SYSUSER:psacln" "$APP_PATH"
 
-if [ -n "$WEB_USER" ]; then
-    echo "👤 Setting ownership to: $WEB_USER"
-    chown -R $WEB_USER "$APP_PATH"
-else
-    echo "⚠️  Could not detect web user, skipping chown"
-fi
-
-# Set directory and file permissions
+# Set proper permissions
+echo "📁 Setting directory permissions..."
 find "$APP_PATH" -type d -exec chmod 755 {} \;
 find "$APP_PATH" -type f -exec chmod 644 {} \;
+
+# Laravel writable directories  
+echo "✍️  Setting Laravel writable permissions..."
 chmod -R 775 "$APP_PATH/storage" "$APP_PATH/bootstrap/cache" 2>/dev/null || true
 
 echo "✅ Permissions set"
@@ -122,29 +108,38 @@ EOF
 
 echo "✅ Test files created"
 
-# Step 5: Instructions for Plesk UI configuration
+# Step 5: DEPLOYMENT-PROOF Plesk configuration instructions  
 echo ""
-echo "🎯 MANUAL PLESK CONFIGURATION REQUIRED:"
+echo "🎯 CRITICAL: DEPLOYMENT-PROOF PLESK CONFIGURATION REQUIRED:"
 echo ""
-echo "1. Go to Plesk → Websites & Domains → $DOMAIN → Hosting Settings"
-echo "   Set Document root to: httpdocs/public"
+echo "⚡ MAKE THIS SURVIVE DEPLOYMENTS by adding to Apache vhost:"
 echo ""
-echo "2. Go to Plesk → Websites & Domains → $DOMAIN → PHP Settings" 
-echo "   Set PHP version to: LSPHP 8.3 (alt-php) FastCGI"
+echo "1. Plesk → Websites & Domains → $DOMAIN → Hosting Settings"
+echo "   Document root: httpdocs/public"
 echo ""
-echo "3. Go to Plesk → Websites & Domains → $DOMAIN → Apache & nginx Settings"
-echo "   Add to Additional Apache directives (both HTTP and HTTPS):"
+echo "2. Plesk → Websites & Domains → $DOMAIN → PHP Settings"
+echo "   PHP version: LSPHP 8.3 (alt-php) FastCGI"
 echo ""
+echo "3. 🚨 MOST IMPORTANT - Plesk → Apache & nginx Settings"
+echo "   Add to BOTH HTTP and HTTPS Additional Apache directives:"
+echo ""
+echo "# Force CloudLinux alt-php 8.3 for this vhost (deployment-proof)"
+echo "AddType application/x-httpd-alt-php83 .php"
+echo "<IfModule lsapi_module>"
+echo "    AddHandler application/x-httpd-alt-php83 .php"
+echo "</IfModule>"
+echo ""
+echo "# Laravel public/ access"
 echo '<Directory "/var/www/vhosts/'$DOMAIN'/httpdocs/public">'
-echo '    AllowOverride All'
-echo '    Options -Indexes +SymLinksIfOwnerMatch'
-echo '    Require all granted'
-echo '</Directory>'
-echo 'DirectoryIndex index.php index.html'
+echo "    AllowOverride All"
+echo "    Options -Indexes +SymLinksIfOwnerMatch"
+echo "    Require all granted"
+echo "</Directory>"
 echo ""
-echo "4. After making changes, run:"
-echo "   plesk repair web -y"
-echo "   systemctl restart lshttpd"
+echo "DirectoryIndex index.php index.html"
+echo ""
+echo "4. Apply changes:"
+echo "   plesk repair web -y && systemctl restart lshttpd"
 echo ""
 
 # Step 6: Test URLs
