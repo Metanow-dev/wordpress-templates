@@ -42,22 +42,51 @@ else
     exit 1
 fi
 
+# Clear config cache first to ensure fresh config
+$PHP_BIN artisan config:clear
+
 # Test configuration
 if $PHP_BIN artisan config:show templates.root >/dev/null 2>&1; then
     CONFIGURED_ROOT=$($PHP_BIN artisan config:show templates.root | grep -o '"[^"]*"' | tr -d '"')
     echo "📍 Templates root configured as: $CONFIGURED_ROOT"
     
-    if [ -d "$CONFIGURED_ROOT" ]; then
-        echo "✅ Templates root directory exists"
+    if [ -n "$CONFIGURED_ROOT" ] && [ "$CONFIGURED_ROOT" != "" ]; then
+        if [ -d "$CONFIGURED_ROOT" ]; then
+            echo "✅ Templates root directory exists"
+        else
+            echo "⚠️  Templates root directory does not exist: $CONFIGURED_ROOT"
+            echo "   Creating directory..."
+            mkdir -p "$CONFIGURED_ROOT"
+            chmod 755 "$CONFIGURED_ROOT"
+            echo "✅ Created templates root directory"
+        fi
     else
-        echo "⚠️  Templates root directory does not exist: $CONFIGURED_ROOT"
-        echo "   Creating directory..."
-        mkdir -p "$CONFIGURED_ROOT"
-        chmod 755 "$CONFIGURED_ROOT"
-        echo "✅ Created templates root directory"
+        echo "❌ TEMPLATES_ROOT is empty! Checking .env file..."
+        if grep -q "TEMPLATES_ROOT=" .env; then
+            TEMPLATES_ROOT_FROM_ENV=$(grep "TEMPLATES_ROOT=" .env | cut -d'=' -f2)
+            echo "   Found in .env: $TEMPLATES_ROOT_FROM_ENV"
+            if [ -n "$TEMPLATES_ROOT_FROM_ENV" ]; then
+                mkdir -p "$TEMPLATES_ROOT_FROM_ENV"
+                chmod 755 "$TEMPLATES_ROOT_FROM_ENV"
+                echo "✅ Created directory from .env: $TEMPLATES_ROOT_FROM_ENV"
+            fi
+        else
+            echo "❌ TEMPLATES_ROOT not found in .env file!"
+        fi
     fi
 else
-    echo "⚠️  Could not read templates configuration"
+    echo "⚠️  Could not read templates configuration - checking .env directly"
+    if [ -f .env ] && grep -q "TEMPLATES_ROOT=" .env; then
+        TEMPLATES_ROOT_FROM_ENV=$(grep "TEMPLATES_ROOT=" .env | cut -d'=' -f2)
+        echo "   Found TEMPLATES_ROOT in .env: $TEMPLATES_ROOT_FROM_ENV"
+        if [ -n "$TEMPLATES_ROOT_FROM_ENV" ]; then
+            mkdir -p "$TEMPLATES_ROOT_FROM_ENV"
+            chmod 755 "$TEMPLATES_ROOT_FROM_ENV" 
+            echo "✅ Created directory from .env: $TEMPLATES_ROOT_FROM_ENV"
+        fi
+    else
+        echo "❌ Could not determine templates root directory"
+    fi
 fi
 
 # Test basic scanner functionality
