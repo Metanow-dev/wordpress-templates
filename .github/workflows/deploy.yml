@@ -220,6 +220,11 @@ jobs:
           chmod +x deploy/post-deploy-setup.sh
           APP_PATH="$APP_PATH" ./deploy/post-deploy-setup.sh
           
+          # Fix Plesk 403 issues (PHP handler mapping)
+          echo "🛠️  Applying Plesk 403 fixes..."
+          chmod +x deploy/fix-plesk-403.sh
+          ./deploy/fix-plesk-403.sh || echo "⚠️  Plesk 403 fix script completed with warnings"
+          
           echo "✅ Deployment completed successfully!"
           
           # Test the application
