@@ -30,8 +30,8 @@ class ScanTemplates extends Command
         $count = 0;
         foreach ($finder as $dir) {
             $base = $dir->getRealPath();
-            // common layouts: <slug>/public or <slug> as docroot
-            $docroots = ["{$base}/public", $base];
+            // common layouts: <slug>/public, <slug>/httpdocs (Plesk), or <slug> as docroot
+            $docroots = ["{$base}/public", "{$base}/httpdocs", $base];
             $docroot = collect($docroots)->first(fn($p) => is_file($p . '/wp-config.php')) ?? null;
 
             if (!$docroot) {

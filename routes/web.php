@@ -11,10 +11,15 @@ Route::get('/media/{slug}/{path}', function (string $slug, string $path) {
     abort_unless(preg_match('/^[a-z0-9\-]+$/i', $slug), 404);
 
     $base = rtrim(config('templates.root'), '/');
-    // We support both "<slug>/public" and "<slug>" as docroot
-    $docroot = is_file("$base/$slug/public/wp-config.php")
-        ? "$base/$slug/public"
-        : "$base/$slug";
+    // We support "<slug>/public", "<slug>/httpdocs" (Plesk), and "<slug>" as docroot
+    $docroots = [
+        "$base/$slug/public",
+        "$base/$slug/httpdocs", 
+        "$base/$slug"
+    ];
+    $docroot = collect($docroots)->first(fn($p) => is_file($p . '/wp-config.php'));
+    
+    abort_unless($docroot, 404);
 
     // Normalize and prevent traversal
     $full = realpath($docroot . '/' . $path);
