@@ -8,7 +8,7 @@
         "responseMode": "responseNode",
         "options": {}
       },
-      "id": "webhook-trigger",
+      "id": "d4c1d4e5-1234-4567-8901-234567890abc",
       "name": "Webhook Trigger",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
@@ -24,17 +24,17 @@
           "fullResponse": false
         }
       },
-      "id": "fetch-website-content",
+      "id": "e5d2e5f6-2345-5678-9012-345678901bcd",
       "name": "Fetch Website Content",
       "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
+      "typeVersion": 4,
       "position": [460, 300]
     },
     {
       "parameters": {
-        "jsCode": "// Extract key content from HTML for AI analysis\nconst html = $input.first().json.body;\nconst cheerio = require('cheerio');\nconst $ = cheerio.load(html);\n\n// Remove script and style tags\n$('script, style, noscript').remove();\n\n// Extract title\nconst title = $('title').text().trim() || $('h1').first().text().trim();\n\n// Extract meta description\nconst description = $('meta[name=\"description\"]').attr('content') || '';\n\n// Extract main content text (first 2000 chars)\nconst bodyText = $('body').text()\n  .replace(/\\s+/g, ' ')\n  .trim()\n  .substring(0, 2000);\n\n// Extract headings\nconst headings = [];\n$('h1, h2, h3').each((i, el) => {\n  if (i < 10) headings.push($(el).text().trim());\n});\n\n// Look for ecommerce indicators\nconst hasWooCommerce = html.includes('woocommerce') || html.includes('shop') || html.includes('cart');\nconst hasBooking = html.includes('booking') || html.includes('reservation') || html.includes('appointment');\nconst hasMenu = html.includes('menu') || html.includes('restaurant') || html.includes('food');\n\n// Look for CMS/Builder indicators\nconst hasElementor = html.includes('elementor');\nconst hasDivi = html.includes('divi-');\nconst hasGutenberg = html.includes('wp-block') || html.includes('gutenberg');\n\n// Extract template data from webhook\nconst templateData = {\n  slug: $('webhook-trigger').first().json.body.slug,\n  name: $('webhook-trigger').first().json.body.name,\n  demo_url: $('webhook-trigger').first().json.body.demo_url,\n  active_theme: $('webhook-trigger').first().json.body.active_theme || '',\n  api_callback_url: $('webhook-trigger').first().json.body.api_callback_url,\n  api_token: $('webhook-trigger').first().json.body.api_token\n};\n\nreturn {\n  templateData,\n  content: {\n    title,\n    description,\n    bodyText,\n    headings,\n    indicators: {\n      hasWooCommerce,\n      hasBooking, \n      hasMenu,\n      hasElementor,\n      hasDivi,\n      hasGutenberg\n    }\n  }\n};"
+        "jsCode": "// Extract key content from HTML for AI analysis\nconst html = $input.first().json.body;\n\n// Simple text extraction without cheerio dependency\nconst extractText = (html) => {\n  // Remove script and style tags\n  let cleaned = html.replace(/<script[^>]*>.*?<\\/script>/gis, '')\n                   .replace(/<style[^>]*>.*?<\\/style>/gis, '');\n  \n  // Extract title\n  const titleMatch = cleaned.match(/<title[^>]*>([^<]*)<\\/title>/i);\n  const title = titleMatch ? titleMatch[1].trim() : '';\n  \n  // Extract meta description\n  const descMatch = cleaned.match(/<meta[^>]*name=[\"']description[\"'][^>]*content=[\"']([^\"']*)[\"']/i);\n  const description = descMatch ? descMatch[1] : '';\n  \n  // Extract text content (simplified)\n  const bodyText = cleaned.replace(/<[^>]*>/g, ' ')\n                          .replace(/\\s+/g, ' ')\n                          .trim()\n                          .substring(0, 2000);\n  \n  // Look for indicators\n  const hasWooCommerce = /woocommerce|shop|cart|product/i.test(html);\n  const hasBooking = /booking|reservation|appointment/i.test(html);\n  const hasMenu = /menu|restaurant|food/i.test(html);\n  const hasElementor = /elementor/i.test(html);\n  const hasDivi = /divi-/i.test(html);\n  const hasGutenberg = /wp-block|gutenberg/i.test(html);\n  \n  return {\n    title,\n    description,\n    bodyText,\n    indicators: {\n      hasWooCommerce,\n      hasBooking,\n      hasMenu,\n      hasElementor,\n      hasDivi,\n      hasGutenberg\n    }\n  };\n};\n\n// Get webhook data\nconst webhookData = $('Webhook Trigger').first().json.body;\n\nconst templateData = {\n  slug: webhookData.slug,\n  name: webhookData.name,\n  demo_url: webhookData.demo_url,\n  active_theme: webhookData.active_theme || '',\n  api_callback_url: webhookData.api_callback_url,\n  api_token: webhookData.api_token\n};\n\nconst content = extractText(html);\n\nreturn [{ templateData, content }];"
       },
-      "id": "process-content",
+      "id": "f6e3f6g7-3456-6789-0123-456789012cde",
       "name": "Process Content",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -42,17 +42,18 @@
     },
     {
       "parameters": {
+        "resource": "chat",
+        "operation": "create",
         "model": "gpt-4o-mini",
         "messages": {
-          "messageType": "multipleMessages",
           "values": [
             {
               "role": "system",
-              "content": "You are an expert at categorizing WordPress websites. Analyze the provided website content and categorize it.\n\nAvailable categories: ecommerce, portfolio, restaurant, hotel, real_estate, healthcare, education, agency, saas, blog_media, nonprofit, event, local_services, beauty_salon, automotive, construction, legal, finance, fitness_wellness\n\nAvailable tags: woocommerce, booking, menu, multilingual, elementor, divi, gutenberg, blog_heavy, gallery, rtl, dark_mode, one_page, lms, directory, events, portfolio_heavy\n\nRespond ONLY with valid JSON in this exact format:\n{\n  \"primary_category\": \"category_name\",\n  \"tags\": [\"tag1\", \"tag2\"],\n  \"confidence\": 0.85,\n  \"rationale\": \"Brief explanation of classification decision\",\n  \"description_en\": \"Short English description of the template\",\n  \"description_de\": \"Short German description of the template\"\n}"
+              "content": "You are an expert at categorizing WordPress websites. Analyze the provided website content and categorize it.\n\nAvailable categories: ecommerce, portfolio, restaurant, hotel, real_estate, healthcare, education, agency, saas, blog_media, nonprofit, event, local_services, beauty_salon, automotive, construction, legal, finance, fitness_wellness\n\nAvailable tags: woocommerce, booking, menu, multilingual, elementor, divi, gutenberg, blog_heavy, gallery, rtl, dark_mode, one_page, lms, directory, events, portfolio_heavy\n\nRespond ONLY with valid JSON in this exact format:\n{\n  \"primary_category\": \"category_name\",\n  \"tags\": [\"tag1\", \"tag2\"],\n  \"confidence\": 0.85,\n  \"rationale\": \"Brief explanation\",\n  \"description_en\": \"Short English description\",\n  \"description_de\": \"Short German description\"\n}"
             },
             {
-              "role": "user", 
-              "content": "Website: {{ $json.templateData.name }}\nURL: {{ $json.templateData.demo_url }}\nTheme: {{ $json.templateData.active_theme }}\n\nTitle: {{ $json.content.title }}\nMeta Description: {{ $json.content.description }}\n\nHeadings: {{ $json.content.headings.join(', ') }}\n\nContent Preview: {{ $json.content.bodyText }}\n\nTechnical Indicators:\n- WooCommerce: {{ $json.content.indicators.hasWooCommerce }}\n- Booking System: {{ $json.content.indicators.hasBooking }}\n- Restaurant/Menu: {{ $json.content.indicators.hasMenu }}\n- Elementor: {{ $json.content.indicators.hasElementor }}\n- Divi: {{ $json.content.indicators.hasDivi }}\n- Gutenberg Blocks: {{ $json.content.indicators.hasGutenberg }}\n\nAnalyze this content and provide categorization."
+              "role": "user",
+              "content": "=Website: {{ $json.templateData.name }}\\nURL: {{ $json.templateData.demo_url }}\\nTheme: {{ $json.templateData.active_theme }}\\n\\nTitle: {{ $json.content.title }}\\nDescription: {{ $json.content.description }}\\n\\nContent: {{ $json.content.bodyText }}\\n\\nFeatures:\\n- WooCommerce: {{ $json.content.indicators.hasWooCommerce }}\\n- Booking: {{ $json.content.indicators.hasBooking }}\\n- Menu/Restaurant: {{ $json.content.indicators.hasMenu }}\\n- Elementor: {{ $json.content.indicators.hasElementor }}\\n- Divi: {{ $json.content.indicators.hasDivi }}\\n- Gutenberg: {{ $json.content.indicators.hasGutenberg }}"
             }
           ]
         },
@@ -61,24 +62,24 @@
           "maxTokens": 500
         }
       },
-      "id": "ai-classify",
-      "name": "AI Classify Template", 
-      "type": "@n8n/n8n-nodes-langchain.openAi",
-      "typeVersion": 1.3,
+      "id": "g7h4g7h8-4567-7890-1234-567890123def",
+      "name": "AI Classify Template",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1,
       "position": [900, 300],
       "credentials": {
         "openAiApi": {
-          "id": "openai-credentials",
-          "name": "OpenAI Credentials"
+          "id": "openai-creds",
+          "name": "OpenAI API"
         }
       }
     },
     {
       "parameters": {
-        "jsCode": "// Parse and validate AI response\nconst aiResponse = $input.first().json.message.content;\nconst templateData = $('process-content').first().json.templateData;\n\ntry {\n  // Clean the response - remove markdown formatting if present\n  const cleanResponse = aiResponse.replace(/```json\\n?/, '').replace(/```\\n?$/, '').trim();\n  const classification = JSON.parse(cleanResponse);\n  \n  // Validate required fields\n  if (!classification.primary_category || !classification.tags || !Array.isArray(classification.tags)) {\n    throw new Error('Invalid classification structure');\n  }\n  \n  // Ensure confidence is between 0 and 1\n  if (typeof classification.confidence !== 'number' || classification.confidence < 0 || classification.confidence > 1) {\n    classification.confidence = 0.5;\n  }\n  \n  // Ensure we have descriptions\n  if (!classification.description_en) {\n    classification.description_en = `WordPress template for ${classification.primary_category}`;\n  }\n  if (!classification.description_de) {\n    classification.description_de = `WordPress-Vorlage für ${classification.primary_category}`;\n  }\n  \n  return {\n    templateData,\n    classification,\n    success: true\n  };\n  \n} catch (error) {\n  // Fallback classification if AI parsing fails\n  return {\n    templateData,\n    classification: {\n      primary_category: 'portfolio',\n      tags: ['gutenberg'],\n      confidence: 0.3,\n      rationale: 'AI parsing failed, using fallback classification',\n      description_en: 'WordPress template',\n      description_de: 'WordPress-Vorlage'\n    },\n    success: false,\n    error: error.message\n  };\n}"
+        "jsCode": "// Parse and validate AI response\nconst aiResponse = $input.first().json.choices[0].message.content;\nconst templateData = $('Process Content').first().json.templateData;\n\ntry {\n  // Clean and parse AI response\n  const cleanResponse = aiResponse.replace(/```json\\n?/, '').replace(/```\\n?$/, '').trim();\n  const classification = JSON.parse(cleanResponse);\n  \n  // Validate structure\n  if (!classification.primary_category || !classification.tags) {\n    throw new Error('Missing required fields');\n  }\n  \n  // Ensure tags is array\n  if (!Array.isArray(classification.tags)) {\n    classification.tags = [];\n  }\n  \n  // Validate confidence\n  if (typeof classification.confidence !== 'number' || classification.confidence < 0 || classification.confidence > 1) {\n    classification.confidence = 0.5;\n  }\n  \n  // Add default descriptions if missing\n  if (!classification.description_en) {\n    classification.description_en = `WordPress template for ${classification.primary_category}`;\n  }\n  if (!classification.description_de) {\n    classification.description_de = `WordPress-Vorlage für ${classification.primary_category}`;\n  }\n  \n  return [{\n    templateData,\n    classification,\n    success: true\n  }];\n  \n} catch (error) {\n  // Fallback classification\n  return [{\n    templateData,\n    classification: {\n      primary_category: 'portfolio',\n      tags: ['gutenberg'],\n      confidence: 0.3,\n      rationale: 'AI parsing failed, using fallback',\n      description_en: 'WordPress template',\n      description_de: 'WordPress-Vorlage'\n    },\n    success: false,\n    error: error.message\n  }];\n}"
       },
-      "id": "validate-response",
-      "name": "Validate AI Response",
+      "id": "h8i5h8i9-5678-8901-2345-678901234efg",
+      "name": "Validate Response",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [1120, 300]
@@ -86,78 +87,35 @@
     {
       "parameters": {
         "url": "={{ $json.templateData.api_callback_url }}",
-        "authentication": "predefinedCredentialType",
-        "nodeCredentialType": "httpHeaderAuth",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
         "sendBody": true,
-        "specifyBodyType": "json",
+        "bodyContentType": "json",
         "jsonBody": "={{ JSON.stringify($json.classification) }}",
-        "options": {
-          "timeout": 10000
-        }
+        "options": {}
       },
-      "id": "update-classification",
-      "name": "Update Template Classification",
+      "id": "i9j6i9j0-6789-9012-3456-789012345fgh",
+      "name": "Update Classification",
       "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
+      "typeVersion": 4,
       "position": [1340, 300],
       "credentials": {
         "httpHeaderAuth": {
-          "id": "api-token-auth",
-          "name": "WordPress Templates API"
+          "id": "wp-api-auth",
+          "name": "WordPress API Auth"
         }
       }
     },
     {
       "parameters": {
         "respondWith": "json",
-        "responseBody": "={{ {\n  success: $json.success !== false,\n  slug: $json.templateData.slug,\n  classification: $json.classification,\n  message: $json.success !== false ? 'Template classified successfully' : 'Classification failed but continued',\n  error: $json.error || null\n} }}"
+        "responseBody": "={{ {\n  \"success\": $json.success !== false,\n  \"slug\": $json.templateData.slug,\n  \"message\": $json.success !== false ? \"Template classified successfully\" : \"Classification completed with errors\"\n} }}"
       },
-      "id": "webhook-response",
+      "id": "j0k7j0k1-7890-0123-4567-890123456ghi",
       "name": "Webhook Response",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1,
       "position": [1560, 300]
-    },
-    {
-      "parameters": {
-        "conditions": {
-          "options": {
-            "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "strict"
-          },
-          "conditions": [
-            {
-              "id": "error-condition",
-              "leftValue": "={{ $json.success }}",
-              "rightValue": false,
-              "operator": {
-                "type": "boolean",
-                "operation": "equal",
-                "singleValue": true
-              }
-            }
-          ],
-          "combineOperation": "any"
-        },
-        "options": {}
-      },
-      "id": "check-errors",
-      "name": "Check for Errors",
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2,
-      "position": [900, 500]
-    },
-    {
-      "parameters": {
-        "content": "🚨 **WordPress Template Classification Error**\n\nTemplate: {{ $json.templateData.slug }}\nURL: {{ $json.templateData.demo_url }}\nError: {{ $json.error || 'Unknown error during classification' }}\n\nPlease review this template manually.",
-        "options": {}
-      },
-      "id": "log-error",
-      "name": "Log Classification Error", 
-      "type": "n8n-nodes-base.sticky",
-      "typeVersion": 1,
-      "position": [1120, 500]
     }
   ],
   "connections": {
@@ -176,7 +134,7 @@
       "main": [
         [
           {
-            "node": "Process Content", 
+            "node": "Process Content",
             "type": "main",
             "index": 0
           }
@@ -188,7 +146,7 @@
         [
           {
             "node": "AI Classify Template",
-            "type": "main", 
+            "type": "main",
             "index": 0
           }
         ]
@@ -198,45 +156,29 @@
       "main": [
         [
           {
-            "node": "Validate AI Response",
+            "node": "Validate Response",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Validate AI Response": {
+    "Validate Response": {
       "main": [
         [
           {
-            "node": "Update Template Classification",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Check for Errors",
+            "node": "Update Classification",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Update Template Classification": {
+    "Update Classification": {
       "main": [
         [
           {
             "node": "Webhook Response",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Check for Errors": {
-      "main": [
-        [
-          {
-            "node": "Log Classification Error",
             "type": "main",
             "index": 0
           }
