@@ -64,6 +64,49 @@ final class Screenshotter
         if ($fullPage)                $shot->fullPage();
 
         $shot->save($this->abs());
+        
+        // Automatically fix permissions for new screenshots
+        $this->fixScreenshotPermissions();
+        
         return $this->publicUrl();
+    }
+
+    /**
+     * Fix permissions automatically after screenshot capture
+     */
+    private function fixScreenshotPermissions(): void
+    {
+        try {
+            $screenshotFile = $this->abs();
+            $screenshotDir = dirname($screenshotFile);
+            
+            // Set correct file permissions
+            if (file_exists($screenshotFile)) {
+                chmod($screenshotFile, 0644);
+            }
+            
+            // Set correct directory permissions
+            if (is_dir($screenshotDir)) {
+                chmod($screenshotDir, 0755);
+            }
+            
+            // Set correct ownership (Plesk domain user)
+            $sysUser = 'wp-templates.metanow_r6s2v1oe7wr';
+            $group = 'psacln';
+            
+            if (file_exists($screenshotFile)) {
+                @chown($screenshotFile, $sysUser);
+                @chgrp($screenshotFile, $group);
+            }
+            
+            if (is_dir($screenshotDir)) {
+                @chown($screenshotDir, $sysUser);
+                @chgrp($screenshotDir, $group);
+            }
+            
+        } catch (\Exception $e) {
+            // Log error but don't fail screenshot capture
+            error_log("Failed to fix screenshot permissions: " . $e->getMessage());
+        }
     }
 }

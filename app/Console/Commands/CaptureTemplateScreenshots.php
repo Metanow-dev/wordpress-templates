@@ -12,6 +12,7 @@ class CaptureTemplateScreenshots extends Command
     protected $signature = 'templates:screenshot 
         {--slug= : Only capture for this slug} 
         {--force : Force re-capture even if screenshot_url exists}
+        {--new-only : Only capture screenshots for templates without captured screenshots}
         {--fullpage : Capture full-page instead of viewport}
         {--w=1200 : Viewport width}
         {--h=800  : Viewport height}';
@@ -27,16 +28,32 @@ class CaptureTemplateScreenshots extends Command
         $h = (int)$this->option('h');
         $full = (bool)$this->option('fullpage');
         $force = (bool)$this->option('force');
+        $newOnly = (bool)$this->option('new-only');
 
         $count = 0;
-        $q->lazy()->each(function (Template $t) use (&$count, $w, $h, $full, $force) {
+        $q->lazy()->each(function (Template $t) use (&$count, $w, $h, $full, $force, $newOnly) {
             if (!$t->demo_url) {
                 $this->warn("{$t->slug}: no demo_url, skipping");
                 return;
             }
-            if ($t->screenshot_url && !$force) {
-                $this->line("{$t->slug}: screenshot exists, skip (use --force to recapture)");
+
+            // Check if captured screenshot already exists
+            $capturedScreenshotExists = file_exists(storage_path('app/public/screenshots/' . $t->slug . '.jpg'));
+            $hasThemeScreenshot = $t->screenshot_url && !str_contains($t->screenshot_url, '/storage/screenshots/');
+
+            if ($newOnly && $capturedScreenshotExists) {
+                $this->line("{$t->slug}: captured screenshot exists, skipping (use --force to recapture)");
                 return;
+            }
+
+            if (!$force && $capturedScreenshotExists) {
+                $this->line("{$t->slug}: captured screenshot exists, skip (use --force to recapture)");
+                return;
+            }
+
+            // If has theme screenshot but no captured screenshot, capture it
+            if ($hasThemeScreenshot && !$capturedScreenshotExists) {
+                $this->info("{$t->slug}: replacing theme screenshot with captured screenshot");
             }
 
             $this->info("{$t->slug}: capturing {$t->demo_url} …");

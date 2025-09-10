@@ -40,10 +40,22 @@ class ScanTemplates extends Command
             }
 
             $slug = Str::slug(basename($dir->getRelativePathname()));
-
             $demoUrl = str_replace('{slug}', $slug, config('templates.demo_url_pattern'));
 
-            // Find a screenshot
+            // Check if this is a new or updated WordPress installation
+            $wpConfigFile = $docroot . '/wp-config.php';
+            $wpConfigMtime = filemtime($wpConfigFile);
+            $existingTemplate = Template::where('slug', $slug)->first();
+            
+            // Skip if exists and WordPress hasn't been modified since last scan
+            if ($existingTemplate && 
+                $existingTemplate->last_scanned_at && 
+                $wpConfigMtime <= $existingTemplate->last_scanned_at->timestamp) {
+                $this->line("Skipping {$slug} (not modified)");
+                continue;
+            }
+
+            // Find theme screenshot (only for new/updated sites)
             $screenshot = null;
             $relPath = null;
             foreach (config('templates.screenshot_candidates') as $pattern) {
@@ -53,14 +65,26 @@ class ScanTemplates extends Command
                 }
             }
 
-            if ($relPath) {
+            // For existing templates with captured screenshots, preserve them
+            $preserveCapturedScreenshot = false;
+            if ($existingTemplate && $existingTemplate->screenshot_url) {
+                $capturedScreenshotPath = 'storage/app/public/screenshots/' . $slug . '.jpg';
+                if (file_exists($capturedScreenshotPath)) {
+                    $screenshot = $existingTemplate->screenshot_url;
+                    $preserveCapturedScreenshot = true;
+                    $this->line("Preserving captured screenshot for {$slug}");
+                }
+            }
+
+            // Use theme screenshot only if no captured screenshot exists
+            if (!$preserveCapturedScreenshot && $relPath) {
                 $screenshot = UrlBuilder::screenshot($slug, $relPath, config('templates.demo_url_pattern'));
             }
 
             // Very basic name (we can improve later from site title)
             $name = Str::headline($slug);
 
-            Template::updateOrCreate(
+            $template = Template::updateOrCreate(
                 ['slug' => $slug],
                 [
                     'name' => $name,
@@ -70,18 +94,27 @@ class ScanTemplates extends Command
                 ]
             );
 
+            $isNewTemplate = $template->wasRecentlyCreated;
+            $wasUpdated = !$isNewTemplate && $template->wasChanged();
+
             // Optional auto-capture if no theme screenshot was found
             if (!$screenshot && $this->option('capture')) {
                 try {
                     $url = \App\Support\Screenshotter::for($slug, $demoUrl)->capture();
-                    \App\Models\Template::where('slug', $slug)->update(['screenshot_url' => $url]);
+                    Template::where('slug', $slug)->update(['screenshot_url' => $url]);
                     $this->info(" → Captured screenshot for {$slug}");
                 } catch (\Throwable $e) {
                     $this->warn(" → Capture failed for {$slug}: " . $e->getMessage());
                 }
             }
 
-            $this->info("Indexed {$slug} -> {$demoUrl}");
+            if ($isNewTemplate) {
+                $this->info("NEW: {$slug} -> {$demoUrl}");
+            } elseif ($wasUpdated) {
+                $this->info("UPDATED: {$slug} -> {$demoUrl}");
+            } else {
+                $this->info("Refreshed: {$slug} -> {$demoUrl}");
+            }
             $count++;
 
             if (($lim = (int)$this->option('limit')) > 0 && $count >= $lim) {
