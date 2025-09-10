@@ -35,4 +35,12 @@ return [
         ],
     ],
 
+    'api' => [
+        'token' => env('API_TOKEN'),
+    ],
+
+    'n8n' => [
+        'classification_webhook' => env('N8N_CLASSIFICATION_WEBHOOK_URL'),
+    ],
+
 ];

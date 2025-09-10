@@ -7,6 +7,7 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Str;
 use Symfony\Component\Finder\Finder;
 use App\Support\UrlBuilder;
+use Illuminate\Support\Facades\Http;
 
 
 class ScanTemplates extends Command
@@ -97,6 +98,11 @@ class ScanTemplates extends Command
             $isNewTemplate = $template->wasRecentlyCreated;
             $wasUpdated = !$isNewTemplate && $template->wasChanged();
 
+            // Trigger AI classification for new or significantly updated templates
+            if (($isNewTemplate || $wasUpdated) && config('services.n8n.classification_webhook')) {
+                $this->triggerClassification($template);
+            }
+
             // Optional auto-capture if no theme screenshot was found
             if (!$screenshot && $this->option('capture')) {
                 try {
@@ -124,5 +130,43 @@ class ScanTemplates extends Command
 
         $this->info("Scan complete. Indexed {$count} sites.");
         return self::SUCCESS;
+    }
+
+    /**
+     * Trigger n8n classification workflow for a template
+     */
+    private function triggerClassification(Template $template): void
+    {
+        try {
+            $webhookUrl = config('services.n8n.classification_webhook');
+            $apiToken = config('services.api.token');
+            
+            if (!$webhookUrl || !$apiToken) {
+                $this->warn("N8N or API configuration missing, skipping classification for {$template->slug}");
+                return;
+            }
+
+            // Skip if already classified and locked by human
+            if ($template->locked_by_human) {
+                return;
+            }
+
+            $response = Http::timeout(10)->post($webhookUrl, [
+                'slug' => $template->slug,
+                'name' => $template->name,
+                'demo_url' => $template->demo_url,
+                'screenshot_url' => $template->screenshot_url,
+                'api_callback_url' => url("/api/templates/{$template->slug}/classification"),
+                'api_token' => $apiToken,
+            ]);
+
+            if ($response->successful()) {
+                $this->line(" → Queued AI classification for {$template->slug}");
+            } else {
+                $this->warn(" → Failed to queue AI classification for {$template->slug}");
+            }
+        } catch (\Exception $e) {
+            $this->warn(" → Classification trigger failed for {$template->slug}: " . $e->getMessage());
+        }
     }
 }
