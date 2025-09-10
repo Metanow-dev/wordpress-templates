@@ -163,7 +163,7 @@
                             @if($template->primary_category)
                                 <div class="absolute top-3 left-3">
                                     <span
-                                        class="inline-block px-3 py-1.5 text-xs font-bold bg-white/90 backdrop-blur-sm text-gray-800 rounded-full shadow-sm">
+                                        class="inline-block px-4 py-2 text-sm font-bold bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-full shadow-lg border-2 border-white/20 backdrop-blur-sm">
                                         {{ ucfirst(str_replace('_', ' ', $template->primary_category)) }}
                                     </span>
                                 </div>
@@ -174,7 +174,7 @@
                                 class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                                 <a href="{{ $template->demo_url }}" target="_blank"
                                     class="bg-blue-600/90 backdrop-blur-sm hover:bg-blue-700 text-white px-4 py-2 rounded-full text-sm font-medium transition-colors duration-200 shadow-lg">
-                                    {{ app()->getLocale() === 'de' ? 'Demo' : 'Demo' }}
+                                    {{ app()->getLocale() === 'de' ? 'Demo ansehen' : 'View Demo' }}
                                 </a>
                             </div>
                         </div>
