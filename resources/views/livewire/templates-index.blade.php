@@ -150,67 +150,173 @@
                     </div>
                 </div>
 
-                <!-- Categories -->
-                <div class="mb-6">
-                    <div class="flex items-center justify-between mb-3">
-                        <span class="text-sm font-semibold text-gray-700">{{ app()->getLocale() === 'de' ? 'Kategorien:' : 'Categories:' }}</span>
-                        @if(!empty($selectedCategories))
-                            <button wire:click="$set('selectedCategories', [])" 
-                                class="text-xs text-gray-500 hover:text-gray-700">
-                                {{ app()->getLocale() === 'de' ? 'Kategorien löschen' : 'Clear categories' }}
-                            </button>
-                        @endif
+                <!-- Professional Categories & Tags Layout -->
+                <div class="space-y-8">
+                    
+                    <!-- Categories Section -->
+                    <div class="bg-gradient-to-r from-gray-50 to-white rounded-xl border border-gray-100 p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 bg-gradient-to-br from-[#D53741] to-[#B12A31] rounded-lg flex items-center justify-center">
+                                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14-7l-4 8 4 8-4-8M5 11l4-4-4-4v8z"></path>
+                                    </svg>
+                                </div>
+                                <h3 class="text-lg font-semibold text-gray-900">{{ app()->getLocale() === 'de' ? 'Kategorien' : 'Categories' }}</h3>
+                                <span class="text-sm text-gray-500">({{ count($selectedCategories) }}/{{ count($categories) }})</span>
+                            </div>
+                            @if(!empty($selectedCategories))
+                                <button wire:click="$set('selectedCategories', [])" 
+                                    class="text-sm text-[#D53741] hover:text-[#B12A31] font-medium transition-colors">
+                                    {{ app()->getLocale() === 'de' ? 'Alle löschen' : 'Clear all' }}
+                                </button>
+                            @endif
+                        </div>
+
+                        <!-- Categories Grid -->
+                        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+                            @foreach($categories as $key => $category)
+                                <button wire:click="toggleCategory('{{ $key }}')" 
+                                    class="group relative px-4 py-3 text-sm font-medium rounded-lg border-2 transition-all duration-200 text-left
+                                        {{ in_array($key, $selectedCategories) 
+                                            ? 'border-[#D53741] bg-[#D53741] text-white shadow-md' 
+                                            : 'border-gray-200 bg-white text-gray-700 hover:border-[#D53741]/30 hover:bg-[#D53741]/5' }}">
+                                    <div class="flex items-center justify-between">
+                                        <span class="truncate">{{ $category }}</span>
+                                        @if(in_array($key, $selectedCategories))
+                                            <svg class="w-4 h-4 ml-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                            </svg>
+                                        @else
+                                            <div class="w-4 h-4 ml-2 flex-shrink-0 border border-gray-300 rounded-sm group-hover:border-[#D53741]/50"></div>
+                                        @endif
+                                    </div>
+                                </button>
+                            @endforeach
+                        </div>
                     </div>
-                    <div class="flex flex-wrap gap-2">
-                        @foreach($categories as $category)
-                            <button wire:click="toggleCategory('{{ $category }}')" 
-                                class="px-4 py-2 text-sm rounded-full transition-all duration-200 font-medium {{ in_array($category, $selectedCategories) ? 'bg-purple-500 text-white shadow-md transform scale-105' : 'bg-gray-100/80 text-gray-700 hover:bg-gray-200/80 hover:scale-105' }}">
-                                {{ ucfirst(str_replace('_', ' ', $category)) }}
-                            </button>
-                        @endforeach
+
+                    <!-- Tags Section -->
+                    <div class="bg-gradient-to-r from-white to-gray-50 rounded-xl border border-gray-100 p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 bg-gradient-to-br from-gray-600 to-gray-700 rounded-lg flex items-center justify-center">
+                                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                                    </svg>
+                                </div>
+                                <h3 class="text-lg font-semibold text-gray-900">{{ app()->getLocale() === 'de' ? 'Features & Technologien' : 'Features & Technologies' }}</h3>
+                                <span class="text-sm text-gray-500">({{ count($selectedTags) }}/{{ count($tags) }})</span>
+                            </div>
+                            @if(!empty($selectedTags))
+                                <button wire:click="$set('selectedTags', [])" 
+                                    class="text-sm text-[#D53741] hover:text-[#B12A31] font-medium transition-colors">
+                                    {{ app()->getLocale() === 'de' ? 'Alle löschen' : 'Clear all' }}
+                                </button>
+                            @endif
+                        </div>
+
+                        <!-- Popular Tags First -->
+                        @php
+                            $popularTags = ['woocommerce', 'responsive', 'elementor', 'contact_form', 'multilingual'];
+                            $otherTags = array_diff($tags, $popularTags);
+                        @endphp
+
+                        <!-- Popular Tags -->
+                        <div class="mb-6">
+                            <div class="flex items-center mb-3">
+                                <span class="text-xs font-semibold text-gray-600 uppercase tracking-wider">{{ app()->getLocale() === 'de' ? 'Beliebt' : 'Popular' }}</span>
+                                <div class="flex-1 h-px bg-gray-200 ml-3"></div>
+                            </div>
+                            <div class="flex flex-wrap gap-2">
+                                @foreach($popularTags as $tag)
+                                    @if(in_array($tag, $tags))
+                                        <button wire:click="toggleTag('{{ $tag }}')" 
+                                            class="inline-flex items-center px-3 py-2 text-sm font-medium rounded-lg border transition-all duration-200
+                                                {{ in_array($tag, $selectedTags) 
+                                                    ? 'border-[#D53741] bg-[#D53741] text-white shadow-sm' 
+                                                    : 'border-gray-300 bg-white text-gray-700 hover:border-[#D53741] hover:bg-[#D53741]/5' }}">
+                                            {{ ucfirst(str_replace('_', ' ', $tag)) }}
+                                            @if(in_array($tag, $selectedTags))
+                                                <svg class="w-3 h-3 ml-1.5" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                                                </svg>
+                                            @endif
+                                        </button>
+                                    @endif
+                                @endforeach
+                            </div>
+                        </div>
+
+                        <!-- All Other Tags -->
+                        <div>
+                            <div class="flex items-center mb-3">
+                                <span class="text-xs font-semibold text-gray-600 uppercase tracking-wider">{{ app()->getLocale() === 'de' ? 'Alle Features' : 'All Features' }}</span>
+                                <div class="flex-1 h-px bg-gray-200 ml-3"></div>
+                            </div>
+                            <div class="flex flex-wrap gap-2">
+                                @foreach($otherTags as $tag)
+                                    <button wire:click="toggleTag('{{ $tag }}')" 
+                                        class="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-md border transition-all duration-200
+                                            {{ in_array($tag, $selectedTags) 
+                                                ? 'border-[#D53741] bg-[#D53741] text-white' 
+                                                : 'border-gray-200 bg-gray-50 text-gray-600 hover:border-[#D53741] hover:bg-[#D53741]/10' }}">
+                                        {{ ucfirst(str_replace('_', ' ', $tag)) }}
+                                    </button>
+                                @endforeach
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Tags -->
-                <div>
-                    <div class="flex items-center gap-3 mb-3">
-                        <span class="text-sm font-semibold text-gray-700">{{ app()->getLocale() === 'de' ? 'Tags:' : 'Tags:' }}</span>
-                        @if(!empty($selectedTags))
-                            <button wire:click="$set('selectedTags', [])" 
-                                class="text-xs text-gray-500 hover:text-gray-700">
-                                {{ app()->getLocale() === 'de' ? 'Tags löschen' : 'Clear tags' }}
+                <!-- Clean Active Filters Summary -->
+                @if(!empty($selectedCategories) || !empty($selectedTags))
+                    <div class="bg-gradient-to-r from-[#D53741]/5 to-[#B12A31]/5 border border-[#D53741]/20 rounded-xl p-4 mt-6">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center space-x-2">
+                                <svg class="w-5 h-5 text-[#D53741]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
+                                </svg>
+                                <span class="font-semibold text-[#D53741]">{{ app()->getLocale() === 'de' ? 'Aktive Filter' : 'Active Filters' }}</span>
+                                <span class="text-sm text-gray-600">({{ count($selectedCategories) + count($selectedTags) }})</span>
+                            </div>
+                            <button wire:click="clearFilters" 
+                                class="text-sm font-medium text-[#D53741] hover:text-[#B12A31] transition-colors">
+                                {{ app()->getLocale() === 'de' ? 'Alle löschen' : 'Clear all' }}
                             </button>
-                        @endif
-                    </div>
-                    <div class="flex flex-wrap gap-2">
-                        @foreach($tags as $tag)
-                            <button wire:click="toggleTag('{{ $tag }}')" 
-                                class="px-3 py-1.5 text-sm rounded-full transition-all duration-200 font-medium {{ in_array($tag, $selectedTags) ? 'bg-blue-500 text-white shadow-sm transform scale-105' : 'bg-gray-100/80 text-gray-700 hover:bg-gray-200/80 hover:scale-105' }}">
-                                {{ ucfirst(str_replace('_', ' ', $tag)) }}
-                            </button>
-                        @endforeach
-                    </div>
-
-                    <!-- Active Filters Display -->
-                    @if(!empty($selectedCategories) || !empty($selectedTags))
-                        <div class="flex items-center gap-2 flex-wrap mt-4 pt-4 border-t border-gray-200/30">
-                            <span class="text-xs font-medium text-gray-500 uppercase tracking-wide">{{ app()->getLocale() === 'de' ? 'Aktiv:' : 'Active:' }}</span>
-
+                        </div>
+                        
+                        <div class="flex flex-wrap gap-2">
                             @foreach($selectedCategories as $category)
-                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs bg-gradient-to-r from-[#D53741] to-[#B12A31] text-white font-medium">
-                                    {{ ucfirst(str_replace('_', ' ', $category)) }}
-                                    <button wire:click="removeCategory('{{ $category }}')" class="ml-1.5 text-purple-100 hover:text-white">×</button>
+                                <span class="inline-flex items-center px-3 py-1.5 rounded-lg text-sm bg-[#D53741] text-white font-medium shadow-sm">
+                                    <svg class="w-3 h-3 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                                    </svg>
+                                    {{ \App\Helpers\CategoryHelper::getCategoryName($category, app()->getLocale()) }}
+                                    <button wire:click="removeCategory('{{ $category }}')" class="ml-2 hover:bg-white/20 rounded-full p-0.5 transition-colors">
+                                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                                        </svg>
+                                    </button>
                                 </span>
                             @endforeach
 
                             @foreach($selectedTags as $tag)
-                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs bg-gradient-to-r from-[#D53741] to-[#B12A31] text-white font-medium">
+                                <span class="inline-flex items-center px-3 py-1.5 rounded-lg text-sm bg-gray-600 text-white font-medium">
+                                    <svg class="w-3 h-3 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                                    </svg>
                                     {{ ucfirst(str_replace('_', ' ', $tag)) }}
-                                    <button wire:click="removeTag('{{ $tag }}')" class="ml-1.5 text-blue-100 hover:text-white">×</button>
+                                    <button wire:click="removeTag('{{ $tag }}')" class="ml-2 hover:bg-white/20 rounded-full p-0.5 transition-colors">
+                                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                                        </svg>
+                                    </button>
                                 </span>
                             @endforeach
                         </div>
-                    @endif
+                    </div>
+                @endif
                 </div>
             </div>
         @endif
