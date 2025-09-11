@@ -325,7 +325,8 @@
         @if($templates->count())
             @if($view === 'grid')
                 <!-- Grid View -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 mb-12">
+                <div class="max-w-7xl mx-auto">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 mb-12">
                     @foreach($templates as $template)
                         <div class="group bg-white rounded-2xl shadow-sm border border-gray-200/50 overflow-hidden hover:shadow-xl hover:shadow-gray-200/50 transition-all duration-300 hover:-translate-y-1">
                             <!-- Screenshot -->
@@ -393,10 +394,12 @@
                             </div>
                         </div>
                     @endforeach
+                    </div>
                 </div>
             @else
                 <!-- List View -->
-                <div class="space-y-4 mb-12">
+                <div class="max-w-7xl mx-auto">
+                    <div class="space-y-4 mb-12">
                     @foreach($templates as $template)
                         <div class="group bg-white rounded-xl shadow-sm border border-gray-200/50 overflow-hidden hover:shadow-lg transition-all duration-300">
                             <div class="flex flex-col sm:flex-row">
@@ -465,6 +468,7 @@
                             </div>
                         </div>
                     @endforeach
+                    </div>
                 </div>
             @endif
 
