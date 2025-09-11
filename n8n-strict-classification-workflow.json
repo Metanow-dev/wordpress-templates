@@ -1,0 +1,237 @@
+{
+  "name": "WordPress Template AI Classification - Ultra Strict",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "wordpress-template-classify",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "45b3931f-2326-4af0-b063-abfccdd6ae78",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 0],
+      "webhookId": "template-classify-webhook"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.body.demo_url }}",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "6838d724-d55c-4bc5-80ee-db7629d23c9a",
+      "name": "Fetch Website Content",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [224, 0]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Ultra-strict content extraction - only what's actually visible\nconst inputData = $input.first();\nlet html = inputData.json.data || inputData.json.body || inputData.json.html;\n\nif (!html || typeof html !== 'string') {\n  throw new Error('HTML content not found or invalid');\n}\n\nconst extractStrictEvidence = (html) => {\n  // Clean HTML but preserve structure for analysis\n  let cleaned = html.replace(/<script[^>]*>.*?<\\/script>/gis, '')\n                   .replace(/<style[^>]*>.*?<\\/style>/gis, '');\n  \n  // Extract basic info\n  const titleMatch = cleaned.match(/<title[^>]*>([^<]*)<\\/title>/i);\n  const title = titleMatch ? titleMatch[1].trim() : '';\n  \n  const descMatch = cleaned.match(/<meta[^>]*name=[\"']description[\"'][^>]*content=[\"']([^\"']*)[\"']/i);\n  const description = descMatch ? descMatch[1] : '';\n  \n  // Extract visible text content\n  const bodyText = cleaned.replace(/<[^>]*>/g, ' ')\n                          .replace(/\\s+/g, ' ')\n                          .trim();\n  \n  // Extract headings for context\n  const headings = [];\n  const headingMatches = cleaned.match(/<h[1-6][^>]*>([^<]*)<\\/h[1-6]>/gi) || [];\n  headingMatches.forEach(match => {\n    const text = match.replace(/<[^>]*>/g, '').trim();\n    if (text.length > 2) headings.push(text);\n  });\n  \n  // VERY STRICT evidence detection - only what's clearly visible\n  const indicators = {\n    // E-commerce - must see actual shop elements\n    hasWooCommerce: /woocommerce|add.to.cart|shopping.cart|wc-/i.test(html) && /shop|product|cart|buy/i.test(bodyText),\n    hasShop: /shop|store|buy|purchase|add.to.cart|shopping/i.test(bodyText),\n    hasPricing: /price|\\$|€|£|cost|pricing/i.test(bodyText) && /table|plan|package/i.test(bodyText),\n    \n    // Booking - must see booking functionality\n    hasBooking: /book.now|booking|reservation|schedule|appointment/i.test(bodyText),\n    \n    // Restaurant - must see menu content\n    hasMenu: /menu|food|dish|cuisine|restaurant/i.test(bodyText) && /price|\\$|€|£/i.test(bodyText),\n    hasRestaurant: /restaurant|cafe|bistro|dining|chef/i.test(bodyText),\n    \n    // Page builders - must see actual builder classes\n    hasElementor: /elementor-/i.test(html),\n    hasDivi: /divi-|et-/i.test(html),\n    hasGutenberg: /wp-block-/i.test(html) && !/hello.world|sample|default/i.test(bodyText),\n    \n    // Content types - must see actual content\n    hasPortfolio: /portfolio|work|project/i.test(bodyText) && /gallery|showcase/i.test(bodyText),\n    hasBlog: /blog|post|article|news/i.test(bodyText) && /read.more|continue.reading/i.test(bodyText),\n    hasGallery: /gallery|photos|images/i.test(bodyText),\n    hasTeam: /team|staff|member/i.test(bodyText) && /meet|about/i.test(bodyText),\n    hasTestimonials: /testimonial|review|client.says|customer/i.test(bodyText),\n    hasEvents: /event|calendar|date|schedule/i.test(bodyText),\n    \n    // Functional features - must see actual forms/functionality\n    hasContactForm: /contact.form|message.form|get.in.touch/i.test(bodyText) || /<form[^>]*>/i.test(html),\n    hasNewsletter: /newsletter|subscribe|email.signup/i.test(bodyText),\n    hasSearch: /search|filter/i.test(bodyText) && /<input[^>]*search/i.test(html),\n    hasSocialMedia: /facebook|twitter|instagram|linkedin/i.test(html),\n    \n    // Visual features - must see actual elements\n    hasSlider: /slider|carousel|swiper/i.test(html) || /next|prev|slide/i.test(bodyText),\n    hasVideo: /video|youtube|vimeo/i.test(html),\n    \n    // Language features\n    hasMultilingual: /language|lang|EN|DE|FR|ES/i.test(bodyText) && /switch|select/i.test(bodyText),\n    \n    // Business type indicators (conservative)\n    isHealthcare: /doctor|medical|health|clinic|hospital|patient/i.test(bodyText),\n    isRealEstate: /real.estate|property|house|apartment|rent|mortgage/i.test(bodyText),\n    isLegal: /law|legal|lawyer|attorney/i.test(bodyText),\n    isEducation: /school|university|course|education|learn/i.test(bodyText),\n    isTechnology: /software|app|technology|development/i.test(bodyText),\n    \n    // Detect minimal/default content\n    isMinimalContent: bodyText.length < 800 || /hello.world|sample.page|coming.soon|default/i.test(bodyText)\n  };\n  \n  return {\n    title,\n    description,\n    bodyText: bodyText.substring(0, 3000),\n    headings: headings.slice(0, 8),\n    indicators,\n    contentLength: bodyText.length\n  };\n};\n\n// Get webhook data\nconst webhookData = $('Webhook Trigger').first().json.body;\n\nconst templateData = {\n  slug: webhookData.slug,\n  name: webhookData.name,\n  demo_url: webhookData.demo_url,\n  active_theme: webhookData.active_theme || '',\n  api_callback_url: webhookData.api_callback_url,\n  api_token: webhookData.api_token\n};\n\nconst content = extractStrictEvidence(html);\n\nreturn [{ templateData, content }];"
+      },
+      "id": "a7abc99f-eea1-4c19-8780-9256e4b09e80",
+      "name": "Ultra Strict Content Analysis",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [448, 0]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a WordPress template classifier that ONLY assigns tags based on VISIBLE, CONCRETE evidence. Be extremely conservative.\n\n**CRITICAL RULES:**\n1. **EVIDENCE-ONLY TAGGING** - Only tag what you can literally see in the content\n2. **NO ASSUMPTIONS** - If you can't quote specific text that proves it, don't tag it\n3. **MAXIMUM 4 TAGS** - Be very selective\n4. **CONSERVATIVE APPROACH** - When in doubt, don't add the tag\n\n**TAG EVIDENCE REQUIREMENTS:**\n- `woocommerce` - Only if you see \"woocommerce\", \"add to cart\", actual products/shop\n- `elementor` - Only if you see \"elementor\" in HTML classes\n- `divi` - Only if you see \"divi\" or \"et-\" in HTML classes\n- `gutenberg` - Only if you see \"wp-block\" AND not default content\n- `booking` - Only if you see booking forms, \"book now\", reservations\n- `menu` - Only if you see restaurant menu with food items\n- `contact_form` - Only if you see actual contact forms\n- `blog_heavy` - Only if you see multiple blog posts/articles\n- `gallery` - Only if you see photo galleries\n- `portfolio_heavy` - Only if you see multiple portfolio projects\n- `team_members` - Only if you see team photos/profiles\n- `testimonials` - Only if you see customer quotes/reviews\n- `events` - Only if you see event listings/calendar\n- `social_media` - Only if you see social media links/icons\n- `slider` - Only if you see image sliders/carousels\n- `multilingual` - Only if you see language switchers\n- `newsletter` - Only if you see email signup forms\n- `pricing_tables` - Only if you see actual pricing tables\n- `responsive` - Only if explicitly mentioned or very obvious\n\n**ANALYSIS DATA:**\nWebsite: {{ $json.templateData.name }}\nURL: {{ $json.templateData.demo_url }}\nTheme: {{ $json.templateData.active_theme }}\n\nTitle: \"{{ $json.content.title }}\"\nDescription: \"{{ $json.content.description }}\"\nHeadings: {{ $json.content.headings.join(', ') }}\nContent Length: {{ $json.content.contentLength }} characters\n\n**VISIBLE CONTENT:**\n{{ $json.content.bodyText }}\n\n**STRICT EVIDENCE DETECTED:**\nE-commerce: WooCommerce={{ $json.content.indicators.hasWooCommerce }}, Shop={{ $json.content.indicators.hasShop }}, Pricing={{ $json.content.indicators.hasPricing }}\nBooking: {{ $json.content.indicators.hasBooking }}\nRestaurant: Menu={{ $json.content.indicators.hasMenu }}, Restaurant={{ $json.content.indicators.hasRestaurant }}\nBuilders: Elementor={{ $json.content.indicators.hasElementor }}, Divi={{ $json.content.indicators.hasDivi }}, Gutenberg={{ $json.content.indicators.hasGutenberg }}\nContent: Portfolio={{ $json.content.indicators.hasPortfolio }}, Blog={{ $json.content.indicators.hasBlog }}, Gallery={{ $json.content.indicators.hasGallery }}, Team={{ $json.content.indicators.hasTeam }}, Testimonials={{ $json.content.indicators.hasTestimonials }}, Events={{ $json.content.indicators.hasEvents }}\nFeatures: Contact={{ $json.content.indicators.hasContactForm }}, Newsletter={{ $json.content.indicators.hasNewsletter }}, Search={{ $json.content.indicators.hasSearch }}, Social={{ $json.content.indicators.hasSocialMedia }}, Slider={{ $json.content.indicators.hasSlider }}, Video={{ $json.content.indicators.hasVideo }}\nLanguage: Multilingual={{ $json.content.indicators.hasMultilingual }}\nBusiness: Healthcare={{ $json.content.indicators.isHealthcare }}, RealEstate={{ $json.content.indicators.isRealEstate }}, Legal={{ $json.content.indicators.isLegal }}, Education={{ $json.content.indicators.isEducation }}, Technology={{ $json.content.indicators.isTechnology }}\nMinimal Content: {{ $json.content.indicators.isMinimalContent }}\n\n**TASK:**\nClassify this template using ONLY what you can clearly see. For each tag, you must be able to point to specific evidence. If content is minimal or default, use maximum 2 basic tags.\n\nCategories: ecommerce, portfolio, restaurant, hotel, real_estate, healthcare, education, agency, saas, blog_media, nonprofit, event, local_services, beauty_salon, automotive, construction, legal, finance, fitness_wellness, technology, consulting, creative, corporate, startup, photography, music, fashion, travel, food_beverage, interior_design, architecture, wedding, sports, gaming, news_magazine, personal_blog, church_religious, government, insurance, logistics, manufacturing\n\nRespond with JSON only:\n{\n  \"primary_category\": \"category_based_on_visible_content\",\n  \"tags\": [\"max_4_tags_with_clear_evidence\"],\n  \"confidence\": 0.XX,\n  \"rationale\": \"Quote specific text/evidence for each tag and category\",\n  \"description_en\": \"English description (max 100 chars)\",\n  \"description_de\": \"German description (max 100 chars)\"\n}",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [720, 0],
+      "id": "296d3150-a910-4298-aa63-e6da12c068be",
+      "name": "Ultra Strict AI Classifier"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "gpt-4o"
+        },
+        "options": {
+          "temperature": 0.1,
+          "maxTokens": 400
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [672, 240],
+      "id": "1f567bd0-0320-484d-986c-653a5c82b43f",
+      "name": "OpenAI GPT-4o",
+      "credentials": {
+        "openAiApi": {
+          "id": "5bxlgiW82CWa6JUS",
+          "name": "Metanow open api - Lead Generation API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n    \"primary_category\": \"category_name\",\n    \"tags\": [\"max_4_evidence_based_tags\"],\n    \"confidence\": 0.85,\n    \"rationale\": \"Specific evidence quoted for each tag\",\n    \"description_en\": \"English description (max 100 chars)\",\n    \"description_de\": \"German description (max 100 chars)\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [864, 240],
+      "id": "4983f3c5-151f-4600-b36d-b1d98a3e12ea",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Ultra-strict validation - enforce evidence requirements\nconst aiResponse = $input.first().json;\nconst templateData = $('Ultra Strict Content Analysis').first().json.templateData;\nconst content = $('Ultra Strict Content Analysis').first().json.content;\n\ntry {\n  let classification;\n  \n  if (typeof aiResponse === 'string') {\n    const cleanResponse = aiResponse.replace(/```json\\n?/, '').replace(/```\\n?$/, '').trim();\n    classification = JSON.parse(cleanResponse);\n  } else if (aiResponse && typeof aiResponse === 'object') {\n    classification = aiResponse.output || aiResponse.text || aiResponse.response || aiResponse;\n    \n    if (typeof classification === 'string') {\n      const cleanResponse = classification.replace(/```json\\n?/, '').replace(/```\\n?$/, '').trim();\n      classification = JSON.parse(cleanResponse);\n    }\n  } else {\n    throw new Error('Invalid AI response format');\n  }\n  \n  // Validate structure\n  if (!classification.primary_category || !Array.isArray(classification.tags)) {\n    throw new Error('Invalid classification structure');\n  }\n  \n  // ENFORCE strict tag limits and validation\n  const validTags = ['woocommerce','booking','menu','multilingual','elementor','divi','gutenberg','blog_heavy','gallery','rtl','dark_mode','one_page','lms','directory','events','portfolio_heavy','responsive','mobile_first','seo_optimized','fast_loading','contact_form','social_media','video_background','slider','testimonials','pricing_tables','team_members','ajax','parallax','animations','custom_post_types','wpml_ready','bbpress','buddypress','membership','subscription','newsletter','popup','sticky_header','breadcrumbs','search_filter','infinite_scroll','lazy_loading','accessibility','gdpr_compliant'];\n  \n  // Filter and limit tags strictly\n  classification.tags = classification.tags\n    .filter(tag => validTags.includes(tag))\n    .slice(0, 4); // Max 4 tags\n  \n  // Extra strict validation for problematic tags\n  const problematicTags = ['woocommerce', 'gutenberg', 'elementor', 'divi'];\n  classification.tags = classification.tags.filter(tag => {\n    if (tag === 'woocommerce' && !content.indicators.hasWooCommerce) return false;\n    if (tag === 'gutenberg' && !content.indicators.hasGutenberg) return false;\n    if (tag === 'elementor' && !content.indicators.hasElementor) return false;\n    if (tag === 'divi' && !content.indicators.hasDivi) return false;\n    return true;\n  });\n  \n  // If minimal content, enforce basic tags only\n  if (content.indicators.isMinimalContent) {\n    classification.tags = classification.tags.filter(tag => \n      ['responsive', 'contact_form'].includes(tag)\n    ).slice(0, 2);\n    \n    if (classification.confidence > 0.4) {\n      classification.confidence = 0.3;\n    }\n  }\n  \n  // Validate confidence\n  if (typeof classification.confidence !== 'number' || classification.confidence < 0 || classification.confidence > 1) {\n    classification.confidence = 0.5;\n  }\n  \n  // Ensure descriptions exist\n  if (!classification.description_en) {\n    classification.description_en = `${classification.primary_category.replace('_', ' ')} WordPress template`;\n  }\n  \n  if (!classification.description_de) {\n    classification.description_de = `${classification.primary_category.replace('_', ' ')} WordPress-Vorlage`;\n  }\n  \n  return [{\n    json: {\n      templateData,\n      classification,\n      success: true\n    }\n  }];\n  \n} catch (error) {\n  // Minimal fallback\n  return [{\n    json: {\n      templateData,\n      classification: {\n        primary_category: 'portfolio',\n        tags: [], // No tags if parsing failed\n        confidence: 0.2,\n        rationale: `Ultra-strict validation failed: ${error.message}`,\n        description_en: 'WordPress template',\n        description_de: 'WordPress-Vorlage'\n      },\n      success: false,\n      error: error.message\n    }\n  }];\n}"
+      },
+      "id": "7a2162a1-eceb-4e14-ae33-fc9f10fe8fff",
+      "name": "Ultra Strict Validation",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1088, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.templateData.api_callback_url }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.classification) }}",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "id": "b80feec3-94f7-41b5-bf9a-392a433cb3c5",
+      "name": "Update Classification",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [1312, 0],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "4InZm74eIehxvUcK",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"success\": {{ $json.success !== false }},\n  \"message\": \"Ultra-strict classification completed\",\n  \"template\": {\n    \"slug\": \"{{ $json.templateData.slug }}\",\n    \"classification\": {{ JSON.stringify($json.classification) }},\n    \"tags_count\": {{ $json.classification.tags.length }},\n    \"confidence\": {{ $json.classification.confidence }}\n  }\n}",
+        "options": {}
+      },
+      "id": "a2913149-bbdd-4ede-b6ad-7650912c2a63",
+      "name": "Webhook Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1536, 0]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Fetch Website Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Website Content": {
+      "main": [
+        [
+          {
+            "node": "Ultra Strict Content Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ultra Strict Content Analysis": {
+      "main": [
+        [
+          {
+            "node": "Ultra Strict AI Classifier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ultra Strict Validation": {
+      "main": [
+        [
+          {
+            "node": "Update Classification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Classification": {
+      "main": [
+        [
+          {
+            "node": "Webhook Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI GPT-4o": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Ultra Strict AI Classifier",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Ultra Strict AI Classifier",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ultra Strict AI Classifier": {
+      "main": [
+        [
+          {
+            "node": "Ultra Strict Validation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "ultra-strict-v1.0",
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "tags": ["wordpress", "ai", "classification", "ultra-strict"]
+}

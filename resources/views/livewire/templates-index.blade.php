@@ -1,13 +1,11 @@
 <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
     <!-- Header -->
-    <header class="bg-white border-b border-gray-200">
+    <header class="bg-white border-b border-gray-200 sticky top-0 z-40 shadow-sm">
         <div class="container mx-auto px-4 py-4 flex items-center justify-between">
             <div class="flex items-center space-x-4">
-                <div class="text-2xl font-bold text-blue-600"><img src="{{ asset('storage/img/logo/Metanow.webp') }}" width="180" alt="Metanow Logo">
-
-
-
-</div>
+                <div class="text-2xl font-bold text-blue-600">
+                    <img src="{{ asset('storage/img/logo/Metanow.webp') }}" width="180" alt="Metanow Logo">
+                </div>
             </div>
             
             <div class="flex items-center space-x-4">
@@ -31,29 +29,100 @@
     </header>
 
     <div class="container mx-auto px-4 py-8">
-        {{-- <!-- Header -->
-        <div class="text-center mb-8">
-            <h1 class="text-4xl font-bold text-gray-900 mb-3">
-                {{ app()->getLocale()==='de' ? 'WordPress Vorlagen' : 'WordPress Templates' }}
-            </h1>
-            <p class="text-lg text-gray-600 max-w-2xl mx-auto">
-                {{ app()->getLocale()==='de' ? 'Entdecken Sie professionelle WordPress-Themes für jedes Projekt' :
-                'Discover professional WordPress themes for every project' }}
-            </p>
-        </div> --}}
         
-        <!-- Search Bar -->
+        <!-- Enhanced Search & Controls Bar -->
         <div class="mb-6">
-            <div class="relative max-w-md mx-auto">
-                <div class="absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
-                    <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-200/50 p-6">
+                <div class="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
+                    
+                    <!-- Search Section -->
+                    <div class="flex-1 max-w-2xl">
+                        <div class="relative">
+                            <div class="absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                                <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                            </div>
+                            <input type="text" wire:model.live.debounce.300ms="search"
+                                placeholder="{{ app()->getLocale() === 'de' ? 'Nach Vorlagen suchen...' : 'Search templates...' }}"
+                                class="w-full pl-10 pr-4 py-3 text-base border-2 border-gray-300 bg-white rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 shadow-sm">
+                            
+                            @if($search)
+                                <button wire:click="$set('search', '')" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                                    </svg>
+                                </button>
+                            @endif
+                        </div>
+                    </div>
+
+                    <!-- Controls Section -->
+                    <div class="flex flex-wrap items-center gap-3">
+                        <!-- Filter Toggle -->
+                        <button wire:click="toggleFilters" 
+                            class="flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 {{ $showFilters ? 'bg-purple-100 text-purple-700 border border-purple-200' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.414A1 1 0 013 6.707V4z"/>
+                            </svg>
+                            <span>{{ app()->getLocale() === 'de' ? 'Filter' : 'Filters' }}</span>
+                        </button>
+
+                        <!-- View Toggle -->
+                        <div class="flex items-center bg-gray-100 rounded-lg p-1">
+                            <button wire:click="setView('grid')" 
+                                class="flex items-center space-x-1 px-3 py-1.5 rounded-md font-medium transition-all duration-200 {{ $view === 'grid' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900' }}">
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
+                                </svg>
+                                <span class="hidden sm:inline">Grid</span>
+                            </button>
+                            <button wire:click="setView('list')" 
+                                class="flex items-center space-x-1 px-3 py-1.5 rounded-md font-medium transition-all duration-200 {{ $view === 'list' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900' }}">
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"/>
+                                </svg>
+                                <span class="hidden sm:inline">List</span>
+                            </button>
+                        </div>
+
+                        <!-- Sort Dropdown -->
+                        <select wire:model.live="sort" 
+                            class="px-4 py-2 border-0 bg-gray-50 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:bg-white transition-all duration-200 text-sm font-medium">
+                            <option value="recent">{{ app()->getLocale() === 'de' ? 'Neueste' : 'Recent' }}</option>
+                            <option value="az">A → Z</option>
+                            <option value="za">Z → A</option>
+                            <option value="confidence">{{ app()->getLocale() === 'de' ? 'Vertrauen' : 'Confidence' }}</option>
+                            <option value="category">{{ app()->getLocale() === 'de' ? 'Kategorie' : 'Category' }}</option>
+                        </select>
+
+                        <!-- Per Page -->
+                        <select wire:model.live="perPage" 
+                            class="px-3 py-2 border-0 bg-gray-50 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:bg-white transition-all duration-200 text-sm font-medium">
+                            <option value="12">12</option>
+                            <option value="24">24</option>
+                            <option value="48">48</option>
+                        </select>
+                    </div>
                 </div>
-                <input type="text" wire:model.live="search"
-                    placeholder="{{ app()->getLocale() === 'de' ? 'Nach Vorlagen suchen...' : 'Search templates...' }}"
-                    class="w-full pl-10 pr-4 py-3 text-base border-2 border-gray-300 bg-white rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 shadow-sm">
+
+                <!-- Results Stats -->
+                <div class="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
+                    <div class="text-sm text-gray-600">
+                        {{ $templates->total() }} {{ app()->getLocale() === 'de' ? 'Vorlagen gefunden' : 'templates found' }}
+                        @if($search || !empty($selectedCategories) || !empty($selectedTags) || $onlyWithScreenshots || $onlyClassified)
+                            • {{ app()->getLocale() === 'de' ? 'Gefiltert von' : 'Filtered from' }} {{ $stats['total'] }} {{ app()->getLocale() === 'de' ? 'insgesamt' : 'total' }}
+                        @endif
+                    </div>
+                    
+                    @if($search || !empty($selectedCategories) || !empty($selectedTags) || $onlyWithScreenshots || $onlyClassified)
+                        <button wire:click="clearFilters"
+                            class="px-3 py-1 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg transition-all duration-200 text-sm font-medium">
+                            {{ app()->getLocale() === 'de' ? 'Alle löschen' : 'Clear all' }}
+                        </button>
+                    @endif
+                </div>
             </div>
         </div>
         <!-- Compact Filters Bar -->
