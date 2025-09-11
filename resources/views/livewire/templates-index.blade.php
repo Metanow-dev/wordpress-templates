@@ -322,6 +322,7 @@
         @endif
 
         <!-- Results -->
+        <div class="mx-auto px-6 lg:px-8">
         @if($templates->count())
             @if($view === 'grid')
                 <!-- Grid View -->
@@ -493,6 +494,7 @@
                 </div>
             </div>
         @endif
+        </div>
         
         <!-- Footer -->
         <footer class="bg-white border-t border-gray-200 mt-12">
