@@ -8,6 +8,7 @@ use Illuminate\Support\Str;
 use Symfony\Component\Finder\Finder;
 use App\Support\UrlBuilder;
 use Illuminate\Support\Facades\Http;
+use App\Services\WordPressAnalyzer;
 
 
 class ScanTemplates extends Command
@@ -100,7 +101,7 @@ class ScanTemplates extends Command
 
             // Trigger AI classification for new or significantly updated templates
             if (($isNewTemplate || $wasUpdated) && config('services.n8n.classification_webhook')) {
-                $this->triggerClassification($template);
+                $this->triggerClassification($template, $docroot);
             }
 
             // Optional auto-capture if no theme screenshot was found
@@ -135,7 +136,7 @@ class ScanTemplates extends Command
     /**
      * Trigger n8n classification workflow for a template
      */
-    private function triggerClassification(Template $template): void
+    private function triggerClassification(Template $template, string $docroot): void
     {
         try {
             $webhookUrl = config('services.n8n.classification_webhook');
@@ -151,12 +152,17 @@ class ScanTemplates extends Command
                 return;
             }
 
-            $response = Http::timeout(10)->post($webhookUrl, [
+            // Get enhanced WordPress data
+            $wordpressData = WordPressAnalyzer::analyze($docroot, $template->slug, $template->demo_url);
+
+            $response = Http::timeout(15)->post($webhookUrl, [
                 'slug' => $template->slug,
                 'name' => $template->name,
                 'demo_url' => $template->demo_url,
                 'screenshot_url' => $template->screenshot_url,
+                'wordpress_data' => $wordpressData,
                 'api_callback_url' => url("/api/templates/{$template->slug}/classification"),
+                'api_catalog_url' => url("/api/catalog"),
                 'api_token' => $apiToken,
             ]);
 

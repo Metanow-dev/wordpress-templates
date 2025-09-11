@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\TemplateClassificationController;
+use App\Http\Controllers\Api\CatalogController;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,6 +18,10 @@ use App\Http\Controllers\Api\TemplateClassificationController;
 
 // Template Classification API (for n8n integration)
 Route::middleware(['api.token'])->group(function () {
+    // Get catalog configuration (categories, tags, locales)
+    Route::get('/catalog', [CatalogController::class, 'index'])
+        ->name('api.catalog.index');
+    
     // Get template data for AI classification
     Route::get('/templates/{slug}/classification', [TemplateClassificationController::class, 'getTemplateForClassification'])
         ->name('api.templates.classification.get');
