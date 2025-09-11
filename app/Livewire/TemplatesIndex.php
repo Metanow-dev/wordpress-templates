@@ -19,11 +19,10 @@ class TemplatesIndex extends Component
     public bool $showFilters = true;
     public bool $onlyWithScreenshots = false;
     public bool $onlyClassified = false;
-    public string $confidenceMin = '0';
     
     protected $queryString = [
         'search', 'sort', 'view', 'perPage', 'selectedCategories', 'selectedTags', 
-        'showFilters', 'onlyWithScreenshots', 'onlyClassified', 'confidenceMin', 'page'
+        'showFilters', 'onlyWithScreenshots', 'onlyClassified', 'page'
     ];
 
     public function updatingSearch() { $this->resetPage(); }
@@ -34,7 +33,6 @@ class TemplatesIndex extends Component
     public function updatingSelectedTags() { $this->resetPage(); }
     public function updatingOnlyWithScreenshots() { $this->resetPage(); }
     public function updatingOnlyClassified() { $this->resetPage(); }
-    public function updatingConfidenceMin() { $this->resetPage(); }
 
     public function toggleCategory($category)
     {
@@ -75,7 +73,6 @@ class TemplatesIndex extends Component
         $this->search = '';
         $this->onlyWithScreenshots = false;
         $this->onlyClassified = false;
-        $this->confidenceMin = '0';
         $this->resetPage();
     }
 
@@ -147,9 +144,6 @@ class TemplatesIndex extends Component
             $q->whereNotNull('primary_category');
         }
 
-        if ($this->confidenceMin !== '0') {
-            $q->where('classification_confidence', '>=', floatval($this->confidenceMin));
-        }
 
         // Sorting
         match ($this->sort) {

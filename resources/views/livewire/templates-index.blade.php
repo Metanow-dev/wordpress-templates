@@ -93,7 +93,6 @@
                             <option value="recent">{{ app()->getLocale() === 'de' ? 'Neueste' : 'Recent' }}</option>
                             <option value="az">A → Z</option>
                             <option value="za">Z → A</option>
-                            <option value="confidence">{{ app()->getLocale() === 'de' ? 'Vertrauen' : 'Confidence' }}</option>
                             <option value="category">{{ app()->getLocale() === 'de' ? 'Kategorie' : 'Category' }}</option>
                         </select>
 
@@ -125,167 +124,243 @@
                 </div>
             </div>
         </div>
-        <!-- Compact Filters Bar -->
-        <div class="bg-white/70 backdrop-blur-sm border border-gray-200/50 rounded-2xl p-6 mb-8 shadow-sm">
 
-
-            <!-- Categories -->
-            <div class="mb-6">
-                <div class="flex items-center justify-between mb-3">
-                    <span
-                        class="text-sm font-semibold text-gray-700">{{ app()->getLocale() === 'de' ? 'Kategorien:' : 'Categories:' }}</span>
-                    <div class="flex items-center gap-4">
-                        <span class="text-sm text-gray-500">
-                            {{ $templates->total() }} {{ app()->getLocale() === 'de' ? 'Vorlagen' : 'templates' }}
-                        </span>
-                        <select wire:model.live="sort"
-                            class="px-3 py-1.5 border-0 bg-gray-50/50 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:bg-white transition-all duration-200 text-sm">
-                            <option value="recent">{{ app()->getLocale() === 'de' ? 'Neueste' : 'Recent' }}</option>
-                            <option value="az">A–Z</option>
-                        </select>
+        <!-- Advanced Filters Panel -->
+        @if($showFilters)
+            <div class="bg-white/80 backdrop-blur-sm border border-gray-200/50 rounded-2xl p-6 mb-8 shadow-sm">
+                
+                <!-- Advanced Options -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                    <div>
+                        <label class="flex items-center space-x-3 text-sm font-medium text-gray-700">
+                            <input type="checkbox" wire:model.live="onlyWithScreenshots" 
+                                class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                            <span>{{ app()->getLocale() === 'de' ? 'Nur mit Screenshots' : 'Only with screenshots' }}</span>
+                            <span class="text-xs text-gray-500">({{ $stats['with_screenshots'] }})</span>
+                        </label>
+                    </div>
+                    
+                    <div>
+                        <label class="flex items-center space-x-3 text-sm font-medium text-gray-700">
+                            <input type="checkbox" wire:model.live="onlyClassified" 
+                                class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                            <span>{{ app()->getLocale() === 'de' ? 'Nur klassifiziert' : 'Only classified' }}</span>
+                            <span class="text-xs text-gray-500">({{ $stats['classified'] }})</span>
+                        </label>
                     </div>
                 </div>
-                <div class="flex flex-wrap gap-2">
-                    @foreach($categories as $category)
-                                    <button wire:click="toggleCategory('{{ $category }}')" class="px-4 py-2 text-sm rounded-full transition-all duration-200 font-medium
-                                                       {{ in_array($category, $selectedCategories)
-                        ? 'bg-purple-500 text-white shadow-md transform scale-105'
-                        : 'bg-gray-100/80 text-gray-700 hover:bg-gray-200/80 hover:scale-105' }}">
-                                        {{ ucfirst(str_replace('_', ' ', $category)) }}
-                                    </button>
-                    @endforeach
-                </div>
-            </div>
 
-            <!-- Tags -->
-            <div>
-                <div class="flex items-center gap-3 mb-3">
-                    <span
-                        class="text-sm font-semibold text-gray-700">{{ app()->getLocale() === 'de' ? 'Tags:' : 'Tags:' }}</span>
-                    @if($search || !empty($selectedCategories) || !empty($selectedTags))
-                        <button wire:click="clearFilters"
-                            class="px-3 py-1 bg-gray-100/80 hover:bg-gray-200/80 text-gray-600 rounded-lg transition-all duration-200 text-xs font-medium">
-                            {{ app()->getLocale() === 'de' ? 'Alle löschen' : 'Clear all' }}
-                        </button>
+                <!-- Categories -->
+                <div class="mb-6">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-sm font-semibold text-gray-700">{{ app()->getLocale() === 'de' ? 'Kategorien:' : 'Categories:' }}</span>
+                        @if(!empty($selectedCategories))
+                            <button wire:click="$set('selectedCategories', [])" 
+                                class="text-xs text-gray-500 hover:text-gray-700">
+                                {{ app()->getLocale() === 'de' ? 'Kategorien löschen' : 'Clear categories' }}
+                            </button>
+                        @endif
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                        @foreach($categories as $category)
+                            <button wire:click="toggleCategory('{{ $category }}')" 
+                                class="px-4 py-2 text-sm rounded-full transition-all duration-200 font-medium {{ in_array($category, $selectedCategories) ? 'bg-purple-500 text-white shadow-md transform scale-105' : 'bg-gray-100/80 text-gray-700 hover:bg-gray-200/80 hover:scale-105' }}">
+                                {{ ucfirst(str_replace('_', ' ', $category)) }}
+                            </button>
+                        @endforeach
+                    </div>
+                </div>
+
+                <!-- Tags -->
+                <div>
+                    <div class="flex items-center gap-3 mb-3">
+                        <span class="text-sm font-semibold text-gray-700">{{ app()->getLocale() === 'de' ? 'Tags:' : 'Tags:' }}</span>
+                        @if(!empty($selectedTags))
+                            <button wire:click="$set('selectedTags', [])" 
+                                class="text-xs text-gray-500 hover:text-gray-700">
+                                {{ app()->getLocale() === 'de' ? 'Tags löschen' : 'Clear tags' }}
+                            </button>
+                        @endif
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                        @foreach($tags as $tag)
+                            <button wire:click="toggleTag('{{ $tag }}')" 
+                                class="px-3 py-1.5 text-sm rounded-full transition-all duration-200 font-medium {{ in_array($tag, $selectedTags) ? 'bg-blue-500 text-white shadow-sm transform scale-105' : 'bg-gray-100/80 text-gray-700 hover:bg-gray-200/80 hover:scale-105' }}">
+                                {{ ucfirst(str_replace('_', ' ', $tag)) }}
+                            </button>
+                        @endforeach
+                    </div>
+
+                    <!-- Active Filters Display -->
+                    @if(!empty($selectedCategories) || !empty($selectedTags))
+                        <div class="flex items-center gap-2 flex-wrap mt-4 pt-4 border-t border-gray-200/30">
+                            <span class="text-xs font-medium text-gray-500 uppercase tracking-wide">{{ app()->getLocale() === 'de' ? 'Aktiv:' : 'Active:' }}</span>
+
+                            @foreach($selectedCategories as $category)
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs bg-gradient-to-r from-purple-500 to-purple-600 text-white font-medium">
+                                    {{ ucfirst(str_replace('_', ' ', $category)) }}
+                                    <button wire:click="removeCategory('{{ $category }}')" class="ml-1.5 text-purple-100 hover:text-white">×</button>
+                                </span>
+                            @endforeach
+
+                            @foreach($selectedTags as $tag)
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs bg-gradient-to-r from-blue-500 to-blue-600 text-white font-medium">
+                                    {{ ucfirst(str_replace('_', ' ', $tag)) }}
+                                    <button wire:click="removeTag('{{ $tag }}')" class="ml-1.5 text-blue-100 hover:text-white">×</button>
+                                </span>
+                            @endforeach
+                        </div>
                     @endif
                 </div>
-                <div class="flex flex-wrap gap-2">
-                    @foreach($tags as $tag)
-                                    <button wire:click="toggleTag('{{ $tag }}')" class="px-3 py-1.5 text-sm rounded-full transition-all duration-200 font-medium
-                                                       {{ in_array($tag, $selectedTags)
-                        ? 'bg-blue-500 text-white shadow-sm transform scale-105'
-                        : 'bg-gray-100/80 text-gray-700 hover:bg-gray-200/80 hover:scale-105' }}">
-                                        {{ ucfirst(str_replace('_', ' ', $tag)) }}
-                                    </button>
-                    @endforeach
-                </div>
-
-                <!-- Active Filters Display -->
-                @if(!empty($selectedCategories) || !empty($selectedTags))
-                    <div class="flex items-center gap-2 flex-wrap mt-4 pt-4 border-t border-gray-200/30">
-                        <span
-                            class="text-xs font-medium text-gray-500 uppercase tracking-wide">{{ app()->getLocale() === 'de' ? 'Aktiv:' : 'Active:' }}</span>
-
-                        @foreach($selectedCategories as $category)
-                            <span
-                                class="inline-flex items-center px-2.5 py-1 rounded-full text-xs bg-gradient-to-r from-purple-500 to-purple-600 text-white font-medium">
-                                {{ ucfirst(str_replace('_', ' ', $category)) }}
-                                <button wire:click="removeCategory('{{ $category }}')"
-                                    class="ml-1.5 text-purple-100 hover:text-white">×</button>
-                            </span>
-                        @endforeach
-
-                        @foreach($selectedTags as $tag)
-                            <span
-                                class="inline-flex items-center px-2.5 py-1 rounded-full text-xs bg-gradient-to-r from-blue-500 to-blue-600 text-white font-medium">
-                                {{ ucfirst(str_replace('_', ' ', $tag)) }}
-                                <button wire:click="removeTag('{{ $tag }}')"
-                                    class="ml-1.5 text-blue-100 hover:text-white">×</button>
-                            </span>
-                        @endforeach
-                    </div>
-                @endif
             </div>
-        </div>
+        @endif
 
         <!-- Results -->
         @if($templates->count())
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 mb-12">
-                @foreach($templates as $template)
-                    <div
-                        class="group bg-white rounded-2xl shadow-sm border border-gray-200/50 overflow-hidden hover:shadow-xl hover:shadow-gray-200/50 transition-all duration-300 hover:-translate-y-1">
-                        <!-- Screenshot -->
-                        <div class="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 relative overflow-hidden">
-                            @if($template->screenshot_url)
-                                <img src="{{ $template->screenshot_url }}" alt="{{ $template->name ?? $template->slug }}"
-                                    class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-                            @else
-                                <div class="flex items-center justify-center h-full text-gray-400">
-                                    <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                    </svg>
-                                </div>
-                            @endif
+            @if($view === 'grid')
+                <!-- Grid View -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 mb-12">
+                    @foreach($templates as $template)
+                        <div class="group bg-white rounded-2xl shadow-sm border border-gray-200/50 overflow-hidden hover:shadow-xl hover:shadow-gray-200/50 transition-all duration-300 hover:-translate-y-1">
+                            <!-- Screenshot -->
+                            <div class="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 relative overflow-hidden">
+                                @if($template->screenshot_url)
+                                    <img src="{{ $template->screenshot_url }}" alt="{{ $template->name ?? $template->slug }}"
+                                        class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                                @else
+                                    <div class="flex items-center justify-center h-full text-gray-400">
+                                        <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                        </svg>
+                                    </div>
+                                @endif
 
-                            <!-- Category Badge -->
-                            @if($template->primary_category)
-                                <div class="absolute top-3 left-3">
-                                    <span
-                                        class="inline-block px-4 py-2 text-sm font-bold bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-full shadow-lg border-2 border-white/20 backdrop-blur-sm">
-                                        {{ ucfirst(str_replace('_', ' ', $template->primary_category)) }}
-                                    </span>
-                                </div>
-                            @endif
+                                <!-- Category Badge -->
+                                @if($template->primary_category)
+                                    <div class="absolute top-3 left-3">
+                                        <span class="inline-block px-4 py-2 text-sm font-bold bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-full shadow-lg border-2 border-white/20 backdrop-blur-sm">
+                                            {{ ucfirst(str_replace('_', ' ', $template->primary_category)) }}
+                                        </span>
+                                    </div>
+                                @endif
 
-                            <!-- Demo Button -->
-                            <div
-                                class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                <a href="{{ $template->demo_url }}" target="_blank"
-                                    class="bg-blue-600/90 backdrop-blur-sm hover:bg-blue-700 text-white px-4 py-2 rounded-full text-sm font-medium transition-colors duration-200 shadow-lg">
-                                    {{ app()->getLocale() === 'de' ? 'Demo ansehen' : 'View Demo' }}
-                                </a>
+                                <!-- Demo Button -->
+                                <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center">
+                                    <a href="{{ $template->demo_url }}" target="_blank"
+                                        class="bg-blue-600/90 hover:bg-blue-700 text-white px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 shadow-lg opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0">
+                                        {{ app()->getLocale() === 'de' ? 'Demo ansehen' : 'View Demo' }}
+                                    </a>
+                                </div>
                             </div>
-                        </div>
 
-                        <!-- Content -->
-                        <div class="p-6">
-                            <h3
-                                class="font-bold text-gray-900 mb-2 text-lg line-clamp-1 group-hover:text-blue-600 transition-colors duration-200">
-                                {{ $template->name ?? ucfirst(str_replace('-', ' ', $template->slug)) }}
-                            </h3>
+                            <!-- Content -->
+                            <div class="p-6">
+                                <h3 class="font-bold text-gray-900 mb-2 text-lg line-clamp-1 group-hover:text-blue-600 transition-colors duration-200">
+                                    {{ $template->name ?? ucfirst(str_replace('-', ' ', $template->slug)) }}
+                                </h3>
 
-                            @if($template->description_en || $template->description_de)
-                                <p class="text-sm text-gray-600 line-clamp-2 mb-4 leading-relaxed">
-                                    {{ app()->getLocale() === 'de' ? $template->description_de : $template->description_en }}
-                                </p>
-                            @endif
+                                @if($template->description_en || $template->description_de)
+                                    <p class="text-sm text-gray-600 line-clamp-2 mb-4 leading-relaxed">
+                                        {{ app()->getLocale() === 'de' ? $template->description_de : $template->description_en }}
+                                    </p>
+                                @endif
 
-                            <!-- Tags Prominently Displayed -->
-                            @if($template->tags && count($template->tags) > 0)
-                                <div class="flex flex-wrap gap-1.5 mb-3">
-                                    @foreach($template->tags as $tag)
+                                <!-- Tags -->
+                                @if($template->tags && count($template->tags) > 0)
+                                    <div class="flex flex-wrap gap-1.5 mb-3">
+                                        @foreach($template->tags as $tag)
                                             <button wire:click="toggleTag('{{ $tag }}')"
-                                                class="inline-block px-2.5 py-1 text-xs rounded-md font-medium transition-all duration-200 cursor-pointer
-                                                                           {{ in_array($tag, $selectedTags)
-                                        ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-sm'
-                                        : 'bg-gradient-to-r from-gray-100 to-gray-50 text-gray-700 hover:from-gray-200 hover:to-gray-100 border border-gray-200/50' }}">
+                                                class="inline-block px-2.5 py-1 text-xs rounded-md font-medium transition-all duration-200 cursor-pointer {{ in_array($tag, $selectedTags) ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-sm' : 'bg-gradient-to-r from-gray-100 to-gray-50 text-gray-700 hover:from-gray-200 hover:to-gray-100 border border-gray-200/50' }}">
                                                 {{ ucfirst(str_replace('_', ' ', $tag)) }}
                                             </button>
-                                    @endforeach
-                                </div>
-                            @endif
+                                        @endforeach
+                                    </div>
+                                @endif
 
-                            @if($template->active_theme)
-                                <div class="mt-3 pt-3 border-t border-gray-100 text-xs text-gray-500">
-                                    <span class="font-medium">{{ app()->getLocale() === 'de' ? 'Theme:' : 'Theme:' }}</span>
-                                    {{ $template->active_theme }}
-                                </div>
-                            @endif
+                                @if($template->active_theme)
+                                    <div class="mt-3 pt-3 border-t border-gray-100 text-xs text-gray-500">
+                                        <span class="font-medium">{{ app()->getLocale() === 'de' ? 'Theme:' : 'Theme:' }}</span>
+                                        {{ $template->active_theme }}
+                                    </div>
+                                @endif
+                            </div>
                         </div>
-                    </div>
-                @endforeach
-            </div>
+                    @endforeach
+                </div>
+            @else
+                <!-- List View -->
+                <div class="space-y-4 mb-12">
+                    @foreach($templates as $template)
+                        <div class="group bg-white rounded-xl shadow-sm border border-gray-200/50 overflow-hidden hover:shadow-lg transition-all duration-300">
+                            <div class="flex flex-col sm:flex-row">
+                                <!-- Screenshot -->
+                                <div class="sm:w-80 aspect-video sm:aspect-square bg-gradient-to-br from-gray-100 to-gray-200 relative overflow-hidden">
+                                    @if($template->screenshot_url)
+                                        <img src="{{ $template->screenshot_url }}" alt="{{ $template->name ?? $template->slug }}"
+                                            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                    @else
+                                        <div class="flex items-center justify-center h-full text-gray-400">
+                                            <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                            </svg>
+                                        </div>
+                                    @endif
+
+                                    <!-- Category Badge -->
+                                    @if($template->primary_category)
+                                        <div class="absolute top-3 left-3">
+                                            <span class="inline-block px-3 py-1.5 text-xs font-bold bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-full shadow-lg">
+                                                {{ ucfirst(str_replace('_', ' ', $template->primary_category)) }}
+                                            </span>
+                                        </div>
+                                    @endif
+                                </div>
+
+                                <!-- Content -->
+                                <div class="flex-1 p-6">
+                                    <div class="flex items-start justify-between mb-3">
+                                        <h3 class="font-bold text-gray-900 text-xl group-hover:text-blue-600 transition-colors duration-200">
+                                            {{ $template->name ?? ucfirst(str_replace('-', ' ', $template->slug)) }}
+                                        </h3>
+                                        
+                                        <a href="{{ $template->demo_url }}" target="_blank"
+                                            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200">
+                                            {{ app()->getLocale() === 'de' ? 'Demo ansehen' : 'View Demo' }}
+                                        </a>
+                                    </div>
+
+                                    @if($template->description_en || $template->description_de)
+                                        <p class="text-gray-600 mb-4 leading-relaxed">
+                                            {{ app()->getLocale() === 'de' ? $template->description_de : $template->description_en }}
+                                        </p>
+                                    @endif
+
+                                    <!-- Tags -->
+                                    @if($template->tags && count($template->tags) > 0)
+                                        <div class="flex flex-wrap gap-2 mb-4">
+                                            @foreach($template->tags as $tag)
+                                                <button wire:click="toggleTag('{{ $tag }}')"
+                                                    class="inline-block px-3 py-1 text-sm rounded-md font-medium transition-all duration-200 cursor-pointer {{ in_array($tag, $selectedTags) ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-sm' : 'bg-gradient-to-r from-gray-100 to-gray-50 text-gray-700 hover:from-gray-200 hover:to-gray-100 border border-gray-200/50' }}">
+                                                    {{ ucfirst(str_replace('_', ' ', $tag)) }}
+                                                </button>
+                                            @endforeach
+                                        </div>
+                                    @endif
+
+                                    @if($template->active_theme)
+                                        <div class="text-sm text-gray-500">
+                                            <span class="font-medium">{{ app()->getLocale() === 'de' ? 'Theme:' : 'Theme:' }}</span>
+                                            {{ $template->active_theme }}
+                                        </div>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            @endif
 
             <!-- Pagination -->
             <div class="flex justify-center">
