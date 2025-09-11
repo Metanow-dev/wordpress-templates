@@ -190,10 +190,15 @@ jobs:
             fi
           fi
           
-          # Generate app key if not set
+          # Generate app key if not set (prevent duplicates)
           if ! grep -q "APP_KEY=base64:" .env; then
             echo "🔑 Generating application key..."
+            # Remove any existing APP_KEY lines first to prevent duplicates
+            sed -i '/^APP_KEY=/d' .env
+            # Generate new key
             $PHP_BIN artisan key:generate --no-interaction
+          else
+            echo "✅ APP_KEY already configured"
           fi
           
           # Clear any cached config first, then cache fresh config

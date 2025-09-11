@@ -148,6 +148,29 @@ else
     exit 1
 fi
 
+# Fix APP_KEY duplication if present (prevent 500 errors)
+echo "🔑 Checking APP_KEY configuration..."
+APP_KEY_COUNT=$(grep -c "^APP_KEY=" .env || echo "0")
+if [ "$APP_KEY_COUNT" -gt 1 ]; then
+    echo "⚠️  Found duplicate APP_KEY entries ($APP_KEY_COUNT), fixing..."
+    
+    # Get the first valid APP_KEY
+    FIRST_APP_KEY=$(grep "^APP_KEY=" .env | head -n1)
+    
+    # Remove all APP_KEY lines
+    sed -i '/^APP_KEY=/d' .env
+    
+    # Add back the first one
+    echo "$FIRST_APP_KEY" >> .env
+    
+    echo "✅ Fixed APP_KEY duplication"
+elif [ "$APP_KEY_COUNT" -eq 0 ] || ! grep -q "APP_KEY=base64:" .env; then
+    echo "🔑 Generating missing APP_KEY..."
+    $PHP_BIN artisan key:generate --no-interaction
+else
+    echo "✅ APP_KEY is properly configured"
+fi
+
 # Clear and refresh all Laravel configuration
 echo "🔄 Clearing and refreshing Laravel configuration..."
 $PHP_BIN artisan config:clear
