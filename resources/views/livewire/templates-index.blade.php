@@ -240,7 +240,7 @@
                                 @if($template->primary_category)
                                     <div class="absolute top-3 left-3">
                                         <span class="inline-block px-4 py-2 text-sm font-bold bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-full shadow-lg border-2 border-white/20 backdrop-blur-sm">
-                                            {{ ucfirst(str_replace('_', ' ', $template->primary_category)) }}
+                                            {{ \App\Helpers\CategoryHelper::getCategoryName($template->primary_category, app()->getLocale()) }}
                                         </span>
                                     </div>
                                 @endif
@@ -312,7 +312,7 @@
                                     @if($template->primary_category)
                                         <div class="absolute top-3 left-3">
                                             <span class="inline-block px-3 py-1.5 text-xs font-bold bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-full shadow-lg">
-                                                {{ ucfirst(str_replace('_', ' ', $template->primary_category)) }}
+                                                {{ \App\Helpers\CategoryHelper::getCategoryName($template->primary_category, app()->getLocale()) }}
                                             </span>
                                         </div>
                                     @endif

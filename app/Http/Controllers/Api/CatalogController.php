@@ -12,8 +12,11 @@ class CatalogController extends Controller
      */
     public function index(): JsonResponse
     {
+        $categories = config('catalog.categories');
+        
         return response()->json([
-            'categories' => config('catalog.categories'),
+            'categories' => array_keys($categories), // Just the keys for n8n
+            'categories_translations' => $categories, // Full translations
             'tags' => config('catalog.tags'),
             'locales' => config('catalog.locales'),
         ]);

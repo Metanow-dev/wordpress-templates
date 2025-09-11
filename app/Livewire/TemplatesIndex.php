@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Models\Template;
+use App\Helpers\CategoryHelper;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -156,7 +157,8 @@ class TemplatesIndex extends Component
 
         $templates = $q->paginate(intval($this->perPage));
 
-        $categories = config('catalog.categories');
+        $locale = app()->getLocale();
+        $categories = CategoryHelper::getCategoriesForLocale($locale);
         $tags = config('catalog.tags');
         $stats = $this->getFilterStats();
 
