@@ -2,12 +2,23 @@
 return [
   'locales' => ['en','de'],
   'categories' => [
-    'ecommerce','portfolio','restaurant','hotel','real_estate','healthcare','education','agency',
-    'saas','nonprofit','event','beauty_salon','automotive',
-    'construction','legal','finance','fitness_wellness','technology','consulting','creative',
-    'corporate','startup','photography','music','fashion','travel','food_beverage',
-    'interior_design','architecture','wedding','sports','gaming','news_magazine',
-    'personal_blog'
+    'automotive',
+    'beauty_wellness',
+    'business_corporate',
+    'construction',
+    'creative_agency',
+    'ecommerce',
+    'education',
+    'event_entertainment',
+    'finance_legal',
+    'food_beverage',
+    'healthcare',
+    'hospitality_travel',
+    'nonprofit',
+    'personal_blog',
+    'portfolio',
+    'real_estate',
+    'technology'
   ],
   'tags' => [
     'woocommerce','booking','menu','multilingual','elementor',
