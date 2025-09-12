@@ -403,7 +403,7 @@
                                 </div>
 
                                 <!-- View Demo Button (Fixed at Bottom) -->
-                                <div class="mx-auto mt-auto pt-1">
+                                <div class="mx-auto mt-auto pt-1 px-0 w-full">
                                     <a href="{{ $template->demo_url }}" target="_blank"
                                         class="block text-center text-sm font-medium text-gray-600 hover:text-white hover:bg-[#D53741] py-2 px-4  border border-transparent hover:border-[#D53741] transition-all duration-200">
                                         {{ app()->getLocale() === 'de' ? 'Demo ansehen' : 'View Demo' }}
@@ -524,11 +524,11 @@
                     {{ app()->getLocale() === 'de' ? 'Lassen Sie uns Ihre Vision in eine professionelle WordPress-Website verwandeln. Kontaktieren Sie unser Expertenteam noch heute.' : 'Let us turn your vision into a professional WordPress website. Contact our expert team today.' }}
                 </p>
                 <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                    <a href="https://metanow.dev/contact" 
+                    <a href="https://api.leadconnectorhq.com/widget/bookings/gleni" 
                        class="bg-white px-4 text-[#D53741] hover:bg-gray-100 px-8 py-4 font-semibold text-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
                         {{ app()->getLocale() === 'de' ? 'Termin buchen' : 'Book a meeting' }}
                     </a>
-                    <a href="https://metanow.dev/portfolio" 
+                    <a href="https://www.metanow.dev/get-a-quote" 
                        class="border-2 px-3 border-white text-white px-8 py-4 font-semibold text-lg transition-all duration-200 hover:bg-white hover:text-[#D53741]">
                         {{ app()->getLocale() === 'de' ? 'Kontakt aufnehmen' : 'Contact us' }}
                     </a>
