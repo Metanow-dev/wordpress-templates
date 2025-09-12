@@ -99,9 +99,9 @@
                         <!-- Per Page -->
                         <select wire:model.live="perPage" 
                             class="px-3 py-2 border-0 bg-gray-50 focus:ring-2 focus:ring-[#D53741]/20 focus:bg-white transition-all duration-200 text-sm font-medium">
-                            <option value="12">12</option>
-                            <option value="24">24</option>
-                            <option value="48">48</option>
+                            <option value="20">20</option>
+                            <option value="40">40</option>
+                            <option value="80">80</option>
                         </select>
                     </div>
                 </div>

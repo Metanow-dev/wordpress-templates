@@ -14,7 +14,7 @@ class TemplatesIndex extends Component
     public string $search = '';
     public string $sort = 'recent'; // recent, az, za, confidence, category
     public string $view = 'grid'; // grid, list
-    public string $perPage = '12'; // 12, 24, 48
+    public string $perPage = '20'; // 20, 40, 80
     public array $selectedCategories = [];
     public array $selectedTags = [];
     public bool $showFilters = true;
@@ -23,7 +23,7 @@ class TemplatesIndex extends Component
     
     protected $queryString = [
         'search', 'sort', 'view', 'perPage', 'selectedCategories', 'selectedTags', 
-        'showFilters', 'onlyWithScreenshots', 'onlyClassified', 'page'
+        'showFilters', 'onlyWithScreenshots', 'onlyClassified'
     ];
 
     public function updatingSearch() { $this->resetPage(); }
