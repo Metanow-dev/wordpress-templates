@@ -40,27 +40,34 @@ class TemplateClassificationController extends Controller
      */
     public function updateClassification(Request $request, string $slug): JsonResponse
     {
-        $template = Template::where('slug', $slug)->firstOrFail();
-        
-        // Don't override human classifications unless forced
-        if ($template->locked_by_human && !$request->boolean('force_override')) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Template classification is locked by human review',
-                'locked_by_human' => true
+        try {
+            $template = Template::where('slug', $slug)->firstOrFail();
+            
+            // Don't override human classifications unless forced
+            if ($template->locked_by_human && !$request->boolean('force_override')) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Template classification is locked by human review',
+                    'locked_by_human' => true
+                ]);
+            }
+            
+            // Log the incoming request data for debugging
+            Log::info("Classification update request for {$slug}", [
+                'request_data' => $request->all(),
+                'content_type' => $request->header('Content-Type')
             ]);
-        }
-        
-        $validated = $request->validate([
-            'primary_category' => 'required|string|in:' . implode(',', config('catalog.categories')),
-            'tags' => 'required|array',
-            'tags.*' => 'string|in:' . implode(',', config('catalog.tags')),
-            'confidence' => 'required|numeric|between:0,1',
-            'rationale' => 'required|string|max:1000',
-            'description_en' => 'nullable|string|max:500',
-            'description_de' => 'nullable|string|max:500',
-            'needs_review' => 'boolean',
-        ]);
+            
+            $validated = $request->validate([
+                'primary_category' => 'required|string|in:' . implode(',', array_keys(config('catalog.categories'))),
+                'tags' => 'required|array',
+                'tags.*' => 'string|in:' . implode(',', config('catalog.tags')),
+                'confidence' => 'required|numeric|between:0,1',
+                'rationale' => 'required|string|max:1000',
+                'description_en' => 'nullable|string|max:500',
+                'description_de' => 'nullable|string|max:500',
+                'needs_review' => 'boolean',
+            ]);
         
         $template->update([
             'primary_category' => $validated['primary_category'],
@@ -76,21 +83,35 @@ class TemplateClassificationController extends Controller
         
         Log::info("AI classified template: {$slug}", [
             'category' => $validated['primary_category'],
-            'tags' => $validated['tags'],
+            'tags' => implode(', ', $validated['tags']),
+            'tags_count' => count($validated['tags']),
             'confidence' => $validated['confidence']
         ]);
         
-        return response()->json([
-            'success' => true,
-            'message' => 'Template classified successfully',
-            'template' => [
-                'slug' => $template->slug,
-                'primary_category' => $template->primary_category,
-                'tags' => $template->tags,
-                'confidence' => $template->classification_confidence,
-                'needs_review' => $template->needs_review,
-            ]
-        ]);
+            return response()->json([
+                'success' => true,
+                'message' => 'Template classified successfully',
+                'template' => [
+                    'slug' => $template->slug,
+                    'primary_category' => $template->primary_category,
+                    'tags' => $template->tags,
+                    'confidence' => $template->classification_confidence,
+                    'needs_review' => $template->needs_review,
+                ]
+            ]);
+            
+        } catch (\Exception $e) {
+            Log::error("Error updating template classification for {$slug}", [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'request_data' => $request->all()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Error updating template classification: ' . $e->getMessage()
+            ], 500);
+        }
     }
     
     /**
