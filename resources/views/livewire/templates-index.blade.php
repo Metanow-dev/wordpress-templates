@@ -322,7 +322,7 @@
                 <!-- Grid View -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
                     @foreach($templates as $template)
-                        <div class="group bg-white shadow-sm border border-gray-200/50 overflow-hidden hover:shadow-xl hover:shadow-gray-200/50 transition-all duration-300 hover:-translate-y-1">
+                        <div class="group bg-white shadow-sm border border-gray-200/50 overflow-hidden hover:shadow-xl hover:shadow-gray-200/50 px-2 py-2 transition-all duration-300 hover:-translate-y-1">
                             <!-- Screenshot -->
                             <div class="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 relative overflow-hidden">
                                 @if($template->screenshot_url)
@@ -340,7 +340,7 @@
                                 <!-- Category Badge -->
                                 @if($template->primary_category)
                                     <div class="absolute top-2 left-2">
-                                        <span class="inline-block px-2 py-2 text-sm font-bold bg-gradient-to-r from-[#D53741] to-[#B12A31] text-white shadow-lg border-2 border-white/20 backdrop-blur-sm">
+                                        <span class="inline-block px-0 py-0 text-sm font-bold bg-gradient-to-r from-[#D53741] to-[#B12A31] text-white shadow-lg border-2 border-white/20 backdrop-blur-sm">
                                             {{ \App\Helpers\CategoryHelper::getCategoryName($template->primary_category, app()->getLocale()) }}
                                         </span>
                                     </div>
@@ -348,7 +348,7 @@
                             </div>
 
                             <!-- Content with Uniform Height -->
-                            <div class="p-6 flex flex-col h-52"> <!-- Fixed height for uniformity -->
+                            <div class="px-6 py-4 flex flex-col h-56"> <!-- MODIFIED: Increased height for uniformity -->
                                 <!-- Title (Fixed Height) -->
                                 <a href="{{ $template->demo_url }}" target="_blank">
                                 <h3 class="font-bold text-gray-900 mb-2 text-lg line-clamp-1 group-hover:text-[#D53741] transition-colors duration-200 min-h-[28px]">
@@ -526,18 +526,18 @@
                 <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
                     <a href="https://metanow.dev/contact" 
                        class="bg-white px-4 text-[#D53741] hover:bg-gray-100 px-8 py-4 font-semibold text-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
-                        {{ app()->getLocale() === 'de' ? 'Projekt starten' : 'Start Your Project' }}
+                        {{ app()->getLocale() === 'de' ? 'Termin buchen' : 'Book a meeting' }}
                     </a>
                     <a href="https://metanow.dev/portfolio" 
                        class="border-2 px-3 border-white text-white px-8 py-4 font-semibold text-lg transition-all duration-200 hover:bg-white hover:text-[#D53741]">
-                        {{ app()->getLocale() === 'de' ? 'Portfolio ansehen' : 'View Portfolio' }}
+                        {{ app()->getLocale() === 'de' ? 'Kontakt aufnehmen' : 'Contact us' }}
                     </a>
                 </div>
             </div>
         </section>
         
         <!-- Simple Footer -->
-        <footer class="bg-gray-900 text-white py-3">
+        <footer class="bg-white text-gray py-3">
             <div class="container mx-auto px-4">
                 <div class="flex  md:flex-row justify-between items-center space-y-4 md:space-y-0">
                     
@@ -548,12 +548,12 @@
                         </p>
                         <div class="flex space-x-3">
                             <a href="/en/templates" 
-                               class="flex items-center space-x-1 px-3 py-1 rounded-md transition-all duration-200 {{ app()->getLocale() === 'en' ? 'bg-[#D53741] text-white' : 'text-gray-400 hover:text-white hover:bg-gray-800' }}">
+                               class="flex items-center space-x-1 px-3 py-1  transition-all duration-200 {{ app()->getLocale() === 'en' ? 'bg-[#D53741] text-white' : 'text-gray-400 hover:text-white hover:bg-gray-800' }}">
                                 <span class="text-base">🇺🇸</span>
                                 <span class="text-sm">EN</span>
                             </a>
                             <a href="/de/vorlagen" 
-                               class="flex items-center space-x-1 px-3 py-1 rounded-md transition-all duration-200 {{ app()->getLocale() === 'de' ? 'bg-[#D53741] text-white' : 'text-gray-400 hover:text-white hover:bg-gray-800' }}">
+                               class="flex items-center space-x-1 px-3 py-1 transition-all duration-200 {{ app()->getLocale() === 'de' ? 'bg-[#D53741] text-white' : 'text-gray-400 hover:text-white hover:bg-gray-800' }}">
                                 <span class="text-base">🇩🇪</span>
                                 <span class="text-sm">DE</span>
                             </a>
