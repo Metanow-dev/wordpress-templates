@@ -1,34 +1,35 @@
-<div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 overflow-x-hidden">
     <!-- Header -->
     <header class="bg-white border-b border-gray-200 sticky top-0 z-40 shadow-sm">
-        <div class="container mx-auto px-4 py-4 flex items-center justify-between">
-            <div class="flex items-center space-x-4">
+        <div class="container mx-auto px-2 sm:px-4 py-4 flex items-center justify-between">
+            <div class="flex items-center space-x-2">
                 <div class="text-2xl font-bold text-[#D53741]">
-                    <img src="{{ asset('storage/img/logo/Metanow.webp') }}" width="180" alt="Metanow Logo">
+                    <img src="{{ asset('storage/img/logo/Metanow.webp') }}" width="120" class="sm:w-[180px]" alt="Metanow Logo">
                 </div>
             </div>
             
-            <div class="flex items-center space-x-4">
+            <div class="flex items-center space-x-1 sm:space-x-4">
                 <!-- Language Switcher -->
-                <div class="flex items-center space-x-2">
-                    <a href="/en/templates" class="px-3 py-1 text-sm  {{ app()->getLocale() === 'en' ? 'bg-red-50 text-[#B12A31] font-medium' : 'text-gray-600 hover:text-[#D53741]' }} transition-colors duration-200">
+                <div class="flex items-center space-x-1 sm:space-x-2">
+                    <a href="/en/templates" class="px-2 py-1 text-xs sm:text-sm {{ app()->getLocale() === 'en' ? 'bg-red-50 text-[#B12A31] font-medium' : 'text-gray-600 hover:text-[#D53741]' }} transition-colors duration-200">
                         EN
                     </a>
-                    <span class="text-gray-300">|</span>
-                    <a href="/de/vorlagen" class="px-3 py-1 text-sm  {{ app()->getLocale() === 'de' ? 'bg-red-50 text-[#B12A31] font-medium' : 'text-gray-600 hover:text-[#D53741]' }} transition-colors duration-200">
+                    <span class="text-gray-300 text-xs sm:text-sm">|</span>
+                    <a href="/de/vorlagen" class="px-2 py-1 text-xs sm:text-sm {{ app()->getLocale() === 'de' ? 'bg-red-50 text-[#B12A31] font-medium' : 'text-gray-600 hover:text-[#D53741]' }} transition-colors duration-200">
                         DE
                     </a>
                 </div>
                 
                 <a href="https://metanow.dev"
-                    class="bg-[#D53741] hover:bg-[#B12A31] text-white px-6 py-2 font-medium transition-colors duration-200">
-                    Back to Metanow
+                    class="bg-[#D53741] hover:bg-[#B12A31] text-white px-3 py-2 text-xs sm:text-sm sm:px-6 font-medium transition-colors duration-200 whitespace-nowrap">
+                    <span class="hidden sm:inline">Back to Metanow</span>
+                    <span class="sm:hidden">Back</span>
                 </a>
             </div>
         </div>
     </header>
 
-    <div class="container mx-auto px-4 py-8">
+    <div class="container mx-auto px-2 sm:px-4 py-4 sm:py-8">
         
         <!-- Enhanced Search & Controls Bar -->
         <div class="mb-6">
@@ -66,7 +67,7 @@
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.414A1 1 0 013 6.707V4z"/>
                             </svg>
-                            <span>{{ app()->getLocale() === 'de' ? 'Filter' : 'Filters' }}</span>
+                            <span>{{ $showFilters ? (app()->getLocale() === 'de' ? 'Filter ausblenden' : 'Hide Filters') : (app()->getLocale() === 'de' ? 'Filter anzeigen' : 'Show Filters') }}</span>
                         </button>
 
                         <!-- View Toggle -->
@@ -115,12 +116,10 @@
                         @endif
                     </div>
                     
-                    @if($search || !empty($selectedCategories) || !empty($selectedTags) || $onlyWithScreenshots || $onlyClassified)
-                        <button wire:click="clearFilters"
-                            class="px-3 py-1 bg-red-50 hover:bg-red-100 text-red-600 transition-all duration-200 text-sm font-medium">
-                            {{ app()->getLocale() === 'de' ? 'Alle löschen' : 'Clear all' }}
-                        </button>
-                    @endif
+                    <button wire:click="clearFilters"
+                        class="px-3 py-1 {{ ($search || !empty($selectedCategories) || !empty($selectedTags) || $onlyWithScreenshots || $onlyClassified) ? 'bg-red-50 hover:bg-red-100 text-red-600' : 'bg-gray-50 hover:bg-gray-100 text-gray-400' }} transition-all duration-200 text-sm font-medium">
+                        {{ app()->getLocale() === 'de' ? 'Alle löschen' : 'Clear all' }}
+                    </button>
                 </div>
             </div>
         </div>
@@ -538,15 +537,58 @@
         
         <!-- Simple Footer -->
         <footer class="bg-white text-gray py-3">
-            <div class="container mx-auto px-4">
-                <div class="flex  md:flex-row justify-between items-center space-y-4 md:space-y-0">
+            <div class="container mx-auto px-2 sm:px-4">
+                <div class="flex flex-col space-y-3 md:flex-row md:justify-between md:items-center md:space-y-0">
                     
-                    <!-- Copyright, Legal Links, and Language Flags -->
-                    <div class="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-6">
-                        <p class="text-sm text-gray-400">
+                    <!-- Copyright -->
+                    <div class="text-center md:text-left">
+                        <p class="text-xs sm:text-sm text-gray-400">
                             &copy; {{ date('Y') }} Metanow | {{ app()->getLocale() === 'de' ? 'Alle Rechte vorbehalten.' : 'All rights reserved.' }}
                         </p>
+                    </div>
+                    
+                    <!-- Mobile: Stacked Layout -->
+                    <div class="flex flex-col space-y-3 md:hidden">
+                        <!-- Language Flags -->
+                        <div class="flex justify-center space-x-3">
+                            <a href="/en/templates" 
+                               class="flex items-center space-x-1 px-2 py-1 rounded-md transition-all duration-200 {{ app()->getLocale() === 'en' ? 'bg-red-50 text-[#B12A31]' : 'text-gray-400 hover:text-gray-900 hover:bg-gray-200' }}">
+                                <span class="fi fi-us" style="width: 16px; height: 12px;"></span>
+                                <span class="text-xs">EN</span>                             
+                            </a>
+                            <a href="/de/vorlagen" 
+                               class="flex items-center space-x-1 px-2 py-1 rounded-md transition-all duration-200 {{ app()->getLocale() === 'de' ? 'bg-red-50 text-[#B12A31]' : 'text-gray-400 hover:text-gray-900 hover:bg-gray-200' }}">
+                                <span class="fi fi-de" style="width: 16px; height: 12px;"></span>
+                                <span class="text-xs">DE</span>
+                            </a>
+                        </div>
                         
+                        <!-- Legal Links -->
+                        <div class="flex justify-center space-x-4 text-xs">
+                            <a href="{{ app()->getLocale() === 'de' ? 'https://www.metanow.dev/de/imprint' : 'https://www.metanow.dev/en/imprint' }}" target="_blank" class="text-gray-400 hover:text-gray-900 transition-colors">
+                                {{ app()->getLocale() === 'de' ? 'Impressum' : 'Imprint' }}
+                            </a>
+                            <a href="{{ app()->getLocale() === 'de' ? 'https://www.metanow.dev/de/privacy-policy' : 'https://www.metanow.dev/en/privacy-policy' }}" target="_blank" class="text-gray-400 hover:text-gray-900 transition-colors">
+                                {{ app()->getLocale() === 'de' ? 'Datenschutz' : 'Privacy' }}
+                            </a>
+                            <a href="{{ app()->getLocale() === 'de' ? 'https://www.metanow.dev/de/terms-of-service' : 'https://www.metanow.dev/en/terms-of-service' }}" target="_blank" class="text-gray-400 hover:text-gray-900 transition-colors">
+                                {{ app()->getLocale() === 'de' ? 'AGB' : 'Terms' }}
+                            </a>
+                        </div>
+                        
+                        <!-- Mobile Powered by -->
+                        <div class="flex justify-center items-center space-x-2">
+                            <span class="text-xs text-gray-400">
+                                {{ app()->getLocale() === 'de' ? 'Betrieben von' : 'Powered by' }}
+                            </span>
+                            <a href="https://metanow.dev" target="_blank" class="hover:opacity-80 transition-opacity duration-200">
+                                <img src="{{ asset('storage/img/logo/Metanow.webp') }}" width="80" alt="Metanow Logo" class="filter brightness-0 invert">
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Desktop: Horizontal Layout -->
+                    <div class="hidden md:flex md:items-center md:space-x-6">
                         <!-- Language Flags -->
                         <div class="flex space-x-3">
                             <a href="/en/templates" 
@@ -558,6 +600,7 @@
                                 <span class="fi fi-de" style="width: 20px; height: 15px;"></span>
                             </a>
                         </div>
+                        
                         <!-- Legal Links -->
                         <div class="flex space-x-4 text-sm">
                             <a href="{{ app()->getLocale() === 'de' ? 'https://www.metanow.dev/de/imprint' : 'https://www.metanow.dev/en/imprint' }}" target="_blank" class="text-gray-400 hover:text-gray-900 transition-colors">
@@ -571,16 +614,15 @@
                             </a>
                         </div>
                         
-                    </div>
-                    
-                    <!-- Powered by Metanow -->
-                    <div class="flex items-center space-x-2 md:text-right">
-                        <span class="text-sm text-gray-400">
-                            {{ app()->getLocale() === 'de' ? 'Betrieben von' : 'Powered by' }}
-                        </span>
-                        <a href="https://metanow.dev" target="_blank" class="hover:opacity-80 transition-opacity duration-200">
-                            <img src="{{ asset('storage/img/logo/Metanow.webp') }}" width="120" alt="Metanow Logo" class="filter brightness-0 invert">
-                        </a>
+                        <!-- Powered by Metanow -->
+                        <div class="flex items-center space-x-2">
+                            <span class="text-sm text-gray-400">
+                                {{ app()->getLocale() === 'de' ? 'Betrieben von' : 'Powered by' }}
+                            </span>
+                            <a href="https://metanow.dev" target="_blank" class="hover:opacity-80 transition-opacity duration-200">
+                                <img src="{{ asset('storage/img/logo/Metanow.webp') }}" width="120" alt="Metanow Logo" class="filter brightness-0 invert">
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>

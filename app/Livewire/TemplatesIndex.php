@@ -17,7 +17,7 @@ class TemplatesIndex extends Component
     public string $perPage = '20'; // 20, 40, 80
     public array $selectedCategories = [];
     public array $selectedTags = [];
-    public bool $showFilters = true;
+    public bool $showFilters = false;
     public bool $onlyWithScreenshots = false;
     public bool $onlyClassified = false;
     
