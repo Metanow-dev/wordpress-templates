@@ -323,6 +323,9 @@
 
         <!-- Results -->
         @if($templates->count())
+            <div class="container cetner mx-auto">
+                
+                <!-- Grid View -->
             @if($view === 'grid')
                 <!-- Grid View -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
@@ -507,6 +510,7 @@
             <div class="flex justify-center">
                 {{ $templates->links() }}
             </div>
+            
         @else
             <!-- Empty State -->
             <div class="text-center py-16">
@@ -526,6 +530,7 @@
                         {{ app()->getLocale() === 'de' ? 'Filter zurücksetzen' : 'Clear filters' }}
                     </button>
                 </div>
+            </div>
             </div>
         @endif
         
