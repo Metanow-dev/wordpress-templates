@@ -285,7 +285,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
                                     </svg>
                                     {{ \App\Helpers\CategoryHelper::getCategoryName($category, app()->getLocale()) }}
-                                    <button wire:click="removeCategory('{{ $category }}')" class="ml-2 hover:bg-white/20 rounded-full p-0.5 transition-colors">
+                                    <button wire:click="removeCategory('{{ $category }}')" class="ml-2 hover:bg-white/20 p-0.5 transition-colors">
                                         <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                                             <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
                                         </svg>
@@ -299,7 +299,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
                                     </svg>
                                     {{ ucfirst(str_replace('_', ' ', $tag)) }}
-                                    <button wire:click="removeTag('{{ $tag }}')" class="ml-2 hover:bg-white/20 rounded-full p-0.5 transition-colors">
+                                    <button wire:click="removeTag('{{ $tag }}')" class="ml-2 hover:bg-white/20 p-0.5 transition-colors">
                                         <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                                             <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
                                         </svg>
@@ -339,29 +339,20 @@
 
                                 <!-- Category Badge -->
                                 @if($template->primary_category)
-                                    <div class="absolute top-3 left-3">
-                                        <span class="inline-block px-4 py-2 text-sm font-bold bg-gradient-to-r from-[#D53741] to-[#B12A31] text-white rounded-full shadow-lg border-2 border-white/20 backdrop-blur-sm">
+                                    <div class="absolute top-2 left-2">
+                                        <span class="inline-block px-2 py-2 text-sm font-bold bg-gradient-to-r from-[#D53741] to-[#B12A31] text-white shadow-lg border-2 border-white/20 backdrop-blur-sm">
                                             {{ \App\Helpers\CategoryHelper::getCategoryName($template->primary_category, app()->getLocale()) }}
                                         </span>
                                     </div>
                                 @endif
-
-                                <!-- Demo Button -->
-                                <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center">
-                                    <a href="{{ $template->demo_url }}" target="_blank"
-                                        class="bg-[#D53741]/90 hover:bg-[#B12A31] text-white px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 shadow-lg opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0">
-                                        {{ app()->getLocale() === 'de' ? 'Demo ansehen' : 'View Demo' }}
-                                    </a>
-                                </div>
                             </div>
 
                             <!-- Content with Uniform Height -->
-                            <div class="p-6 flex flex-col h-48"> <!-- Fixed height for uniformity -->
+                            <div class="p-6 flex flex-col h-52"> <!-- Fixed height for uniformity -->
                                 <!-- Title (Fixed Height) -->
                                 <a href="{{ $template->demo_url }}" target="_blank">
                                 <h3 class="font-bold text-gray-900 mb-2 text-lg line-clamp-1 group-hover:text-[#D53741] transition-colors duration-200 min-h-[28px]">
                                     {{ $template->name ?? ucfirst(str_replace('-', ' ', $template->slug)) }}
-                                    
                                 </h3>
                                 </a>
 
@@ -411,18 +402,13 @@
                                     @endif
                                 </div>
 
-                                <!-- Theme (Fixed at Bottom) -->
-                                {{-- @if($template->active_theme)
-                                    <div class="mt-auto pt-3 border-t border-gray-100 text-xs text-gray-500">
-                                        <span class="font-medium">{{ app()->getLocale() === 'de' ? 'Theme:' : 'Theme:' }}</span>
-                                        {{ $template->active_theme }}
-                                    </div>
-                                @else
-                                    <!-- Spacer if no theme -->
-                                    <div class="mt-auto pt-3 border-t border-gray-100 text-xs text-transparent">
-                                        &nbsp;
-                                    </div>
-                                @endif --}}
+                                <!-- View Demo Button (Fixed at Bottom) -->
+                                <div class="mx-auto mt-auto pt-1">
+                                    <a href="{{ $template->demo_url }}" target="_blank"
+                                        class="block text-center text-sm font-medium text-gray-600 hover:text-white hover:bg-[#D53741] py-2 px-4  border border-transparent hover:border-[#D53741] transition-all duration-200">
+                                        {{ app()->getLocale() === 'de' ? 'Demo ansehen' : 'View Demo' }}
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     @endforeach
@@ -450,7 +436,7 @@
                                     <!-- Category Badge -->
                                     @if($template->primary_category)
                                         <div class="absolute top-3 left-3">
-                                            <span class="inline-block px-3 py-1.5 text-xs font-bold bg-gradient-to-r from-[#D53741] to-[#B12A31] text-white rounded-full shadow-lg">
+                                            <span class="inline-block px-3 py-1.5 text-xs font-bold bg-gradient-to-r from-[#D53741] to-[#B12A31] text-white shadow-lg">
                                                 {{ \App\Helpers\CategoryHelper::getCategoryName($template->primary_category, app()->getLocale()) }}
                                             </span>
                                         </div>
@@ -526,14 +512,63 @@
                     </button>
                 </div>
             </div>
-            </div>
         @endif
         
-        <!-- Footer -->
-        <footer class="bg-white border-t border-gray-200 mt-12">
-            <div class="container mx-auto px-4 py-6">
-                <div class="text-center text-gray-600">
-                    <p>&copy; {{ date('Y') }} Metanow. All rights reserved.</p>
+        <!-- Call to Action Section -->
+        <section class="bg-gradient-to-r from-[#D53741] to-[#B12A31] text-white mb-8 mt-16 py-16">
+            <div class="container mx-auto px-4 text-center">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">
+                    {{ app()->getLocale() === 'de' ? 'Bereit für Ihr nächstes Projekt?' : 'Ready for Your Next Project?' }}
+                </h2>
+                <p class="text-xl mb-8 opacity-90 max-w-2xl mx-auto">
+                    {{ app()->getLocale() === 'de' ? 'Lassen Sie uns Ihre Vision in eine professionelle WordPress-Website verwandeln. Kontaktieren Sie unser Expertenteam noch heute.' : 'Let us turn your vision into a professional WordPress website. Contact our expert team today.' }}
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                    <a href="https://metanow.dev/contact" 
+                       class="bg-white px-4 text-[#D53741] hover:bg-gray-100 px-8 py-4 font-semibold text-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+                        {{ app()->getLocale() === 'de' ? 'Projekt starten' : 'Start Your Project' }}
+                    </a>
+                    <a href="https://metanow.dev/portfolio" 
+                       class="border-2 px-3 border-white text-white px-8 py-4 font-semibold text-lg transition-all duration-200 hover:bg-white hover:text-[#D53741]">
+                        {{ app()->getLocale() === 'de' ? 'Portfolio ansehen' : 'View Portfolio' }}
+                    </a>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Simple Footer -->
+        <footer class="bg-gray-900 text-white py-3">
+            <div class="container mx-auto px-4">
+                <div class="flex  md:flex-row justify-between items-center space-y-4 md:space-y-0">
+                    
+                    <!-- Copyright and Language Flags -->
+                    <div class="flex  md:flex-row  items-center space-y-1 gap-6 md:space-y-0 md:space-x-6">
+                        <p class="text-sm text-gray-400">
+                            &copy; {{ date('Y') }} Metanow | {{ app()->getLocale() === 'de' ? 'Alle Rechte vorbehalten.' : 'All rights reserved.' }}
+                        </p>
+                        <div class="flex space-x-3">
+                            <a href="/en/templates" 
+                               class="flex items-center space-x-1 px-3 py-1 rounded-md transition-all duration-200 {{ app()->getLocale() === 'en' ? 'bg-[#D53741] text-white' : 'text-gray-400 hover:text-white hover:bg-gray-800' }}">
+                                <span class="text-base">🇺🇸</span>
+                                <span class="text-sm">EN</span>
+                            </a>
+                            <a href="/de/vorlagen" 
+                               class="flex items-center space-x-1 px-3 py-1 rounded-md transition-all duration-200 {{ app()->getLocale() === 'de' ? 'bg-[#D53741] text-white' : 'text-gray-400 hover:text-white hover:bg-gray-800' }}">
+                                <span class="text-base">🇩🇪</span>
+                                <span class="text-sm">DE</span>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Powered by Metanow -->
+                    <div class="flex items-center space-x-2 md:text-right">
+                        <span class="text-sm text-gray-400">
+                            {{ app()->getLocale() === 'de' ? 'Betrieben von' : 'Powered by' }}
+                        </span>
+                        <a href="https://metanow.dev" target="_blank" class="hover:opacity-80 transition-opacity duration-200">
+                            <img src="{{ asset('storage/img/logo/Metanow.webp') }}" width="120" alt="Metanow Logo" class="filter brightness-0 invert">
+                        </a>
+                    </div>
                 </div>
             </div>
         </footer>
