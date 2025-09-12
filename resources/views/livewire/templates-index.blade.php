@@ -541,23 +541,36 @@
             <div class="container mx-auto px-4">
                 <div class="flex  md:flex-row justify-between items-center space-y-4 md:space-y-0">
                     
-                    <!-- Copyright and Language Flags -->
-                    <div class="flex  md:flex-row  items-center space-y-1 gap-6 md:space-y-0 md:space-x-6">
+                    <!-- Copyright, Legal Links, and Language Flags -->
+                    <div class="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-6">
                         <p class="text-sm text-gray-400">
                             &copy; {{ date('Y') }} Metanow | {{ app()->getLocale() === 'de' ? 'Alle Rechte vorbehalten.' : 'All rights reserved.' }}
                         </p>
+                        
+                        <!-- Language Flags -->
                         <div class="flex space-x-3">
                             <a href="/en/templates" 
-                               class="flex items-center space-x-1 px-3 py-1  transition-all duration-200 {{ app()->getLocale() === 'en' ? 'bg-[#D53741] text-white' : 'text-gray-400 hover:text-white hover:bg-gray-800' }}">
-                                <span class="text-base">🇺🇸</span>
-                                <span class="text-sm">EN</span>
+                               class="flex items-center space-x-2 px-3 py-1 rounded-md transition-all duration-200 {{ app()->getLocale() === 'en' ? 'bg-red-50 text-[#B12A31]' : 'text-gray-400 hover:text-gray-900 hover:bg-gray-200' }}">
+                                <span class="fi fi-us" style="width: 20px; height: 15px;"></span>                                
                             </a>
                             <a href="/de/vorlagen" 
-                               class="flex items-center space-x-1 px-3 py-1 transition-all duration-200 {{ app()->getLocale() === 'de' ? 'bg-[#D53741] text-white' : 'text-gray-400 hover:text-white hover:bg-gray-800' }}">
-                                <span class="text-base">🇩🇪</span>
-                                <span class="text-sm">DE</span>
+                               class="flex items-center space-x-2 px-3 py-1 rounded-md transition-all duration-200 {{ app()->getLocale() === 'de' ? 'bg-red-50 text-[#B12A31]' : 'text-gray-400 hover:text-gray-900 hover:bg-gray-200' }}">
+                                <span class="fi fi-de" style="width: 20px; height: 15px;"></span>
                             </a>
                         </div>
+                        <!-- Legal Links -->
+                        <div class="flex space-x-4 text-sm">
+                            <a href="{{ app()->getLocale() === 'de' ? 'https://www.metanow.dev/de/imprint' : 'https://www.metanow.dev/en/imprint' }}" target="_blank" class="text-gray-400 hover:text-gray-900 transition-colors">
+                                {{ app()->getLocale() === 'de' ? 'Impressum' : 'Imprint' }}
+                            </a>
+                            <a href="{{ app()->getLocale() === 'de' ? 'https://www.metanow.dev/de/privacy-policy' : 'https://www.metanow.dev/en/privacy-policy' }}" target="_blank" class="text-gray-400 hover:text-gray-900 transition-colors">
+                                {{ app()->getLocale() === 'de' ? 'Datenschutz' : 'Privacy Policy' }}
+                            </a>
+                            <a href="{{ app()->getLocale() === 'de' ? 'https://www.metanow.dev/de/terms-of-service' : 'https://www.metanow.dev/en/terms-of-service' }}" target="_blank" class="text-gray-400 hover:text-gray-900 transition-colors">
+                                {{ app()->getLocale() === 'de' ? 'AGB' : 'Terms & Conditions' }}
+                            </a>
+                        </div>
+                        
                     </div>
                     
                     <!-- Powered by Metanow -->

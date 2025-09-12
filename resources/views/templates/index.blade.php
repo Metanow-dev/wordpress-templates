@@ -28,6 +28,9 @@
     
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="/watermark.png">
+    
+    <!-- Flag Icons CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css" />
 
     
     @vite(['resources/css/app.css', 'resources/js/app.js'])
