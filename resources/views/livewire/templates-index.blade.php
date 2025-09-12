@@ -322,11 +322,11 @@
         @endif
 
         <!-- Results -->
-        <div class="mx-auto px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
         @if($templates->count())
             @if($view === 'grid')
                 <!-- Grid View -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 mb-12">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
                     @foreach($templates as $template)
                         <div class="group bg-white rounded-2xl shadow-sm border border-gray-200/50 overflow-hidden hover:shadow-xl hover:shadow-gray-200/50 transition-all duration-300 hover:-translate-y-1">
                             <!-- Screenshot -->
@@ -361,34 +361,69 @@
                                 </div>
                             </div>
 
-                            <!-- Content -->
-                            <div class="p-6">
-                                <h3 class="font-bold text-gray-900 mb-2 text-lg line-clamp-1 group-hover:text-[#D53741] transition-colors duration-200">
+                            <!-- Content with Uniform Height -->
+                            <div class="p-6 flex flex-col h-48"> <!-- Fixed height for uniformity -->
+                                <!-- Title (Fixed Height) -->
+                                <h3 class="font-bold text-gray-900 mb-2 text-lg line-clamp-1 group-hover:text-[#D53741] transition-colors duration-200 min-h-[28px]">
                                     {{ $template->name ?? ucfirst(str_replace('-', ' ', $template->slug)) }}
                                 </h3>
 
-                                @if($template->description_en || $template->description_de)
-                                    <p class="text-sm text-gray-600 line-clamp-2 mb-4 leading-relaxed">
-                                        {{ app()->getLocale() === 'de' ? $template->description_de : $template->description_en }}
-                                    </p>
-                                @endif
+                                <!-- Description (Fixed Height) -->
+                                <div class="mb-4 min-h-[40px]">
+                                    @if($template->description_en || $template->description_de)
+                                        <p class="text-sm text-gray-600 line-clamp-2 leading-relaxed">
+                                            {{ app()->getLocale() === 'de' ? $template->description_de : $template->description_en }}
+                                        </p>
+                                    @endif
+                                </div>
 
-                                <!-- Tags -->
-                                @if($template->tags && count($template->tags) > 0)
-                                    <div class="flex flex-wrap gap-1.5 mb-3">
-                                        @foreach($template->tags as $tag)
-                                            <button wire:click="toggleTag('{{ $tag }}')"
-                                                class="inline-block px-2.5 py-1 text-xs rounded-md font-medium transition-all duration-200 cursor-pointer {{ in_array($tag, $selectedTags) ? 'bg-gradient-to-r from-[#D53741] to-[#B12A31] text-white shadow-sm' : 'bg-gradient-to-r from-gray-100 to-gray-50 text-gray-700 hover:from-gray-200 hover:to-gray-100 border border-gray-200/50' }}">
-                                                {{ ucfirst(str_replace('_', ' ', $tag)) }}
-                                            </button>
-                                        @endforeach
-                                    </div>
-                                @endif
+                                <!-- Tags with Overflow Handling (Flexible Height) -->
+                                <div class="flex-1 mb-3">
+                                    @if($template->tags && count($template->tags) > 0)
+                                        @php
+                                            $visibleTags = array_slice($template->tags, 0, 4);
+                                            $remainingCount = count($template->tags) - 4;
+                                        @endphp
+                                        
+                                        <div class="flex flex-wrap gap-1.5">
+                                            @foreach($visibleTags as $tag)
+                                                <button wire:click="toggleTag('{{ $tag }}')"
+                                                    class="inline-block px-2.5 py-1 text-xs rounded-md font-medium transition-all duration-200 cursor-pointer {{ in_array($tag, $selectedTags) ? 'bg-gradient-to-r from-[#D53741] to-[#B12A31] text-white shadow-sm' : 'bg-gradient-to-r from-gray-100 to-gray-50 text-gray-700 hover:from-gray-200 hover:to-gray-100 border border-gray-200/50' }}">
+                                                    {{ ucfirst(str_replace('_', ' ', $tag)) }}
+                                                </button>
+                                            @endforeach
+                                            
+                                            @if($remainingCount > 0)
+                                                <div class="relative group/tags">
+                                                    <button class="inline-block px-2.5 py-1 text-xs rounded-md font-medium bg-gray-200 text-gray-600 hover:bg-gray-300 transition-all duration-200">
+                                                        +{{ $remainingCount }}
+                                                    </button>
+                                                    
+                                                    <!-- Tooltip with remaining tags -->
+                                                    <div class="absolute bottom-full left-0 mb-2 hidden group-hover/tags:block z-50">
+                                                        <div class="bg-black text-white text-xs rounded-lg py-2 px-3 whitespace-nowrap shadow-lg">
+                                                            @foreach(array_slice($template->tags, 4) as $tag)
+                                                                <span class="inline-block mr-2">{{ ucfirst(str_replace('_', ' ', $tag)) }}</span>
+                                                            @endforeach
+                                                            <div class="absolute top-full left-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-black"></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @endif
+                                        </div>
+                                    @endif
+                                </div>
 
+                                <!-- Theme (Fixed at Bottom) -->
                                 @if($template->active_theme)
-                                    <div class="mt-3 pt-3 border-t border-gray-100 text-xs text-gray-500">
+                                    <div class="mt-auto pt-3 border-t border-gray-100 text-xs text-gray-500">
                                         <span class="font-medium">{{ app()->getLocale() === 'de' ? 'Theme:' : 'Theme:' }}</span>
                                         {{ $template->active_theme }}
+                                    </div>
+                                @else
+                                    <!-- Spacer if no theme -->
+                                    <div class="mt-auto pt-3 border-t border-gray-100 text-xs text-transparent">
+                                        &nbsp;
                                     </div>
                                 @endif
                             </div>
