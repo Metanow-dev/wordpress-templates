@@ -1,2 +1,17 @@
 User-agent: *
-Disallow:
+# Allow gallery pages
+Allow: /en/templates$
+Allow: /de/vorlagen$
+
+# Block individual template detail pages
+Disallow: /en/templates/
+Disallow: /de/vorlagen/
+
+# Block API endpoints
+Disallow: /api/
+
+# Block media proxy
+Disallow: /media/
+
+# Allow everything else
+Allow: /

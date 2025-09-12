@@ -33,13 +33,17 @@ Route::get('/media/{slug}/{path}', function (string $slug, string $path) {
 
 // EN
 Route::prefix('en')->middleware('set.locale')->group(function () {
+    // Allow crawling of main gallery page
     Route::get('templates', fn () => view('templates.index'))->name('templates.index');
-    Route::get('templates/{slug}', fn ($slug) => "DETAIL locale=en slug=$slug")->name('templates.show');
+    // Block crawling of individual template detail pages
+    Route::get('templates/{slug}', fn ($slug) => response("DETAIL locale=en slug=$slug")->header('X-Robots-Tag', 'noindex, nofollow, noarchive, nosnippet'))->name('templates.show');
 });
 
 // DE
 Route::prefix('de')->middleware('set.locale')->group(function () {
+    // Allow crawling of main gallery page
     Route::get('vorlagen', fn () => view('templates.index'))->name('templates.index.de');
-    Route::get('vorlagen/{slug}', fn ($slug) => "DETAIL locale=de slug=$slug")->name('templates.show.de');
+    // Block crawling of individual template detail pages
+    Route::get('vorlagen/{slug}', fn ($slug) => response("DETAIL locale=de slug=$slug")->header('X-Robots-Tag', 'noindex, nofollow, noarchive, nosnippet'))->name('templates.show.de');
 });
 

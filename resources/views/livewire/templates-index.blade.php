@@ -11,17 +11,17 @@
             <div class="flex items-center space-x-4">
                 <!-- Language Switcher -->
                 <div class="flex items-center space-x-2">
-                    <a href="/en/templates" class="px-3 py-1 text-sm rounded {{ app()->getLocale() === 'en' ? 'bg-red-50 text-[#B12A31] font-medium' : 'text-gray-600 hover:text-[#D53741]' }} transition-colors duration-200">
+                    <a href="/en/templates" class="px-3 py-1 text-sm  {{ app()->getLocale() === 'en' ? 'bg-red-50 text-[#B12A31] font-medium' : 'text-gray-600 hover:text-[#D53741]' }} transition-colors duration-200">
                         EN
                     </a>
                     <span class="text-gray-300">|</span>
-                    <a href="/de/vorlagen" class="px-3 py-1 text-sm rounded {{ app()->getLocale() === 'de' ? 'bg-red-50 text-[#B12A31] font-medium' : 'text-gray-600 hover:text-[#D53741]' }} transition-colors duration-200">
+                    <a href="/de/vorlagen" class="px-3 py-1 text-sm  {{ app()->getLocale() === 'de' ? 'bg-red-50 text-[#B12A31] font-medium' : 'text-gray-600 hover:text-[#D53741]' }} transition-colors duration-200">
                         DE
                     </a>
                 </div>
                 
                 <a href="https://metanow.dev"
-                    class="bg-[#D53741] hover:bg-[#B12A31] text-white px-6 py-2 rounded-lg font-medium transition-colors duration-200">
+                    class="bg-[#D53741] hover:bg-[#B12A31] text-white px-6 py-2 font-medium transition-colors duration-200">
                     Back to Metanow
                 </a>
             </div>
@@ -32,7 +32,7 @@
         
         <!-- Enhanced Search & Controls Bar -->
         <div class="mb-6">
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-200/50 p-6">
+            <div class="bg-white shadow-sm border border-gray-200/50 p-6">
                 <div class="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
                     
                     <!-- Search Section -->
@@ -46,7 +46,7 @@
                             </div>
                             <input type="text" wire:model.live.debounce.300ms="search"
                                 placeholder="{{ app()->getLocale() === 'de' ? 'Nach Vorlagen suchen...' : 'Search templates...' }}"
-                                class="w-full pl-10 pr-4 py-3 text-base border-2 border-gray-300 bg-white rounded-xl focus:ring-2 focus:ring-[#D53741] focus:border-blue-500 transition-all duration-200 shadow-sm">
+                                class="w-full pl-10 pr-4 py-3 text-base border-gray-300 bg-white focus:ring-2 focus:ring-[#D53741] focus:border-blue-500 transition-all duration-200 shadow-sm">
                             
                             @if($search)
                                 <button wire:click="$set('search', '')" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600">
@@ -62,7 +62,7 @@
                     <div class="flex flex-wrap items-center gap-3">
                         <!-- Filter Toggle -->
                         <button wire:click="toggleFilters" 
-                            class="flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 {{ $showFilters ? 'bg-red-50 text-[#D53741] border border-red-200' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}">
+                            class="flex items-center space-x-2 px-4 py-2 font-medium transition-all duration-200 {{ $showFilters ? 'bg-red-50 text-[#D53741] border border-red-200' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.414A1 1 0 013 6.707V4z"/>
                             </svg>
@@ -70,16 +70,16 @@
                         </button>
 
                         <!-- View Toggle -->
-                        <div class="flex items-center bg-gray-100 rounded-lg p-1">
+                        <div class="flex items-center bg-gray-100 p-1">
                             <button wire:click="setView('grid')" 
-                                class="flex items-center space-x-1 px-3 py-1.5 rounded-md font-medium transition-all duration-200 {{ $view === 'grid' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900' }}">
+                                class="flex items-center space-x-1 px-3 py-1.5 font-medium transition-all duration-200 {{ $view === 'grid' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900' }}">
                                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                                     <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
                                 </svg>
                                 <span class="hidden sm:inline">Grid</span>
                             </button>
                             <button wire:click="setView('list')" 
-                                class="flex items-center space-x-1 px-3 py-1.5 rounded-md font-medium transition-all duration-200 {{ $view === 'list' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900' }}">
+                                class="flex items-center space-x-1 px-3 py-1.5 font-medium transition-all duration-200 {{ $view === 'list' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900' }}">
                                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"/>
                                 </svg>
@@ -89,7 +89,7 @@
 
                         <!-- Sort Dropdown -->
                         <select wire:model.live="sort" 
-                            class="px-4 py-2 border-0 bg-gray-50 rounded-lg focus:ring-2 focus:ring-[#D53741]/20 focus:bg-white transition-all duration-200 text-sm font-medium">
+                            class="px-4 py-2 border-0 bg-gray-50 focus:ring-2 focus:ring-[#D53741]/20 focus:bg-white transition-all duration-200 text-sm font-medium">
                             <option value="recent">{{ app()->getLocale() === 'de' ? 'Neueste' : 'Recent' }}</option>
                             <option value="az">A → Z</option>
                             <option value="za">Z → A</option>
@@ -98,7 +98,7 @@
 
                         <!-- Per Page -->
                         <select wire:model.live="perPage" 
-                            class="px-3 py-2 border-0 bg-gray-50 rounded-lg focus:ring-2 focus:ring-[#D53741]/20 focus:bg-white transition-all duration-200 text-sm font-medium">
+                            class="px-3 py-2 border-0 bg-gray-50 focus:ring-2 focus:ring-[#D53741]/20 focus:bg-white transition-all duration-200 text-sm font-medium">
                             <option value="12">12</option>
                             <option value="24">24</option>
                             <option value="48">48</option>
@@ -117,7 +117,7 @@
                     
                     @if($search || !empty($selectedCategories) || !empty($selectedTags) || $onlyWithScreenshots || $onlyClassified)
                         <button wire:click="clearFilters"
-                            class="px-3 py-1 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg transition-all duration-200 text-sm font-medium">
+                            class="px-3 py-1 bg-red-50 hover:bg-red-100 text-red-600 transition-all duration-200 text-sm font-medium">
                             {{ app()->getLocale() === 'de' ? 'Alle löschen' : 'Clear all' }}
                         </button>
                     @endif
@@ -127,14 +127,14 @@
 
         <!-- Advanced Filters Panel -->
         @if($showFilters)
-            <div class="bg-white/80 backdrop-blur-sm border border-gray-200/50 rounded-2xl p-6 mb-8 shadow-sm">
+            <div class="bg-white/80 backdrop-blur-sm border border-gray-200/50  p-6 mb-8 shadow-sm">
                 
-                <!-- Advanced Options -->
+                {{-- <!-- Advanced Options -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                     <div>
                         <label class="flex items-center space-x-3 text-sm font-medium text-gray-700">
                             <input type="checkbox" wire:model.live="onlyWithScreenshots" 
-                                class="rounded border-gray-300 text-[#D53741] focus:ring-[#D53741]">
+                                class=" border-gray-300 text-[#D53741] focus:ring-[#D53741]">
                             <span>{{ app()->getLocale() === 'de' ? 'Nur mit Screenshots' : 'Only with screenshots' }}</span>
                             <span class="text-xs text-gray-500">({{ $stats['with_screenshots'] }})</span>
                         </label>
@@ -143,25 +143,21 @@
                     <div>
                         <label class="flex items-center space-x-3 text-sm font-medium text-gray-700">
                             <input type="checkbox" wire:model.live="onlyClassified" 
-                                class="rounded border-gray-300 text-[#D53741] focus:ring-[#D53741]">
+                                class="border-gray-300 text-[#D53741] focus:ring-[#D53741]">
                             <span>{{ app()->getLocale() === 'de' ? 'Nur klassifiziert' : 'Only classified' }}</span>
                             <span class="text-xs text-gray-500">({{ $stats['classified'] }})</span>
                         </label>
                     </div>
-                </div>
+                </div> --}}
 
                 <!-- Professional Categories & Tags Layout -->
                 <div class="space-y-8">
                     
                     <!-- Categories Section -->
-                    <div class="bg-gradient-to-r from-gray-50 to-white rounded-xl border border-gray-100 p-6">
+                    <div class="bg-gradient-to-r from-gray-50 to-white border border-gray-100 p-6">
                         <div class="flex items-center justify-between mb-4">
                             <div class="flex items-center space-x-3">
-                                <div class="w-8 h-8 bg-gradient-to-br from-[#D53741] to-[#B12A31] rounded-lg flex items-center justify-center">
-                                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14-7l-4 8 4 8-4-8M5 11l4-4-4-4v8z"></path>
-                                    </svg>
-                                </div>
+                               
                                 <h3 class="text-lg font-semibold text-gray-900">{{ app()->getLocale() === 'de' ? 'Kategorien' : 'Categories' }}</h3>
                                 <span class="text-sm text-gray-500">({{ count($selectedCategories) }}/{{ count($categories) }})</span>
                             </div>
@@ -177,7 +173,7 @@
                         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
                             @foreach($categories as $key => $category)
                                 <button wire:click="toggleCategory('{{ $key }}')" 
-                                    class="group relative px-4 py-3 text-sm font-medium rounded-lg border-2 transition-all duration-200 text-left
+                                    class="group relative px-4 py-3 text-sm font-medium  border-2 transition-all duration-200 text-left
                                         {{ in_array($key, $selectedCategories) 
                                             ? 'border-[#D53741] bg-[#D53741] text-white shadow-md' 
                                             : 'border-gray-200 bg-white text-gray-700 hover:border-[#D53741]/30 hover:bg-[#D53741]/5' }}">
@@ -188,7 +184,7 @@
                                                 <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
                                             </svg>
                                         @else
-                                            <div class="w-4 h-4 ml-2 flex-shrink-0 border border-gray-300 rounded-sm group-hover:border-[#D53741]/50"></div>
+                                            
                                         @endif
                                     </div>
                                 </button>
@@ -197,14 +193,10 @@
                     </div>
 
                     <!-- Tags Section -->
-                    <div class="bg-gradient-to-r from-white to-gray-50 rounded-xl border border-gray-100 p-6">
+                    <div class="bg-gradient-to-r from-white to-gray-50  border border-gray-100 p-6">
                         <div class="flex items-center justify-between mb-4">
                             <div class="flex items-center space-x-3">
-                                <div class="w-8 h-8 bg-gradient-to-br from-gray-600 to-gray-700 rounded-lg flex items-center justify-center">
-                                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
-                                    </svg>
-                                </div>
+                                
                                 <h3 class="text-lg font-semibold text-gray-900">{{ app()->getLocale() === 'de' ? 'Features & Technologien' : 'Features & Technologies' }}</h3>
                                 <span class="text-sm text-gray-500">({{ count($selectedTags) }}/{{ count($tags) }})</span>
                             </div>
@@ -232,7 +224,7 @@
                                 @foreach($popularTags as $tag)
                                     @if(in_array($tag, $tags))
                                         <button wire:click="toggleTag('{{ $tag }}')" 
-                                            class="inline-flex items-center px-3 py-2 text-sm font-medium rounded-lg border transition-all duration-200
+                                            class="inline-flex items-center px-3 py-2 text-sm font-medium border transition-all duration-200
                                                 {{ in_array($tag, $selectedTags) 
                                                     ? 'border-[#D53741] bg-[#D53741] text-white shadow-sm' 
                                                     : 'border-gray-300 bg-white text-gray-700 hover:border-[#D53741] hover:bg-[#D53741]/5' }}">
@@ -257,7 +249,7 @@
                             <div class="flex flex-wrap gap-2">
                                 @foreach($otherTags as $tag)
                                     <button wire:click="toggleTag('{{ $tag }}')" 
-                                        class="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-md border transition-all duration-200
+                                        class="inline-flex items-center px-3 py-1.5 text-xs font-medium border transition-all duration-200
                                             {{ in_array($tag, $selectedTags) 
                                                 ? 'border-[#D53741] bg-[#D53741] text-white' 
                                                 : 'border-gray-200 bg-gray-50 text-gray-600 hover:border-[#D53741] hover:bg-[#D53741]/10' }}">
@@ -271,7 +263,7 @@
 
                 <!-- Clean Active Filters Summary -->
                 @if(!empty($selectedCategories) || !empty($selectedTags))
-                    <div class="bg-gradient-to-r from-[#D53741]/5 to-[#B12A31]/5 border border-[#D53741]/20 rounded-xl p-4 mt-6">
+                    <div class="bg-gradient-to-r from-[#D53741]/5 to-[#B12A31]/5 border border-[#D53741]/20 p-4 mt-6">
                         <div class="flex items-center justify-between mb-3">
                             <div class="flex items-center space-x-2">
                                 <svg class="w-5 h-5 text-[#D53741]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -288,7 +280,7 @@
                         
                         <div class="flex flex-wrap gap-2">
                             @foreach($selectedCategories as $category)
-                                <span class="inline-flex items-center px-3 py-1.5 rounded-lg text-sm bg-[#D53741] text-white font-medium shadow-sm">
+                                <span class="inline-flex items-center px-3 py-1.5 text-sm bg-[#D53741] text-white font-medium shadow-sm">
                                     <svg class="w-3 h-3 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
                                     </svg>
@@ -302,7 +294,7 @@
                             @endforeach
 
                             @foreach($selectedTags as $tag)
-                                <span class="inline-flex items-center px-3 py-1.5 rounded-lg text-sm bg-gray-600 text-white font-medium">
+                                <span class="inline-flex items-center px-3 py-1.5 text-sm bg-gray-600 text-white font-medium">
                                     <svg class="w-3 h-3 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
                                     </svg>
@@ -323,14 +315,14 @@
 
         <!-- Results -->
         @if($templates->count())
-            <div class="container cetner mx-auto">
+            <div class="container cetner mx-auto px-4">
                 
                 <!-- Grid View -->
             @if($view === 'grid')
                 <!-- Grid View -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
                     @foreach($templates as $template)
-                        <div class="group bg-white rounded-2xl shadow-sm border border-gray-200/50 overflow-hidden hover:shadow-xl hover:shadow-gray-200/50 transition-all duration-300 hover:-translate-y-1">
+                        <div class="group bg-white shadow-sm border border-gray-200/50 overflow-hidden hover:shadow-xl hover:shadow-gray-200/50 transition-all duration-300 hover:-translate-y-1">
                             <!-- Screenshot -->
                             <div class="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 relative overflow-hidden">
                                 @if($template->screenshot_url)
@@ -366,9 +358,12 @@
                             <!-- Content with Uniform Height -->
                             <div class="p-6 flex flex-col h-48"> <!-- Fixed height for uniformity -->
                                 <!-- Title (Fixed Height) -->
+                                <a href="{{ $template->demo_url }}" target="_blank">
                                 <h3 class="font-bold text-gray-900 mb-2 text-lg line-clamp-1 group-hover:text-[#D53741] transition-colors duration-200 min-h-[28px]">
                                     {{ $template->name ?? ucfirst(str_replace('-', ' ', $template->slug)) }}
+                                    
                                 </h3>
+                                </a>
 
                                 <!-- Description (Fixed Height) -->
                                 <div class="mb-4 min-h-[40px]">
@@ -390,20 +385,20 @@
                                         <div class="flex flex-wrap gap-1.5">
                                             @foreach($visibleTags as $tag)
                                                 <button wire:click="toggleTag('{{ $tag }}')"
-                                                    class="inline-block px-2.5 py-1 text-xs rounded-md font-medium transition-all duration-200 cursor-pointer {{ in_array($tag, $selectedTags) ? 'bg-gradient-to-r from-[#D53741] to-[#B12A31] text-white shadow-sm' : 'bg-gradient-to-r from-gray-100 to-gray-50 text-gray-700 hover:from-gray-200 hover:to-gray-100 border border-gray-200/50' }}">
+                                                    class="inline-block px-2.5 py-1 text-xs font-medium transition-all duration-200 cursor-pointer {{ in_array($tag, $selectedTags) ? 'bg-gradient-to-r from-[#D53741] to-[#B12A31] text-white shadow-sm' : 'bg-gradient-to-r from-gray-100 to-gray-50 text-gray-700 hover:from-gray-200 hover:to-gray-100 border border-gray-200/50' }}">
                                                     {{ ucfirst(str_replace('_', ' ', $tag)) }}
                                                 </button>
                                             @endforeach
                                             
                                             @if($remainingCount > 0)
                                                 <div class="relative group/tags">
-                                                    <button class="inline-block px-2.5 py-1 text-xs rounded-md font-medium bg-gray-200 text-gray-600 hover:bg-gray-300 transition-all duration-200">
+                                                    <button class="inline-block px-2.5 py-1 text-xs font-medium bg-gray-200 text-gray-600 hover:bg-gray-300 transition-all duration-200">
                                                         +{{ $remainingCount }}
                                                     </button>
                                                     
                                                     <!-- Tooltip with remaining tags -->
                                                     <div class="absolute bottom-full left-0 mb-2 hidden group-hover/tags:block z-50">
-                                                        <div class="bg-black text-white text-xs rounded-lg py-2 px-3 whitespace-nowrap shadow-lg">
+                                                        <div class="bg-black text-white text-xs py-2 px-3 whitespace-nowrap shadow-lg">
                                                             @foreach(array_slice($template->tags, 4) as $tag)
                                                                 <span class="inline-block mr-2">{{ ucfirst(str_replace('_', ' ', $tag)) }}</span>
                                                             @endforeach
@@ -417,7 +412,7 @@
                                 </div>
 
                                 <!-- Theme (Fixed at Bottom) -->
-                                @if($template->active_theme)
+                                {{-- @if($template->active_theme)
                                     <div class="mt-auto pt-3 border-t border-gray-100 text-xs text-gray-500">
                                         <span class="font-medium">{{ app()->getLocale() === 'de' ? 'Theme:' : 'Theme:' }}</span>
                                         {{ $template->active_theme }}
@@ -427,7 +422,7 @@
                                     <div class="mt-auto pt-3 border-t border-gray-100 text-xs text-transparent">
                                         &nbsp;
                                     </div>
-                                @endif
+                                @endif --}}
                             </div>
                         </div>
                     @endforeach
@@ -436,7 +431,7 @@
                 <!-- List View -->
                 <div class="space-y-4 mb-12">
                     @foreach($templates as $template)
-                        <div class="group bg-white rounded-xl shadow-sm border border-gray-200/50 overflow-hidden hover:shadow-lg transition-all duration-300">
+                        <div class="group bg-white shadow-sm border border-gray-200/50 overflow-hidden hover:shadow-lg transition-all duration-300">
                             <div class="flex flex-col sm:flex-row">
                                 <!-- Screenshot -->
                                 <div class="sm:w-80 aspect-video sm:aspect-square bg-gradient-to-br from-gray-100 to-gray-200 relative overflow-hidden">
@@ -470,7 +465,7 @@
                                         </h3>
                                         
                                         <a href="{{ $template->demo_url }}" target="_blank"
-                                            class="bg-[#D53741] hover:bg-[#B12A31] text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200">
+                                            class="bg-[#D53741] hover:bg-[#B12A31] text-white px-4 py-2 text-sm font-medium transition-colors duration-200">
                                             {{ app()->getLocale() === 'de' ? 'Demo ansehen' : 'View Demo' }}
                                         </a>
                                     </div>
@@ -486,7 +481,7 @@
                                         <div class="flex flex-wrap gap-2 mb-4">
                                             @foreach($template->tags as $tag)
                                                 <button wire:click="toggleTag('{{ $tag }}')"
-                                                    class="inline-block px-3 py-1 text-sm rounded-md font-medium transition-all duration-200 cursor-pointer {{ in_array($tag, $selectedTags) ? 'bg-gradient-to-r from-[#D53741] to-[#B12A31] text-white shadow-sm' : 'bg-gradient-to-r from-gray-100 to-gray-50 text-gray-700 hover:from-gray-200 hover:to-gray-100 border border-gray-200/50' }}">
+                                                    class="inline-block px-3 py-1 text-sm font-medium transition-all duration-200 cursor-pointer {{ in_array($tag, $selectedTags) ? 'bg-gradient-to-r from-[#D53741] to-[#B12A31] text-white shadow-sm' : 'bg-gradient-to-r from-gray-100 to-gray-50 text-gray-700 hover:from-gray-200 hover:to-gray-100 border border-gray-200/50' }}">
                                                     {{ ucfirst(str_replace('_', ' ', $tag)) }}
                                                 </button>
                                             @endforeach
@@ -514,7 +509,7 @@
         @else
             <!-- Empty State -->
             <div class="text-center py-16">
-                <div class="bg-white/50 backdrop-blur-sm rounded-2xl p-12 max-w-md mx-auto">
+                <div class="bg-white/50 backdrop-blur-sm p-12 max-w-md mx-auto">
                     <svg class="mx-auto h-16 w-16 text-gray-300 mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                             d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -526,7 +521,7 @@
                         {{ app()->getLocale() === 'de' ? 'Versuchen Sie, Ihre Suchkriterien zu ändern.' : 'Try adjusting your search criteria.' }}
                     </p>
                     <button wire:click="clearFilters"
-                        class="bg-[#D53741] hover:bg-[#B12A31] text-white px-6 py-3 rounded-xl font-medium transition-colors duration-200">
+                        class="bg-[#D53741] hover:bg-[#B12A31] text-white px-6 py-3 font-medium transition-colors duration-200">
                         {{ app()->getLocale() === 'de' ? 'Filter zurücksetzen' : 'Clear filters' }}
                     </button>
                 </div>
