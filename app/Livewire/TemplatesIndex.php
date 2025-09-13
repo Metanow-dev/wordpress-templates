@@ -82,6 +82,16 @@ class TemplatesIndex extends Component
         $this->showFilters = !$this->showFilters;
     }
 
+    public function getFilterToggleTextProperty()
+    {
+        $locale = app()->getLocale();
+        if ($this->showFilters) {
+            return $locale === 'de' ? 'Filter ausblenden' : 'Hide Filters';
+        } else {
+            return $locale === 'de' ? 'Filter anzeigen' : 'Show Filters';
+        }
+    }
+
     public function setView($view)
     {
         $this->view = $view;

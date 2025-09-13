@@ -1,11 +1,8 @@
 import './bootstrap';
-import Alpine from 'alpinejs';
 
-window.Alpine = Alpine;
+// Temporarily disable Alpine.js to test if it's causing conflicts
+// import Alpine from 'alpinejs';
+// window.Alpine = Alpine;
+// Alpine.start();
 
-// Start Alpine after DOM is ready
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => Alpine.start());
-} else {
-    Alpine.start();
-}
+console.log('JavaScript loaded - Alpine.js disabled for testing');

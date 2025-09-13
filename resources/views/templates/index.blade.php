@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     
     <!-- SEO Meta Tags -->
     <title>{{ app()->getLocale() === 'de' ? 'Premium WordPress Vorlagen Galerie | Entdecken & Wählen Sie Ihr Website Design' : 'Premium WordPress Templates Gallery | Explore & Choose Your Future Website Design' }}</title>

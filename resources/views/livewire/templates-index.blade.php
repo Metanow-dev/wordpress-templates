@@ -11,11 +11,11 @@
             <div class="flex items-center space-x-1 sm:space-x-4">
                 <!-- Language Switcher -->
                 <div class="flex items-center space-x-1 sm:space-x-2">
-                    <a href="/en/templates" class="px-2 py-1 text-xs sm:text-sm {{ app()->getLocale() === 'en' ? 'bg-red-50 text-[#B12A31] font-medium' : 'text-gray-600 hover:text-[#D53741]' }} transition-colors duration-200">
+                    <a href="{{ route('templates.index') }}" class="px-2 py-1 text-xs sm:text-sm @if(app()->getLocale() === 'en') bg-red-50 text-[#B12A31] font-medium @else text-gray-600 hover:text-[#D53741] @endif transition-colors duration-200">
                         EN
                     </a>
                     <span class="text-gray-300 text-xs sm:text-sm">|</span>
-                    <a href="/de/vorlagen" class="px-2 py-1 text-xs sm:text-sm {{ app()->getLocale() === 'de' ? 'bg-red-50 text-[#B12A31] font-medium' : 'text-gray-600 hover:text-[#D53741]' }} transition-colors duration-200">
+                    <a href="{{ route('templates.index.de') }}" class="px-2 py-1 text-xs sm:text-sm @if(app()->getLocale() === 'de') bg-red-50 text-[#B12A31] font-medium @else text-gray-600 hover:text-[#D53741] @endif transition-colors duration-200">
                         DE
                     </a>
                 </div>
@@ -67,7 +67,7 @@
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.414A1 1 0 013 6.707V4z"/>
                             </svg>
-                            <span>{{ $showFilters ? (app()->getLocale() === 'de' ? 'Filter ausblenden' : 'Hide Filters') : (app()->getLocale() === 'de' ? 'Filter anzeigen' : 'Show Filters') }}</span>
+                            <span>{{ $this->filterToggleText }}</span>
                         </button>
 
                         <!-- View Toggle -->
@@ -125,29 +125,10 @@
         </div>
 
         <!-- Advanced Filters Panel -->
+        <div id="filters-panel" wire:key="filters-panel">
         @if($showFilters)
-            <div class="bg-white/80 backdrop-blur-sm border border-gray-200/50  p-6 mb-8 shadow-sm">
+            <div class="bg-white/80 backdrop-blur-sm border border-gray-200/50 p-6 mb-8 shadow-sm">
                 
-                {{-- <!-- Advanced Options -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                    <div>
-                        <label class="flex items-center space-x-3 text-sm font-medium text-gray-700">
-                            <input type="checkbox" wire:model.live="onlyWithScreenshots" 
-                                class=" border-gray-300 text-[#D53741] focus:ring-[#D53741]">
-                            <span>{{ app()->getLocale() === 'de' ? 'Nur mit Screenshots' : 'Only with screenshots' }}</span>
-                            <span class="text-xs text-gray-500">({{ $stats['with_screenshots'] }})</span>
-                        </label>
-                    </div>
-                    
-                    <div>
-                        <label class="flex items-center space-x-3 text-sm font-medium text-gray-700">
-                            <input type="checkbox" wire:model.live="onlyClassified" 
-                                class="border-gray-300 text-[#D53741] focus:ring-[#D53741]">
-                            <span>{{ app()->getLocale() === 'de' ? 'Nur klassifiziert' : 'Only classified' }}</span>
-                            <span class="text-xs text-gray-500">({{ $stats['classified'] }})</span>
-                        </label>
-                    </div>
-                </div> --}}
 
                 <!-- Professional Categories & Tags Layout -->
                 <div class="space-y-8">
@@ -309,8 +290,8 @@
                     </div>
                 @endif
                 </div>
-            </div>
         @endif
+        </div>
 
         <!-- Results -->
         @if($templates->count())
@@ -321,7 +302,7 @@
                 <!-- Grid View -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
                     @foreach($templates as $template)
-                        <div class="group bg-white shadow-sm border border-gray-200/50 overflow-hidden hover:shadow-xl hover:shadow-gray-200/50 px-2 py-2 transition-all duration-300 hover:-translate-y-1">
+                        <div wire:key="grid-{{ $template->id ?? $template->slug }}" class="group bg-white shadow-sm border border-gray-200/50 overflow-hidden hover:shadow-xl hover:shadow-gray-200/50 px-2 py-2 transition-all duration-300 hover:-translate-y-1">
                             <!-- Screenshot -->
                             <div class="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 relative overflow-hidden">
                                 @if($template->screenshot_url)
@@ -416,7 +397,7 @@
                 <!-- List View -->
                 <div class="space-y-4 mb-12">
                     @foreach($templates as $template)
-                        <div class="group bg-white shadow-sm border border-gray-200/50 overflow-hidden hover:shadow-lg transition-all duration-300">
+                        <div wire:key="list-{{ $template->id ?? $template->slug }}" class="group bg-white shadow-sm border border-gray-200/50 overflow-hidden hover:shadow-lg transition-all duration-300">
                             <div class="flex flex-col sm:flex-row">
                                 <!-- Screenshot -->
                                 <div class="sm:w-80 aspect-video sm:aspect-square bg-gradient-to-br from-gray-100 to-gray-200 relative overflow-hidden">
@@ -551,13 +532,13 @@
                     <div class="flex flex-col space-y-3 md:hidden">
                         <!-- Language Flags -->
                         <div class="flex justify-center space-x-3">
-                            <a href="/en/templates" 
-                               class="flex items-center space-x-1 px-2 py-1 rounded-md transition-all duration-200 {{ app()->getLocale() === 'en' ? 'bg-red-50 text-[#B12A31]' : 'text-gray-400 hover:text-gray-900 hover:bg-gray-200' }}">
+                            <a href="{{ route('templates.index') }}"
+                               class="flex items-center space-x-1 px-2 py-1 rounded-md transition-all duration-200 @if(app()->getLocale() === 'en') bg-red-50 text-[#B12A31] @else text-gray-400 hover:text-gray-900 hover:bg-gray-200 @endif">
                                 <span class="fi fi-us" style="width: 16px; height: 12px;"></span>
                                 <span class="text-xs">EN</span>                             
                             </a>
-                            <a href="/de/vorlagen" 
-                               class="flex items-center space-x-1 px-2 py-1 rounded-md transition-all duration-200 {{ app()->getLocale() === 'de' ? 'bg-red-50 text-[#B12A31]' : 'text-gray-400 hover:text-gray-900 hover:bg-gray-200' }}">
+                            <a href="{{ route('templates.index.de') }}"
+                               class="flex items-center space-x-1 px-2 py-1 rounded-md transition-all duration-200 @if(app()->getLocale() === 'de') bg-red-50 text-[#B12A31] @else text-gray-400 hover:text-gray-900 hover:bg-gray-200 @endif">
                                 <span class="fi fi-de" style="width: 16px; height: 12px;"></span>
                                 <span class="text-xs">DE</span>
                             </a>
@@ -591,12 +572,12 @@
                     <div class="hidden md:flex md:items-center md:space-x-6">
                         <!-- Language Flags -->
                         <div class="flex space-x-3">
-                            <a href="/en/templates" 
-                               class="flex items-center space-x-2 px-3 py-1 rounded-md transition-all duration-200 {{ app()->getLocale() === 'en' ? 'bg-red-50 text-[#B12A31]' : 'text-gray-400 hover:text-gray-900 hover:bg-gray-200' }}">
+                            <a href="{{ route('templates.index') }}"
+                               class="flex items-center space-x-2 px-3 py-1 rounded-md transition-all duration-200 @if(app()->getLocale() === 'en') bg-red-50 text-[#B12A31] @else text-gray-400 hover:text-gray-900 hover:bg-gray-200 @endif">
                                 <span class="fi fi-us" style="width: 20px; height: 15px;"></span>                                
                             </a>
-                            <a href="/de/vorlagen" 
-                               class="flex items-center space-x-2 px-3 py-1 rounded-md transition-all duration-200 {{ app()->getLocale() === 'de' ? 'bg-red-50 text-[#B12A31]' : 'text-gray-400 hover:text-gray-900 hover:bg-gray-200' }}">
+                            <a href="{{ route('templates.index.de') }}"
+                               class="flex items-center space-x-2 px-3 py-1 rounded-md transition-all duration-200 @if(app()->getLocale() === 'de') bg-red-50 text-[#B12A31] @else text-gray-400 hover:text-gray-900 hover:bg-gray-200 @endif">
                                 <span class="fi fi-de" style="width: 20px; height: 15px;"></span>
                             </a>
                         </div>
@@ -628,4 +609,5 @@
             </div>
         </footer>
     </div>
+</div>
 </div>
