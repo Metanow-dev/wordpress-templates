@@ -295,12 +295,12 @@
 
         <!-- Results -->
         @if($templates->count())
-            <div class="container cetner mx-auto px-4">
+            <div class="container mx-auto sm:px-4">
                 
                 <!-- Grid View -->
             @if($view === 'grid')
                 <!-- Grid View -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6 mb-12">
                     @foreach($templates as $template)
                         <div wire:key="grid-{{ $template->id ?? $template->slug }}" class="group bg-white shadow-sm border border-gray-200/50 overflow-hidden hover:shadow-xl hover:shadow-gray-200/50 px-2 py-2 transition-all duration-300 hover:-translate-y-1">
                             <!-- Screenshot -->
@@ -496,7 +496,7 @@
         
         <!-- Call to Action Section -->
         <section class="bg-gradient-to-r from-[#D53741] to-[#B12A31] text-white mb-8 mt-16 py-16">
-            <div class="container mx-auto px-4 text-center">
+            <div class="container mx-auto px-2 sm:px-4 text-center">
                 <h2 class="text-3xl md:text-4xl font-bold mb-4">
                     {{ app()->getLocale() === 'de' ? 'Bereit für Ihr nächstes Projekt?' : 'Ready for Your Next Project?' }}
                 </h2>
@@ -518,7 +518,7 @@
         
         <!-- Simple Footer -->
         <footer class="bg-white text-gray py-3">
-            <div class="container mx-auto px-2 sm:px-4">
+            <div class="container mx-auto sm:px-4">
                 <div class="flex flex-col space-y-3 md:flex-row md:justify-between md:items-center md:space-y-0">
                     
                     <!-- Copyright -->
