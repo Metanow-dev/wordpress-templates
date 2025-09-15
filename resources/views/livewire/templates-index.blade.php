@@ -9,8 +9,18 @@
             </div>
             
             <div class="flex items-center space-x-1 sm:space-x-4">
+                <div class="flex space-x-3">
+                            <a href="{{ route('templates.index') }}"
+                               class="flex items-center space-x-2 px-3 py-1 rounded-md transition-all duration-200 @if(app()->getLocale() === 'en') bg-red-50 text-[#B12A31] @else text-gray-400 hover:text-gray-900 hover:bg-gray-200 @endif">
+                                <span class="fi fi-gb" style="width: 20px; height: 15px;"></span>                                
+                            </a>
+                            <a href="{{ route('templates.index.de') }}"
+                               class="flex items-center space-x-2 px-3 py-1 rounded-md transition-all duration-200 @if(app()->getLocale() === 'de') bg-red-50 text-[#B12A31] @else text-gray-400 hover:text-gray-900 hover:bg-gray-200 @endif">
+                                <span class="fi fi-de" style="width: 20px; height: 15px;"></span>
+                            </a>
+                        </div>
                 <!-- Language Switcher -->
-                <div class="flex items-center space-x-1 sm:space-x-2">
+                {{-- <div class="flex items-center space-x-1 sm:space-x-2">
                     <a href="{{ route('templates.index') }}" class="px-2 py-1 text-xs sm:text-sm @if(app()->getLocale() === 'en') bg-red-50 text-[#B12A31] font-medium @else text-gray-600 hover:text-[#D53741] @endif transition-colors duration-200">
                         EN
                     </a>
@@ -18,7 +28,7 @@
                     <a href="{{ route('templates.index.de') }}" class="px-2 py-1 text-xs sm:text-sm @if(app()->getLocale() === 'de') bg-red-50 text-[#B12A31] font-medium @else text-gray-600 hover:text-[#D53741] @endif transition-colors duration-200">
                         DE
                     </a>
-                </div>
+                </div> --}}
                 
                 <a href="https://metanow.dev"
                     class="bg-[#D53741] hover:bg-[#B12A31] text-white px-3 py-2 text-xs sm:text-sm sm:px-6 font-medium transition-colors duration-200 whitespace-nowrap">
@@ -574,7 +584,7 @@
                         <div class="flex space-x-3">
                             <a href="{{ route('templates.index') }}"
                                class="flex items-center space-x-2 px-3 py-1 rounded-md transition-all duration-200 @if(app()->getLocale() === 'en') bg-red-50 text-[#B12A31] @else text-gray-400 hover:text-gray-900 hover:bg-gray-200 @endif">
-                                <span class="fi fi-us" style="width: 20px; height: 15px;"></span>                                
+                                <span class="fi fi-gb" style="width: 20px; height: 15px;"></span>                                
                             </a>
                             <a href="{{ route('templates.index.de') }}"
                                class="flex items-center space-x-2 px-3 py-1 rounded-md transition-all duration-200 @if(app()->getLocale() === 'de') bg-red-50 text-[#B12A31] @else text-gray-400 hover:text-gray-900 hover:bg-gray-200 @endif">

@@ -29,11 +29,8 @@ crontab -l > /tmp/crontab_backup_$(date +%Y%m%d_%H%M%S) 2>/dev/null || echo "No 
 cat >> /tmp/new_crontab << EOF
 
 # WordPress Templates - Daily Automated Jobs
-# Daily scan at 2:00 AM (includes AI classification)
-0 2 * * * cd $APP_PATH && $PHP_PATH artisan templates:scan --capture >> $APP_PATH/storage/logs/cron-scan.log 2>&1
-
-# Daily screenshots at 2:30 AM
-30 2 * * * cd $APP_PATH && $PHP_PATH artisan templates:screenshot --force >> $APP_PATH/storage/logs/cron-screenshots.log 2>&1
+# Daily scan at 2:00 AM (includes AI classification and screenshots for new templates)
+0 2 * * * cd $APP_PATH && $PHP_PATH artisan config:clear && $PHP_PATH artisan cache:clear && $PHP_PATH artisan templates:scan >> $APP_PATH/storage/logs/cron-scan.log 2>&1
 
 # Daily maintenance at 3:00 AM
 0 3 * * * cd $APP_PATH && $PHP_PATH artisan config:cache && $PHP_PATH artisan view:cache >> $APP_PATH/storage/logs/cron-maintenance.log 2>&1

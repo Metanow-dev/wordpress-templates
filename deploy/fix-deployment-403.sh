@@ -178,6 +178,8 @@ $PHP_BIN artisan cache:clear
 $PHP_BIN artisan config:cache
 $PHP_BIN artisan route:cache
 $PHP_BIN artisan view:cache
+# Additional config:clear to fix error 500 after deployment
+$PHP_BIN artisan config:clear
 
 # Test TEMPLATES_ROOT configuration
 echo "🧪 Testing TEMPLATES_ROOT configuration..."

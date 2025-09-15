@@ -130,6 +130,13 @@ class ScanTemplates extends Command
         }
 
         $this->info("Scan complete. Indexed {$count} sites.");
+        
+        // Run screenshot command for new templates only
+        $this->info("Starting screenshot capture for new templates...");
+        $this->call('templates:screenshot', [
+            '--new-only' => true
+        ]);
+        
         return self::SUCCESS;
     }
 
