@@ -30,7 +30,7 @@ cat >> /tmp/new_crontab << EOF
 
 # WordPress Templates - Daily Automated Jobs
 # Daily scan at 2:00 AM (includes AI classification and screenshots for new templates)
-0 2 * * * cd $APP_PATH && $PHP_PATH artisan config:clear && $PHP_PATH artisan cache:clear && $PHP_PATH artisan templates:scan >> $APP_PATH/storage/logs/cron-scan.log 2>&1
+0 2 * * * cd $APP_PATH && $PHP_PATH artisan config:clear && $PHP_PATH artisan cache:clear && $PHP_PATH artisan templates:scan && $PHP_PATH artisan config:clear && $PHP_PATH artisan cache:clear && $PHP_PATH artisan route:clear >> $APP_PATH/storage/logs/cron-scan.log 2>&1
 
 # Daily maintenance at 3:00 AM
 0 3 * * * cd $APP_PATH && $PHP_PATH artisan config:cache && $PHP_PATH artisan view:cache >> $APP_PATH/storage/logs/cron-maintenance.log 2>&1

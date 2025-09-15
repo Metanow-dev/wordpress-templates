@@ -4,7 +4,9 @@
         <div class="container mx-auto px-2 sm:px-4 py-4 flex items-center justify-between">
             <div class="flex items-center space-x-2">
                 <div class="text-2xl font-bold text-[#D53741]">
+                    <a href="https://metanow.dev">
                     <img src="{{ asset('storage/img/logo/Metanow.webp') }}" width="120" class="sm:w-[180px]" alt="Metanow Logo">
+                    </a>
                 </div>
             </div>
             
