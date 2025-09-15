@@ -132,11 +132,24 @@ class ScanTemplates extends Command
 
         $this->info("Scan complete. Indexed {$count} sites.");
         
-        // Run screenshot command for new templates only
+        // Run screenshot command for new templates only using correct PHP path
         $this->info("Starting screenshot capture for new templates...");
-        $this->call('templates:screenshot', [
-            '--new-only' => true
-        ]);
+        
+        // Use the correct PHP binary path for screenshot dependencies
+        $phpBin = '/opt/alt/php83/usr/bin/php';
+        if (!file_exists($phpBin)) {
+            $phpBin = 'php'; // fallback
+        }
+        
+        $artisanPath = base_path('artisan');
+        $command = "{$phpBin} {$artisanPath} templates:screenshot --new-only";
+        
+        $this->info("Running: {$command}");
+        $result = shell_exec("{$command} 2>&1");
+        
+        if ($result) {
+            $this->line($result);
+        }
         
         return self::SUCCESS;
     }
