@@ -52,11 +52,13 @@ final class Screenshotter
     {
         File::ensureDirectoryExists(dirname($this->abs()), 0775, true);
 
+        // Special handling for problematic sites
+        $isProblematicSite = in_array($this->slug, ['albaniatourguide']);
+        
         $shot = Browsershot::url($this->url)
             ->windowSize($width, $height)
-            ->waitUntilNetworkIdle()
-            ->timeout(60) // Increase timeout to 60 seconds
-            ->setDelay(1000) // Increase delay to 1 second for slow sites
+            ->timeout($isProblematicSite ? 30 : 60) // Shorter timeout for known problematic sites
+            ->setDelay($isProblematicSite ? 500 : 1000)
             ->quality(70)
             ->addChromiumArguments([
                 'no-sandbox',
@@ -64,8 +66,17 @@ final class Screenshotter
                 'ignore-certificate-errors',
                 'disable-background-timer-throttling',
                 'disable-backgrounding-occluded-windows',
-                'disable-renderer-backgrounding'
+                'disable-renderer-backgrounding',
+                'disable-extensions',
+                'disable-plugins'
             ]);
+        
+        // Use different wait strategy for problematic sites
+        if ($isProblematicSite) {
+            $shot->waitUntilNetworkIdle(0, 500); // Less strict network idle
+        } else {
+            $shot->waitUntilNetworkIdle();
+        }
 
         if ($n = $this->nodePath())   $shot->setNodeBinary($n);
         if ($c = $this->chromePath()) $shot->setChromePath($c);

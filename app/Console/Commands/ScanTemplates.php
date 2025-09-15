@@ -143,7 +143,7 @@ class ScanTemplates extends Command
         }
         
         $artisanPath = base_path('artisan');
-        $command = "{$phpBin} {$artisanPath} templates:screenshot --new-only";
+        $command = "{$phpBin} {$artisanPath} templates:screenshot --new-only --skip-problematic";
         
         $this->info("Running: {$command}");
         $result = shell_exec("{$command} 2>&1");

@@ -13,6 +13,7 @@ class CaptureTemplateScreenshots extends Command
         {--slug= : Only capture for this slug} 
         {--force : Force re-capture even if screenshot_url exists}
         {--new-only : Only capture screenshots for templates without captured screenshots}
+        {--skip-problematic : Skip known problematic sites that timeout}
         {--fullpage : Capture full-page instead of viewport}
         {--w=1200 : Viewport width}
         {--h=800  : Viewport height}';
@@ -29,11 +30,21 @@ class CaptureTemplateScreenshots extends Command
         $full = (bool)$this->option('fullpage');
         $force = (bool)$this->option('force');
         $newOnly = (bool)$this->option('new-only');
+        $skipProblematic = (bool)$this->option('skip-problematic');
+        
+        // Known problematic sites that frequently timeout
+        $problematicSites = ['albaniatourguide'];
 
         $count = 0;
-        $q->lazy()->each(function (Template $t) use (&$count, $w, $h, $full, $force, $newOnly) {
+        $q->lazy()->each(function (Template $t) use (&$count, $w, $h, $full, $force, $newOnly, $skipProblematic, $problematicSites) {
             if (!$t->demo_url) {
                 $this->warn("{$t->slug}: no demo_url, skipping");
+                return;
+            }
+            
+            // Skip known problematic sites if option is set
+            if ($skipProblematic && in_array($t->slug, $problematicSites)) {
+                $this->line("{$t->slug}: skipping problematic site");
                 return;
             }
 
