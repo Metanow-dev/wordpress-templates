@@ -41,7 +41,8 @@ class ScanTemplates extends Command
                 continue;
             }
 
-            $slug = Str::slug(basename($dir->getRelativePathname()));
+            // Use directory name as-is to preserve underscores in URLs
+            $slug = basename($dir->getRelativePathname());
             $demoUrl = str_replace('{slug}', $slug, config('templates.demo_url_pattern'));
 
             // Check if this is a new or updated WordPress installation

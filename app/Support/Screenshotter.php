@@ -55,9 +55,17 @@ final class Screenshotter
         $shot = Browsershot::url($this->url)
             ->windowSize($width, $height)
             ->waitUntilNetworkIdle()
-            ->setDelay(700)
+            ->timeout(60) // Increase timeout to 60 seconds
+            ->setDelay(1000) // Increase delay to 1 second for slow sites
             ->quality(70)
-            ->addChromiumArguments(['no-sandbox','disable-dev-shm-usage','ignore-certificate-errors']);
+            ->addChromiumArguments([
+                'no-sandbox',
+                'disable-dev-shm-usage',
+                'ignore-certificate-errors',
+                'disable-background-timer-throttling',
+                'disable-backgrounding-occluded-windows',
+                'disable-renderer-backgrounding'
+            ]);
 
         if ($n = $this->nodePath())   $shot->setNodeBinary($n);
         if ($c = $this->chromePath()) $shot->setChromePath($c);
