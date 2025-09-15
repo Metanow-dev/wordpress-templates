@@ -28,27 +28,31 @@ fi
 CURRENT_TEMPLATES_ROOT=$(grep "TEMPLATES_ROOT=" .env | cut -d'=' -f2 || echo "")
 echo "Current TEMPLATES_ROOT: '$CURRENT_TEMPLATES_ROOT'"
 
-# Fix if empty or missing
-if [ -z "$CURRENT_TEMPLATES_ROOT" ] || [ "$CURRENT_TEMPLATES_ROOT" = "" ]; then
+# Fix if empty, missing, or incorrectly set to public directory
+if [ -z "$CURRENT_TEMPLATES_ROOT" ] || [ "$CURRENT_TEMPLATES_ROOT" = "" ] || [[ "$CURRENT_TEMPLATES_ROOT" == *"/public"* ]]; then
     echo "📝 Fixing TEMPLATES_ROOT in .env..."
     
-    # Remove any existing empty TEMPLATES_ROOT lines
-    sed -i '/^TEMPLATES_ROOT=$/d' .env
-    sed -i '/^TEMPLATES_ROOT=""$/d' .env
-    sed -i '/^TEMPLATES_ROOT=$/d' .env
+    # Remove any existing TEMPLATES_ROOT lines
+    sed -i '/^TEMPLATES_ROOT=.*$/d' .env
     
-    # Add or update TEMPLATES_ROOT
-    if grep -q "^TEMPLATES_ROOT=" .env; then
-        sed -i "s|^TEMPLATES_ROOT=.*|TEMPLATES_ROOT=$TEMPLATES_PATH|" .env
-    else
+    # Add correct TEMPLATES_ROOT
+    if grep -q "^# Templates Configuration" .env; then
         # Add after "# Templates Configuration" line
-        sed -i '/^# Templates Configuration/a TEMPLATES_ROOT='$TEMPLATES_PATH .env
+        sed -i "/^# Templates Configuration/a TEMPLATES_ROOT=$TEMPLATES_PATH" .env
+    else
+        # Add at the end
+        echo "" >> .env
+        echo "# Templates Configuration" >> .env
+        echo "TEMPLATES_ROOT=$TEMPLATES_PATH" >> .env
     fi
     
     echo "✅ Updated TEMPLATES_ROOT to: $TEMPLATES_PATH"
 else
     echo "✅ TEMPLATES_ROOT already configured: $CURRENT_TEMPLATES_ROOT"
-    TEMPLATES_PATH="$CURRENT_TEMPLATES_ROOT"
+    # Only use existing path if it's not the public directory
+    if [[ "$CURRENT_TEMPLATES_ROOT" != *"/public"* ]]; then
+        TEMPLATES_PATH="$CURRENT_TEMPLATES_ROOT"
+    fi
 fi
 
 # Create templates directory with correct permissions
@@ -88,6 +92,10 @@ cat > "$PUBLIC_PATH/.htaccess" << 'EOF'
 <IfModule lsapi_module>
     AddHandler application/x-httpd-alt-php83 .php
 </IfModule>
+
+# Additional PHP handler mappings for different server configurations
+AddHandler application/x-httpd-alt-php83 .php
+AddType application/x-httpd-alt-php83 .php
 
 DirectoryIndex index.php index.html
 
@@ -173,13 +181,13 @@ fi
 
 # Clear and refresh all Laravel configuration
 echo "🔄 Clearing and refreshing Laravel configuration..."
-$PHP_BIN artisan config:clear
-$PHP_BIN artisan cache:clear
-$PHP_BIN artisan config:cache
-$PHP_BIN artisan route:cache
-$PHP_BIN artisan view:cache
+$PHP_BIN artisan config:clear 2>/dev/null || $PHP_BIN artisan config:clear
+$PHP_BIN artisan cache:clear 2>/dev/null || $PHP_BIN artisan cache:clear
+$PHP_BIN artisan config:cache 2>/dev/null || $PHP_BIN artisan config:cache
+$PHP_BIN artisan route:cache 2>/dev/null || $PHP_BIN artisan route:cache
+$PHP_BIN artisan view:cache 2>/dev/null || $PHP_BIN artisan view:cache
 # Additional config:clear to fix error 500 after deployment
-$PHP_BIN artisan config:clear
+$PHP_BIN artisan config:clear 2>/dev/null || $PHP_BIN artisan config:clear
 
 # Test TEMPLATES_ROOT configuration
 echo "🧪 Testing TEMPLATES_ROOT configuration..."
