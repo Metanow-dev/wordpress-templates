@@ -307,7 +307,7 @@
 
         <!-- Results -->
         @if($templates->count())
-            <div class="container mx-auto sm:px-4">
+            <div class="container mx-auto">
                 
                 <!-- Grid View -->
             @if($view === 'grid')
