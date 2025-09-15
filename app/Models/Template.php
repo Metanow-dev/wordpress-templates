@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Template extends Model
 {
     protected $fillable = [
-        'slug','name','demo_url','screenshot_url','language','active_theme','plugins',
+        'slug','name','name_source','demo_url','screenshot_url','language','active_theme','plugins',
         'description_en','description_de','auto_translated','primary_category','tags',
         'classification_confidence','classification_source','classification_rationale',
         'locked_by_human','needs_review','snippet_payload','text_snippet_hash','last_classified_hash',

@@ -90,6 +90,7 @@ class ScanTemplates extends Command
                 ['slug' => $slug],
                 [
                     'name' => $name,
+                    'name_source' => 'file', // Mark as file-based name, AI can override later
                     'demo_url' => $demoUrl,
                     'screenshot_url' => $screenshot,
                     'last_scanned_at' => now(),

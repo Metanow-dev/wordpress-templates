@@ -66,10 +66,11 @@ class TemplateClassificationController extends Controller
                 'rationale' => 'required|string|max:1000',
                 'description_en' => 'nullable|string|max:500',
                 'description_de' => 'nullable|string|max:500',
+                'ai_generated_name' => 'nullable|string|max:100',
                 'needs_review' => 'boolean',
             ]);
         
-        $template->update([
+        $updateData = [
             'primary_category' => $validated['primary_category'],
             'tags' => $validated['tags'],
             'classification_confidence' => $validated['confidence'],
@@ -79,13 +80,22 @@ class TemplateClassificationController extends Controller
             'description_de' => $validated['description_de'] ?? null,
             'needs_review' => $validated['needs_review'] ?? ($validated['confidence'] < 0.8),
             'last_classified_at' => now(),
-        ]);
+        ];
+        
+        // Update name if AI provided a better one
+        if (!empty($validated['ai_generated_name'])) {
+            $updateData['name'] = $validated['ai_generated_name'];
+            $updateData['name_source'] = 'ai';
+        }
+        
+        $template->update($updateData);
         
         Log::info("AI classified template: {$slug}", [
             'category' => $validated['primary_category'],
             'tags' => implode(', ', $validated['tags']),
             'tags_count' => count($validated['tags']),
-            'confidence' => $validated['confidence']
+            'confidence' => $validated['confidence'],
+            'ai_generated_name' => $validated['ai_generated_name'] ?? null
         ]);
         
             return response()->json([
