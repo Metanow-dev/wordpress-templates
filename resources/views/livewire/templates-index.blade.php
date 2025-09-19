@@ -1,6 +1,6 @@
 <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 overflow-x-hidden">
     <!-- Header -->
-    <header class="bg-white border-b border-gray-200 sticky top-0 z-40 shadow-sm">
+    <header class="bg-white border-b border-gray-200 sticky top-0 z-40"style="margin-bottom:80px">
         <div class="container mx-auto px-2 sm:px-4 py-4 flex items-center justify-between">
             <div class="flex items-center space-x-2">
                 <div class="text-2xl font-bold text-[#D53741]">
@@ -21,25 +21,26 @@
                                 <span class="fi fi-de" style="width: 20px; height: 15px;"></span>
                             </a>
                         </div>
-                <!-- Language Switcher -->
-                {{-- <div class="flex items-center space-x-1 sm:space-x-2">
-                    <a href="{{ route('templates.index') }}" class="px-2 py-1 text-xs sm:text-sm @if(app()->getLocale() === 'en') bg-red-50 text-[#B12A31] font-medium @else text-gray-600 hover:text-[#D53741] @endif transition-colors duration-200">
-                        EN
-                    </a>
-                    <span class="text-gray-300 text-xs sm:text-sm">|</span>
-                    <a href="{{ route('templates.index.de') }}" class="px-2 py-1 text-xs sm:text-sm @if(app()->getLocale() === 'de') bg-red-50 text-[#B12A31] font-medium @else text-gray-600 hover:text-[#D53741] @endif transition-colors duration-200">
-                        DE
-                    </a>
-                </div> --}}
-                
                 <a href="https://metanow.dev"
                     class="bg-[#D53741] hover:bg-[#B12A31] text-white px-3 py-2 text-xs sm:text-sm sm:px-6 font-medium transition-colors duration-200 whitespace-nowrap">
                     <span class="hidden sm:inline">Back to Metanow</span>
-                    <span class="sm:hidden">Back</span>
+                    <span class="sm:hidden">Back to Metanow</span>
                 </a>
             </div>
         </div>
     </header>
+
+    <!-- Page Title Section -->
+    <div class="py-8 sm:py-12 mt-16" style="margin-bottom: 50px;">
+        <div class="container mx-auto px-2 sm:px-4 text-center ">
+            <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#D53741] mb-1">
+                Handcrafted WordPress Projects
+            </h1>
+            <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                {{ app()->getLocale() === 'de' ? 'Entdecken Sie unsere Sammlung professionell gestalteter WordPress-Vorlagen' : 'Discover our collection of professionally designed WordPress templates' }}
+            </p>
+        </div>
+    </div>
 
     <div class="container mx-auto px-2 sm:px-4 py-4 sm:py-8">
         
@@ -307,12 +308,12 @@
 
         <!-- Results -->
         @if($templates->count())
-            <div class="container mx-auto">
+            <div class="container mx-auto" style="margin-bottom:50px">
                 
                 <!-- Grid View -->
             @if($view === 'grid')
                 <!-- Grid View -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6 mb-12">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mb-12" style="gap: 20px;">
                     @foreach($templates as $template)
                         <div wire:key="grid-{{ $template->id ?? $template->slug }}" class="group bg-white shadow-sm border border-gray-200/50 overflow-hidden hover:shadow-xl hover:shadow-gray-200/50 px-2 py-2 transition-all duration-300 hover:-translate-y-1">
                             <!-- Screenshot -->
@@ -480,9 +481,25 @@
             @endif
 
             <!-- Pagination -->
-            <div class="flex justify-center">
-                {{ $templates->links() }}
+            <div class="flex justify-center" style="margin-top: 50px">
+                <div class="pagination-wrapper">
+                    {{ $templates->links() }}
+                </div>
             </div>
+            
+            <style>
+                .pagination-wrapper .hidden.sm\\:flex-1.sm\\:flex.sm\\:items-center.sm\\:justify-between {
+                    flex-direction: column !important;
+                    gap: 20px !important;
+                    align-items: center !important;
+                }
+                @media (min-width: 640px) {
+                    .pagination-wrapper .hidden.sm\\:flex-1.sm\\:flex.sm\\:items-center.sm\\:justify-between {
+                        flex-direction: column !important;
+                        justify-content: center !important;
+                    }
+                }
+            </style>
             
         @else
             <!-- Empty State -->
@@ -505,7 +522,7 @@
                 </div>
             </div>
         @endif
-        
+        </div>
         <!-- Call to Action Section -->
         <section class="bg-gradient-to-r from-[#D53741] to-[#B12A31] text-white mb-8 mt-16 py-16">
             <div class="container mx-auto px-2 sm:px-4 text-center">
@@ -620,6 +637,6 @@
                 </div>
             </div>
         </footer>
-    </div>
+    
 </div>
 </div>
