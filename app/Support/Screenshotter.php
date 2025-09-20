@@ -48,7 +48,7 @@ final class Screenshotter
         return ($p && is_file($p)) ? $p : null;
     }
 
-    public function capture(int $width = 2560, int $height = 1440, bool $fullPage = false): string
+    public function capture(int $width = 1600, int $height = 900, bool $fullPage = false): string
     {
         File::ensureDirectoryExists(dirname($this->abs()), 0775, true);
 
@@ -57,10 +57,10 @@ final class Screenshotter
         
         $shot = Browsershot::url($this->url)
             ->windowSize($width, $height)
-            ->deviceScaleFactor(3) // 3x resolution for ultra-crisp screenshots
+            ->deviceScaleFactor(2) // 2x is optimal for web display
             ->timeout($isProblematicSite ? 45 : 90) // Increased timeouts
             ->setDelay($isProblematicSite ? 2000 : 3000) // Longer delays for proper loading
-            ->quality(95) // Maximum practical quality (95% is better than 100% for file size)
+            ->quality(90) // High quality but optimized for file size
             ->format('jpg') // Explicitly set format
             ->addChromiumArguments([
                 'no-sandbox',
@@ -72,11 +72,9 @@ final class Screenshotter
                 'disable-extensions',
                 'disable-plugins',
                 'disable-web-security', // Help with CORS issues
-                'force-device-scale-factor=3', // Ensure 3x high DPI
-                'disable-features=VizDisplayCompositor', // Better rendering
-                'run-all-compositor-stages-before-draw', // Ensure complete rendering
-                'disable-background-media-suspend', // Don't suspend media
-                'disable-low-res-tiling', // Use high-res tiles
+                'force-device-scale-factor=2', // 2x scale for crisp text
+                'disable-font-subpixel-positioning', // Better text rendering
+                'enable-font-antialiasing', // Smooth fonts
                 'use-gl=desktop' // Use hardware acceleration if available
             ]);
         

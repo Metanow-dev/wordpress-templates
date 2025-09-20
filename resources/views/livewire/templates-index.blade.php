@@ -321,7 +321,6 @@
                                 @if($template->screenshot_url)
                                     <img src="{{ $template->screenshot_url }}" alt="{{ $template->name ?? $template->slug }}"
                                         class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                                        style="image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges;"
                                         loading="lazy">
                                 @else
                                     <div class="flex items-center justify-center h-full text-gray-400">
@@ -419,7 +418,6 @@
                                     @if($template->screenshot_url)
                                         <img src="{{ $template->screenshot_url }}" alt="{{ $template->name ?? $template->slug }}"
                                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                            style="image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges;"
                                             loading="lazy">
                                     @else
                                         <div class="flex items-center justify-center h-full text-gray-400">
@@ -504,21 +502,15 @@
                     }
                 }
                 
-                /* Optimize image rendering for crisp screenshots */
+                /* Optimize image rendering for crisp text in screenshots */
                 img[src*="/screenshots/"] {
-                    image-rendering: -webkit-optimize-contrast !important;
-                    image-rendering: -moz-crisp-edges !important;
-                    image-rendering: crisp-edges !important;
-                    image-rendering: pixelated !important;
-                    -ms-interpolation-mode: nearest-neighbor !important;
-                    backface-visibility: hidden !important;
-                    transform: translateZ(0) !important;
-                }
-                
-                /* Force hardware acceleration for smooth scaling */
-                .aspect-video img {
-                    will-change: transform !important;
-                    transform: translate3d(0, 0, 0) !important;
+                    image-rendering: auto;
+                    -webkit-backface-visibility: hidden;
+                    backface-visibility: hidden;
+                    -webkit-transform: translate3d(0, 0, 0);
+                    transform: translate3d(0, 0, 0);
+                    -webkit-font-smoothing: subpixel-antialiased;
+                    -moz-osx-font-smoothing: auto;
                 }
             </style>
             
