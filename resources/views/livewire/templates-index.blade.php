@@ -320,7 +320,9 @@
                             <div class="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 relative overflow-hidden">
                                 @if($template->screenshot_url)
                                     <img src="{{ $template->screenshot_url }}" alt="{{ $template->name ?? $template->slug }}"
-                                        class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                                        class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                        style="image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges;"
+                                        loading="lazy">
                                 @else
                                     <div class="flex items-center justify-center h-full text-gray-400">
                                         <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -416,7 +418,9 @@
                                 <div class="sm:w-80 aspect-video sm:aspect-square bg-gradient-to-br from-gray-100 to-gray-200 relative overflow-hidden">
                                     @if($template->screenshot_url)
                                         <img src="{{ $template->screenshot_url }}" alt="{{ $template->name ?? $template->slug }}"
-                                            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                            style="image-rendering: -webkit-optimize-contrast; image-rendering: crisp-edges;"
+                                            loading="lazy">
                                     @else
                                         <div class="flex items-center justify-center h-full text-gray-400">
                                             <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -498,6 +502,23 @@
                         flex-direction: column !important;
                         justify-content: center !important;
                     }
+                }
+                
+                /* Optimize image rendering for crisp screenshots */
+                img[src*="/screenshots/"] {
+                    image-rendering: -webkit-optimize-contrast !important;
+                    image-rendering: -moz-crisp-edges !important;
+                    image-rendering: crisp-edges !important;
+                    image-rendering: pixelated !important;
+                    -ms-interpolation-mode: nearest-neighbor !important;
+                    backface-visibility: hidden !important;
+                    transform: translateZ(0) !important;
+                }
+                
+                /* Force hardware acceleration for smooth scaling */
+                .aspect-video img {
+                    will-change: transform !important;
+                    transform: translate3d(0, 0, 0) !important;
                 }
             </style>
             
