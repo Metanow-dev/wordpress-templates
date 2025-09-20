@@ -31,7 +31,7 @@
     </header>
 
     <!-- Page Title Section -->
-    <div class="py-8 sm:py-12 mt-16" style="margin-bottom: 50px;">
+    <div style="margin-bottom: 50px;">
         <div class="container mx-auto px-2 sm:px-4 text-center ">
             <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#D53741] mb-1">
                 Handcrafted WordPress Projects
@@ -42,7 +42,7 @@
         </div>
     </div>
 
-    <div class="container mx-auto px-2 sm:px-4 py-4 sm:py-8">
+    <div class="container mx-auto px-2 sm:px-4">
         
         <!-- Enhanced Search & Controls Bar -->
         <div class="mb-6">
@@ -399,7 +399,7 @@
                                 <!-- View Demo Button (Fixed at Bottom) -->
                                 <div class="mx-auto mt-auto pt-1 px-0 w-full">
                                     <a href="{{ $template->demo_url }}" target="_blank"
-                                        class="block text-center text-sm font-medium text-gray-600 hover:text-white hover:bg-[#D53741] py-2 px-4  border border-transparent hover:border-[#D53741] transition-all duration-200">
+                                        class="block text-center text-sm font-medium text-gray-600 hover:text-white hover:bg-[#D53741] py-2 px-4 border border-transparent hover:border-[#D53741] transition-all duration-200 underline decoration-gray-400 hover:decoration-white decoration-2 underline-offset-4">
                                         {{ app()->getLocale() === 'de' ? 'Demo ansehen' : 'View Demo' }}
                                     </a>
                                 </div>
@@ -446,7 +446,7 @@
                                         </h3>
                                         
                                         <a href="{{ $template->demo_url }}" target="_blank"
-                                            class="bg-[#D53741] hover:bg-[#B12A31] text-white px-4 py-2 text-sm font-medium transition-colors duration-200">
+                                            class="bg-[#D53741] hover:bg-[#B12A31] text-white px-4 py-2 text-sm font-medium transition-colors duration-200 underline decoration-white decoration-2 underline-offset-4">
                                             {{ app()->getLocale() === 'de' ? 'Demo ansehen' : 'View Demo' }}
                                         </a>
                                     </div>

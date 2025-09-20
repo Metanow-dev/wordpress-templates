@@ -48,7 +48,7 @@ final class Screenshotter
         return ($p && is_file($p)) ? $p : null;
     }
 
-    public function capture(int $width = 1600, int $height = 900, bool $fullPage = false): string
+    public function capture(int $width = 686, int $height = 384, bool $fullPage = false): string
     {
         File::ensureDirectoryExists(dirname($this->abs()), 0775, true);
 
