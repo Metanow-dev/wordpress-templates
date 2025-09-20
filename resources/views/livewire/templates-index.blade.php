@@ -334,7 +334,7 @@
                                 <!-- Category Badge -->
                                 @if($template->primary_category)
                                     <div class="absolute top-2 left-2">
-                                        <span class="inline-block px-0 py-0 text-sm font-bold bg-gradient-to-r from-[#D53741] to-[#B12A31] text-white shadow-lg border-2 border-white/20 backdrop-blur-sm">
+                                        <span class="inline-block px-1 py-0 text-sm font-bold bg-gradient-to-r from-[#D53741] to-[#B12A31] text-white shadow-lg border-2 border-white/20 backdrop-blur-sm">
                                             {{ \App\Helpers\CategoryHelper::getCategoryName($template->primary_category, app()->getLocale()) }}
                                         </span>
                                     </div>
