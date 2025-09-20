@@ -28,32 +28,26 @@ fi
 CURRENT_TEMPLATES_ROOT=$(grep "TEMPLATES_ROOT=" .env | cut -d'=' -f2 || echo "")
 echo "Current TEMPLATES_ROOT: '$CURRENT_TEMPLATES_ROOT'"
 
-# Fix if empty, missing, or incorrectly set to public directory
-if [ -z "$CURRENT_TEMPLATES_ROOT" ] || [ "$CURRENT_TEMPLATES_ROOT" = "" ] || [[ "$CURRENT_TEMPLATES_ROOT" == *"/public"* ]]; then
-    echo "📝 Fixing TEMPLATES_ROOT in .env..."
-    
-    # Remove any existing TEMPLATES_ROOT lines
-    sed -i '/^TEMPLATES_ROOT=.*$/d' .env
-    
-    # Add correct TEMPLATES_ROOT
-    if grep -q "^# Templates Configuration" .env; then
-        # Add after "# Templates Configuration" line
-        sed -i "/^# Templates Configuration/a TEMPLATES_ROOT=$TEMPLATES_PATH" .env
-    else
-        # Add at the end
-        echo "" >> .env
-        echo "# Templates Configuration" >> .env
-        echo "TEMPLATES_ROOT=$TEMPLATES_PATH" >> .env
-    fi
-    
-    echo "✅ Updated TEMPLATES_ROOT to: $TEMPLATES_PATH"
+# Force correct TEMPLATES_ROOT for production
+CORRECT_TEMPLATES_ROOT="$APP_PATH/public"
+echo "📝 Ensuring correct TEMPLATES_ROOT in .env..."
+
+# Remove any existing TEMPLATES_ROOT lines
+sed -i '/^TEMPLATES_ROOT=.*$/d' .env
+
+# Add correct TEMPLATES_ROOT
+if grep -q "^# Templates Configuration" .env; then
+    # Add after "# Templates Configuration" line
+    sed -i "/^# Templates Configuration/a TEMPLATES_ROOT=$CORRECT_TEMPLATES_ROOT" .env
 else
-    echo "✅ TEMPLATES_ROOT already configured: $CURRENT_TEMPLATES_ROOT"
-    # Only use existing path if it's not the public directory
-    if [[ "$CURRENT_TEMPLATES_ROOT" != *"/public"* ]]; then
-        TEMPLATES_PATH="$CURRENT_TEMPLATES_ROOT"
-    fi
+    # Add at the end
+    echo "" >> .env
+    echo "# Templates Configuration" >> .env
+    echo "TEMPLATES_ROOT=$CORRECT_TEMPLATES_ROOT" >> .env
 fi
+
+echo "✅ Set TEMPLATES_ROOT to: $CORRECT_TEMPLATES_ROOT"
+TEMPLATES_PATH="$CORRECT_TEMPLATES_ROOT"
 
 # Create templates directory with correct permissions
 echo "📁 Creating templates directory: $TEMPLATES_PATH"

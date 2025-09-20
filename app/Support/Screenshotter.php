@@ -48,7 +48,7 @@ final class Screenshotter
         return ($p && is_file($p)) ? $p : null;
     }
 
-    public function capture(int $width = 1200, int $height = 800, bool $fullPage = false): string
+    public function capture(int $width = 1920, int $height = 1080, bool $fullPage = false): string
     {
         File::ensureDirectoryExists(dirname($this->abs()), 0775, true);
 
@@ -57,9 +57,10 @@ final class Screenshotter
         
         $shot = Browsershot::url($this->url)
             ->windowSize($width, $height)
-            ->timeout($isProblematicSite ? 30 : 60) // Shorter timeout for known problematic sites
-            ->setDelay($isProblematicSite ? 500 : 1000)
-            ->quality(70)
+            ->deviceScaleFactor(2) // 2x resolution for crisp screenshots
+            ->timeout($isProblematicSite ? 45 : 90) // Increased timeouts
+            ->setDelay($isProblematicSite ? 2000 : 3000) // Longer delays for proper loading
+            ->quality(80) // Higher quality
             ->addChromiumArguments([
                 'no-sandbox',
                 'disable-dev-shm-usage',
@@ -68,14 +69,16 @@ final class Screenshotter
                 'disable-backgrounding-occluded-windows',
                 'disable-renderer-backgrounding',
                 'disable-extensions',
-                'disable-plugins'
+                'disable-plugins',
+                'disable-web-security', // Help with CORS issues
+                'force-device-scale-factor=2' // Ensure high DPI
             ]);
         
         // Use different wait strategy for problematic sites
         if ($isProblematicSite) {
-            $shot->waitUntilNetworkIdle(0, 500); // Less strict network idle
+            $shot->waitUntilNetworkIdle(0, 1000); // Wait for network to be idle for 1 second
         } else {
-            $shot->waitUntilNetworkIdle();
+            $shot->waitUntilNetworkIdle(0, 2000); // Wait for network to be idle for 2 seconds
         }
 
         if ($n = $this->nodePath())   $shot->setNodeBinary($n);
