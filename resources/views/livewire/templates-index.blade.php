@@ -321,7 +321,7 @@
                                 @if($template->screenshot_url)
                                     <img src="{{ $template->screenshot_url }}" alt="{{ $template->name ?? $template->slug }}"
                                         class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                                        loading="lazy">
+                                        loading="lazy" style="image-resolution: 350px">
                                 @else
                                     <div class="flex items-center justify-center h-full text-gray-400">
                                         <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
