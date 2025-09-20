@@ -14,6 +14,58 @@ TEMPLATES_PATH="$APP_PATH/templates"
 echo "🚨 COMPREHENSIVE Deployment 403 Fix for $DOMAIN"
 echo "   This fixes BOTH TEMPLATES_ROOT and Plesk PHP handler issues"
 
+# EARLY STAGE: Immediate fixes to minimize downtime
+echo ""
+echo "🚀 EARLY STAGE: Immediate fixes to prevent 403/500 errors..."
+
+# Detect PHP binary first
+if [ -x "/opt/alt/php83/usr/bin/php" ]; then
+    PHP_BIN="/opt/alt/php83/usr/bin/php"
+elif [ -x "/opt/plesk/php/8.3/bin/php" ]; then
+    PHP_BIN="/opt/plesk/php/8.3/bin/php"
+elif [ -x "/opt/plesk/php/8.2/bin/php" ]; then
+    PHP_BIN="/opt/plesk/php/8.2/bin/php"
+elif command -v php >/dev/null 2>&1; then
+    PHP_BIN="php"
+else
+    echo "❌ PHP not found!"
+    exit 1
+fi
+
+# Immediate .htaccess creation
+cat > "$PUBLIC_PATH/.htaccess" << 'EOF'
+# IMMEDIATE FIX: Force CloudLinux alt-php 8.3
+<IfModule mime_module>
+    AddType application/x-httpd-alt-php83 .php
+</IfModule>
+<IfModule lsapi_module>
+    AddHandler application/x-httpd-alt-php83 .php
+</IfModule>
+AddHandler application/x-httpd-alt-php83 .php
+AddType application/x-httpd-alt-php83 .php
+DirectoryIndex index.php index.html
+<IfModule mod_rewrite.c>
+    <IfModule mod_negotiation.c>
+        Options -MultiViews -Indexes
+    </IfModule>
+    RewriteEngine On
+    RewriteCond %{HTTP:Authorization} .
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_URI} (.+)/$
+    RewriteRule ^ %1 [L,R=301]
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^ index.php [L]
+</IfModule>
+EOF
+
+# Immediate cache clearing
+$PHP_BIN artisan config:clear 2>/dev/null || true
+$PHP_BIN artisan cache:clear 2>/dev/null || true
+
+echo "✅ Early fixes applied - 403/500 errors should be minimized!"
+
 # Step 1: Fix TEMPLATES_ROOT configuration (Critical for Laravel)
 echo ""
 echo "1️⃣  FIXING TEMPLATES_ROOT CONFIGURATION"
