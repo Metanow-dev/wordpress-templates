@@ -49,7 +49,7 @@ class CaptureTemplateScreenshots extends Command
             }
 
             // Check if captured screenshot already exists
-            $capturedScreenshotExists = file_exists(storage_path('app/public/screenshots/' . $t->slug . '.jpg'));
+            $capturedScreenshotExists = file_exists(storage_path('app/public/screenshots/' . $t->slug . '.png'));
             $hasThemeScreenshot = $t->screenshot_url && !str_contains($t->screenshot_url, '/storage/screenshots/');
 
             // When using --new-only, skip templates that already have captured screenshots

@@ -18,7 +18,7 @@ final class Screenshotter
         return new self($slug, $url);
     }
 
-    private function rel(): string { return $this->dir.'/'.$this->slug.'.jpg'; }
+    private function rel(): string { return $this->dir.'/'.$this->slug.'.png'; }
     private function abs(): string { return storage_path('app/public/'.$this->rel()); }
     private function publicUrl(): string { return asset('storage/'.$this->rel()); }
 
@@ -48,7 +48,7 @@ final class Screenshotter
         return ($p && is_file($p)) ? $p : null;
     }
 
-    public function capture(int $width = 686, int $height = 384, bool $fullPage = false): string
+    public function capture(int $width = 343, int $height = 192, bool $fullPage = false): string
     {
         File::ensureDirectoryExists(dirname($this->abs()), 0775, true);
 
@@ -57,11 +57,11 @@ final class Screenshotter
         
         $shot = Browsershot::url($this->url)
             ->windowSize($width, $height)
-            ->deviceScaleFactor(2) // 2x is optimal for web display
+            ->deviceScaleFactor(1) // 1:1 pixel ratio - no scaling
             ->timeout($isProblematicSite ? 45 : 90) // Increased timeouts
             ->setDelay($isProblematicSite ? 2000 : 3000) // Longer delays for proper loading
-            ->quality(90) // High quality but optimized for file size
-            ->format('jpg') // Explicitly set format
+            ->quality(100) // Maximum quality for text clarity
+            ->format('png') // PNG for better text rendering
             ->addChromiumArguments([
                 'no-sandbox',
                 'disable-dev-shm-usage',
@@ -72,10 +72,11 @@ final class Screenshotter
                 'disable-extensions',
                 'disable-plugins',
                 'disable-web-security', // Help with CORS issues
-                'force-device-scale-factor=2', // 2x scale for crisp text
-                'disable-font-subpixel-positioning', // Better text rendering
+                'force-device-scale-factor=1', // No scaling
                 'enable-font-antialiasing', // Smooth fonts
-                'use-gl=desktop' // Use hardware acceleration if available
+                'disable-lcd-text', // Better text on screenshots
+                'force-color-profile=srgb', // Consistent colors
+                'disable-features=TranslateUI' // Prevent translation overlays
             ]);
         
         // Use different wait strategy for problematic sites
