@@ -328,21 +328,44 @@
                                         $isCritical = $loop->first;
                                         $isLocalShot = str_contains($template->screenshot_url, '/storage/screenshots/');
                                         $slug = $template->slug;
+                                        $webpSet = [];
+                                        $pngSet = [];
+                                        if ($isLocalShot) {
+                                            foreach ([480,768,1024] as $w) {
+                                                $p = storage_path('app/public/screenshots/'.$slug.'-'.$w.'.webp');
+                                                if (file_exists($p)) {
+                                                    $webpSet[] = asset('storage/screenshots/'.$slug.'-'.$w.'.webp')." {$w}w";
+                                                }
+                                                $pp = storage_path('app/public/screenshots/'.$slug.'-'.$w.'.png');
+                                                if (file_exists($pp)) {
+                                                    $pngSet[] = asset('storage/screenshots/'.$slug.'-'.$w.'.png')." {$w}w";
+                                                }
+                                            }
+                                        }
                                     @endphp
-                                    <picture>
-                                        @if($isLocalShot)
-                                            <source type="image/webp"
-                                                srcset="{{ asset('storage/screenshots/'.$slug.'-480.webp') }} 480w, 
-                                                        {{ asset('storage/screenshots/'.$slug.'-768.webp') }} 768w,
-                                                        {{ asset('storage/screenshots/'.$slug.'-1024.webp') }} 1024w"
-                                                sizes="(min-width: 1280px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw">
-                                        @endif
+                                    @if(!empty($webpSet) || !empty($pngSet))
+                                        <picture>
+                                            @if(!empty($webpSet))
+                                                <source type="image/webp" srcset="{{ implode(', ', $webpSet) }}"
+                                                    sizes="(min-width: 1280px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw">
+                                            @endif
+                                            @if(!empty($pngSet))
+                                                <source type="image/png" srcset="{{ implode(', ', $pngSet) }}"
+                                                    sizes="(min-width: 1280px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw">
+                                            @endif
+                                            <img src="{{ $template->screenshot_url }}" alt="{{ $template->name ?? $template->slug }}"
+                                                class="screenshot-img w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                                decoding="async"
+                                                loading="{{ $isCritical ? 'eager' : 'lazy' }}"
+                                                fetchpriority="{{ $isCritical ? 'high' : 'low' }}">
+                                        </picture>
+                                    @else
                                         <img src="{{ $template->screenshot_url }}" alt="{{ $template->name ?? $template->slug }}"
                                             class="screenshot-img w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                                             decoding="async"
                                             loading="{{ $isCritical ? 'eager' : 'lazy' }}"
                                             fetchpriority="{{ $isCritical ? 'high' : 'low' }}">
-                                    </picture>
+                                    @endif
                                 @else
                                     <div class="flex items-center justify-center h-full text-gray-400">
                                         <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -441,21 +464,44 @@
                                             $isCritical = $loop->first; 
                                             $isLocalShot = str_contains($template->screenshot_url, '/storage/screenshots/');
                                             $slug = $template->slug;
+                                            $webpSet = [];
+                                            $pngSet = [];
+                                            if ($isLocalShot) {
+                                                foreach ([480,768,1024] as $w) {
+                                                    $p = storage_path('app/public/screenshots/'.$slug.'-'.$w.'.webp');
+                                                    if (file_exists($p)) {
+                                                        $webpSet[] = asset('storage/screenshots/'.$slug.'-'.$w.'.webp')." {$w}w";
+                                                    }
+                                                    $pp = storage_path('app/public/screenshots/'.$slug.'-'.$w.'.png');
+                                                    if (file_exists($pp)) {
+                                                        $pngSet[] = asset('storage/screenshots/'.$slug.'-'.$w.'.png')." {$w}w";
+                                                    }
+                                                }
+                                            }
                                         @endphp
-                                        <picture>
-                                            @if($isLocalShot)
-                                                <source type="image/webp"
-                                                    srcset="{{ asset('storage/screenshots/'.$slug.'-480.webp') }} 480w, 
-                                                            {{ asset('storage/screenshots/'.$slug.'-768.webp') }} 768w,
-                                                            {{ asset('storage/screenshots/'.$slug.'-1024.webp') }} 1024w"
-                                                    sizes="(min-width: 640px) 320px, 100vw">
-                                            @endif
+                                        @if(!empty($webpSet) || !empty($pngSet))
+                                            <picture>
+                                                @if(!empty($webpSet))
+                                                    <source type="image/webp" srcset="{{ implode(', ', $webpSet) }}"
+                                                        sizes="(min-width: 640px) 320px, 100vw">
+                                                @endif
+                                                @if(!empty($pngSet))
+                                                    <source type="image/png" srcset="{{ implode(', ', $pngSet) }}"
+                                                        sizes="(min-width: 640px) 320px, 100vw">
+                                                @endif
+                                                <img src="{{ $template->screenshot_url }}" alt="{{ $template->name ?? $template->slug }}"
+                                                    class="screenshot-img w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                                    decoding="async"
+                                                    loading="{{ $isCritical ? 'eager' : 'lazy' }}"
+                                                    fetchpriority="{{ $isCritical ? 'high' : 'low' }}">
+                                            </picture>
+                                        @else
                                             <img src="{{ $template->screenshot_url }}" alt="{{ $template->name ?? $template->slug }}"
                                                 class="screenshot-img w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                                 decoding="async"
                                                 loading="{{ $isCritical ? 'eager' : 'lazy' }}"
                                                 fetchpriority="{{ $isCritical ? 'high' : 'low' }}">
-                                        </picture>
+                                        @endif
                                     @else
                                         <div class="flex items-center justify-center h-full text-gray-400">
                                             <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">

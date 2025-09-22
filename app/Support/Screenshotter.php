@@ -156,17 +156,48 @@ final class Screenshotter
         if (!is_file($src)) return;
 
         $widths = [480, 768, 1024];
+
+        $hasImagick = extension_loaded('imagick');
+        $hasGd = extension_loaded('gd');
+        $gdCanWebp = function_exists('imagewebp');
+
+        // Prefer Imagick; else use GD. If WebP unsupported, fall back to PNG.
+        $driver = $hasImagick ? 'imagick' : ($hasGd ? 'gd' : null);
+        if (! $driver) return; // No image library available
+
         foreach ($widths as $w) {
-            $dest = storage_path('app/public/screenshots/'.$this->slug."-{$w}.webp");
-            // Skip if already exists newer than source
-            if (file_exists($dest) && filemtime($dest) >= filemtime($src)) {
-                continue;
+            $webpDest = storage_path('app/public/screenshots/'.$this->slug."-{$w}.webp");
+            $pngDest  = storage_path('app/public/screenshots/'.$this->slug."-{$w}.png");
+
+            $srcMtime = filemtime($src) ?: time();
+            $webpFresh = file_exists($webpDest) && filemtime($webpDest) >= $srcMtime;
+            $pngFresh  = file_exists($pngDest)  && filemtime($pngDest)  >= $srcMtime;
+            if ($webpFresh || $pngFresh) continue;
+
+            try {
+                // Force driver explicitly
+                $img = SpatieImage::useImageDriver($driver)->loadFile($src);
+                $img->width($w);
+
+                if ($hasImagick || ($hasGd && $gdCanWebp)) {
+                    $img->format('webp')->quality(82)->save($webpDest);
+                } else {
+                    $img->format('png')->quality(82)->save($pngDest);
+                }
+            } catch (\Throwable $e) {
+                // Fallback: try PNG if WEBP failed
+                try {
+                    SpatieImage::useImageDriver($driver)
+                        ->loadFile($src)
+                        ->width($w)
+                        ->format('png')
+                        ->quality(82)
+                        ->save($pngDest);
+                } catch (\Throwable $e2) {
+                    // Give up on this size
+                    error_log("Variant generation failed for {$this->slug}-{$w}: ".$e2->getMessage());
+                }
             }
-            SpatieImage::load($src)
-                ->width($w)
-                ->format('webp')
-                ->quality(82)
-                ->save($dest);
         }
     }
 
