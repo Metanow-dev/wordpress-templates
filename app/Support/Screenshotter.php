@@ -84,20 +84,26 @@ final class Screenshotter
         
         // Use different wait strategy for problematic sites
         if ($isProblematicSite) {
-            $shot->waitUntilNetworkIdle(0, 1000); // Wait for network to be idle for 1 second
+            $shot->waitUntilNetworkIdle(1000); // Wait for network to be idle for 1 second
         } else {
-            $shot->waitUntilNetworkIdle(0, 2000); // Wait for network to be idle for 2 seconds
+            $shot->waitUntilNetworkIdle(2000); // Wait for network to be idle for 2 seconds
         }
 
         if ($n = $this->nodePath())   $shot->setNodeBinary($n);
         if ($c = $this->chromePath()) $shot->setChromePath($c);
         if ($fullPage)                $shot->fullPage();
 
-        // Dismiss cookie popups and inject hiding CSS before taking screenshot
+        // Run cookie popup dismissal script multiple times for stubborn banners
+        $shot->evaluate($this->getCookiePopupScript());
+        
+        // Wait for any dynamic content to load
+        usleep(500000); // 0.5 seconds
+        
+        // Run the script again to catch dynamically loaded banners
         $shot->evaluate($this->getCookiePopupScript());
         
         // Additional delay to ensure cookie popups are fully dismissed
-        $shot->setDelay(1500); // Extra 1.5 seconds after script execution
+        $shot->setDelay(2000); // Extra 2 seconds after script execution
 
         $shot->save($this->abs());
 
@@ -271,8 +277,8 @@ final class Screenshotter
     private function getCookiePopupScript(): string
     {
         return "
-        // Wait for page to be fully loaded
-        setTimeout(() => {
+        // Function to hide cookie banners
+        function hideCookieBanners() {
             try {
                 // Comprehensive cookie popup dismissal script
                 
@@ -481,7 +487,48 @@ final class Screenshotter
             } catch (error) {
                 console.log('Cookie popup script error:', error);
             }
-        }, 1000); // Wait 1 second for popups to appear
+        }
+        
+        // Run immediately
+        hideCookieBanners();
+        
+        // Run again after 1 second
+        setTimeout(hideCookieBanners, 1000);
+        
+        // Run again after 2 seconds
+        setTimeout(hideCookieBanners, 2000);
+        
+        // Set up MutationObserver to catch dynamically added banners
+        if (typeof MutationObserver !== 'undefined') {
+            const observer = new MutationObserver((mutations) => {
+                let shouldRun = false;
+                mutations.forEach((mutation) => {
+                    mutation.addedNodes.forEach((node) => {
+                        if (node.nodeType === 1) { // Element node
+                            const element = node;
+                            if (element.id === 'cmplz-cookiebanner-container' ||
+                                element.className?.includes('cmplz') ||
+                                element.className?.includes('cookie') ||
+                                element.className?.includes('consent')) {
+                                shouldRun = true;
+                            }
+                        }
+                    });
+                });
+                if (shouldRun) {
+                    console.log('Detected new cookie banner, running dismissal script');
+                    hideCookieBanners();
+                }
+            });
+            
+            observer.observe(document.body, {
+                childList: true,
+                subtree: true
+            });
+            
+            // Stop observing after 5 seconds
+            setTimeout(() => observer.disconnect(), 5000);
+        }
         ";
     }
 }
