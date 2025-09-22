@@ -524,9 +524,11 @@
                                 <!-- Content -->
                                 <div class="flex-1 p-6">
                                     <div class="flex items-start justify-between mb-3">
-                                        <h3 class="font-bold text-gray-900 text-xl group-hover:text-[#D53741] transition-colors duration-200">
-                                            {{ $template->name ?? ucfirst(str_replace('-', ' ', $template->slug)) }}
-                                        </h3>
+                                        <a href="{{ $template->demo_url }}" target="_blank">
+                                            <h3 class="font-bold text-gray-900 text-xl group-hover:text-[#D53741] transition-colors duration-200">
+                                                {{ $template->name ?? ucfirst(str_replace('-', ' ', $template->slug)) }}
+                                            </h3>
+                                        </a>
                                         
                                         <a href="{{ $template->demo_url }}" target="_blank"
                                             class="bg-[#D53741] hover:bg-[#B12A31] text-white px-4 py-2 text-sm font-medium transition-colors duration-200 underline decoration-white decoration-2 underline-offset-4">
@@ -736,7 +738,7 @@
                                 {{ app()->getLocale() === 'de' ? 'Betrieben von' : 'Powered by' }}
                             </span>
                             <a href="https://metanow.dev" target="_blank" class="hover:opacity-80 transition-opacity duration-200">
-                                <img src="{{ asset('storage/img/logo/Metanow.webp') }}" width="80" alt="Metanow Logo" class="filter brightness-0 invert">
+                                <img src="{{ asset('storage/img/logo/Metanow.webp') }}" width="80" alt="Metanow Logo">
                             </a>
                         </div>
                     </div>
@@ -774,7 +776,7 @@
                                 {{ app()->getLocale() === 'de' ? 'Betrieben von' : 'Powered by' }}
                             </span>
                             <a href="https://metanow.dev" target="_blank" class="hover:opacity-80 transition-opacity duration-200">
-                                <img src="{{ asset('storage/img/logo/Metanow.webp') }}" width="120" alt="Metanow Logo" class="filter brightness-0 invert">
+                                <img src="{{ asset('storage/img/logo/Metanow.webp') }}" width="120" alt="Metanow Logo">
                             </a>
                         </div>
                     </div>
