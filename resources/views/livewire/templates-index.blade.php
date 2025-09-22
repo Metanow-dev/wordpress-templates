@@ -173,9 +173,11 @@
                                     <div class="flex items-center justify-between">
                                         <span class="truncate">{{ $category }}</span>
                                         <div class="flex items-center ml-2 space-x-1">
-                                            <span class="text-xs px-1.5 py-0.5 rounded {{ in_array($key, $selectedCategories) ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-600' }}">
-                                                {{ $categoryCounts[$key] ?? 0 }}
-                                            </span>
+                                            @if(($categoryCounts[$key] ?? 0) > 0)
+                                                <span class="text-xs px-1.5 py-0.5 rounded {{ in_array($key, $selectedCategories) ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-600' }}">
+                                                    {{ $categoryCounts[$key] }}
+                                                </span>
+                                            @endif
                                             @if(in_array($key, $selectedCategories))
                                                 <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                                     <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
@@ -495,7 +497,7 @@
             <style>
                 .pagination-wrapper .hidden.sm\\:flex-1.sm\\:flex.sm\\:items-center.sm\\:justify-between {
                     flex-direction: column !important;
-                    gap: 20px !important;
+                    gap: 25px !important;
                     align-items: center !important;
                 }
                 @media (min-width: 640px) {
@@ -503,6 +505,109 @@
                         flex-direction: column !important;
                         justify-content: center !important;
                     }
+                }
+                
+                /* Enhanced pagination styles */
+                .pagination-wrapper nav[role="navigation"] {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    gap: 20px;
+                }
+                
+                /* Results text styling */
+                .pagination-wrapper p {
+                    margin: 0 !important;
+                    padding: 12px 20px !important;
+                    background: #f8fafc !important;
+                    border: 1px solid #e2e8f0 !important;
+                    border-radius: 8px !important;
+                    color: #64748b !important;
+                    font-size: 14px !important;
+                    font-weight: 500 !important;
+                }
+                
+                /* Pagination links container */
+                .pagination-wrapper div[aria-label*="Pagination"] {
+                    display: flex !important;
+                    align-items: center !important;
+                    gap: 8px !important;
+                    background: white !important;
+                    padding: 8px !important;
+                    border: 1px solid #e2e8f0 !important;
+                    border-radius: 12px !important;
+                    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1) !important;
+                }
+                
+                /* Individual pagination links */
+                .pagination-wrapper a,
+                .pagination-wrapper span {
+                    display: inline-flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    min-width: 40px !important;
+                    height: 40px !important;
+                    padding: 8px 12px !important;
+                    margin: 0 !important;
+                    border-radius: 8px !important;
+                    font-size: 14px !important;
+                    font-weight: 500 !important;
+                    text-decoration: none !important;
+                    cursor: pointer !important;
+                    transition: all 0.2s ease-in-out !important;
+                    border: 1px solid transparent !important;
+                }
+                
+                /* Active page styling */
+                .pagination-wrapper span[aria-current="page"] {
+                    background: linear-gradient(135deg, #D53741, #B12A31) !important;
+                    color: white !important;
+                    border-color: #D53741 !important;
+                    box-shadow: 0 2px 4px rgba(213, 55, 65, 0.2) !important;
+                    cursor: default !important;
+                }
+                
+                /* Regular page links */
+                .pagination-wrapper a {
+                    background: #f8fafc !important;
+                    color: #64748b !important;
+                    border-color: #e2e8f0 !important;
+                }
+                
+                .pagination-wrapper a:hover {
+                    background: #D53741 !important;
+                    color: white !important;
+                    border-color: #D53741 !important;
+                    transform: translateY(-1px) !important;
+                    box-shadow: 0 4px 8px rgba(213, 55, 65, 0.2) !important;
+                }
+                
+                /* Disabled links (prev/next when not available) */
+                .pagination-wrapper span:not([aria-current="page"]) {
+                    background: #f1f5f9 !important;
+                    color: #cbd5e1 !important;
+                    border-color: #e2e8f0 !important;
+                    cursor: not-allowed !important;
+                }
+                
+                /* Previous/Next button styling */
+                .pagination-wrapper a[rel="prev"],
+                .pagination-wrapper a[rel="next"] {
+                    font-weight: 600 !important;
+                    padding: 8px 16px !important;
+                }
+                
+                .pagination-wrapper a[rel="prev"]:hover,
+                .pagination-wrapper a[rel="next"]:hover {
+                    background: #B12A31 !important;
+                }
+                
+                /* Three dots styling */
+                .pagination-wrapper span:not([aria-current]):not([rel]) {
+                    background: transparent !important;
+                    color: #94a3b8 !important;
+                    border: none !important;
+                    cursor: default !important;
                 }
                 
                 /* Optimize image rendering for crisp text in screenshots */
