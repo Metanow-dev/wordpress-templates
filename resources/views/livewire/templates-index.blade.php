@@ -324,9 +324,25 @@
                             <!-- Screenshot -->
                             <div class="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 relative overflow-hidden">
                                 @if($template->screenshot_url)
-                                    <img src="{{ $template->screenshot_url }}" alt="{{ $template->name ?? $template->slug }}"
-                                        class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                                        loading="lazy" style="image-resolution: 350px">
+                                    @php 
+                                        $isCritical = $loop->first;
+                                        $isLocalShot = str_contains($template->screenshot_url, '/storage/screenshots/');
+                                        $slug = $template->slug;
+                                    @endphp
+                                    <picture>
+                                        @if($isLocalShot)
+                                            <source type="image/webp"
+                                                srcset="{{ asset('storage/screenshots/'.$slug.'-480.webp') }} 480w, 
+                                                        {{ asset('storage/screenshots/'.$slug.'-768.webp') }} 768w,
+                                                        {{ asset('storage/screenshots/'.$slug.'-1024.webp') }} 1024w"
+                                                sizes="(min-width: 1280px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw">
+                                        @endif
+                                        <img src="{{ $template->screenshot_url }}" alt="{{ $template->name ?? $template->slug }}"
+                                            class="screenshot-img w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                            decoding="async"
+                                            loading="{{ $isCritical ? 'eager' : 'lazy' }}"
+                                            fetchpriority="{{ $isCritical ? 'high' : 'low' }}">
+                                    </picture>
                                 @else
                                     <div class="flex items-center justify-center h-full text-gray-400">
                                         <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -421,9 +437,25 @@
                                 <!-- Screenshot -->
                                 <div class="sm:w-80 aspect-video sm:aspect-square bg-gradient-to-br from-gray-100 to-gray-200 relative overflow-hidden">
                                     @if($template->screenshot_url)
-                                        <img src="{{ $template->screenshot_url }}" alt="{{ $template->name ?? $template->slug }}"
-                                            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                            loading="lazy">
+                                        @php 
+                                            $isCritical = $loop->first; 
+                                            $isLocalShot = str_contains($template->screenshot_url, '/storage/screenshots/');
+                                            $slug = $template->slug;
+                                        @endphp
+                                        <picture>
+                                            @if($isLocalShot)
+                                                <source type="image/webp"
+                                                    srcset="{{ asset('storage/screenshots/'.$slug.'-480.webp') }} 480w, 
+                                                            {{ asset('storage/screenshots/'.$slug.'-768.webp') }} 768w,
+                                                            {{ asset('storage/screenshots/'.$slug.'-1024.webp') }} 1024w"
+                                                    sizes="(min-width: 640px) 320px, 100vw">
+                                            @endif
+                                            <img src="{{ $template->screenshot_url }}" alt="{{ $template->name ?? $template->slug }}"
+                                                class="screenshot-img w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                                decoding="async"
+                                                loading="{{ $isCritical ? 'eager' : 'lazy' }}"
+                                                fetchpriority="{{ $isCritical ? 'high' : 'low' }}">
+                                        </picture>
                                     @else
                                         <div class="flex items-center justify-center h-full text-gray-400">
                                             <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -495,6 +527,11 @@
             </div>
             
             <style>
+                /* Hint the browser about offscreen image size to reduce work */
+                .screenshot-img[loading="lazy"] {
+                    content-visibility: auto;
+                    contain-intrinsic-size: 400px 225px; /* ~16:9 placeholder */
+                }
                 /* Pagination layout: keep elements together with small gap */
                 .pagination-wrapper nav {
                     display: flex !important;

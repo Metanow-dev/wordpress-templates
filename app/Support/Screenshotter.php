@@ -4,6 +4,7 @@ namespace App\Support;
 
 use Illuminate\Support\Facades\File;
 use Spatie\Browsershot\Browsershot;
+use Spatie\Image\Image as SpatieImage;
 
 final class Screenshotter
 {
@@ -91,6 +92,14 @@ final class Screenshotter
         if ($fullPage)                $shot->fullPage();
 
         $shot->save($this->abs());
+
+        // Create responsive, optimized variants for faster delivery
+        try {
+            $this->createResponsiveVariants();
+        } catch (\Throwable $e) {
+            // Non-fatal: continue even if variant generation fails
+            error_log("Failed to create responsive variants: " . $e->getMessage());
+        }
         
         // Automatically fix permissions for new screenshots
         $this->fixScreenshotPermissions();
@@ -135,5 +144,37 @@ final class Screenshotter
             // Log error but don't fail screenshot capture
             error_log("Failed to fix screenshot permissions: " . $e->getMessage());
         }
+    }
+
+    /**
+     * Create multiple WebP variants for responsive images.
+     *  -480w, -768w, -1024w files alongside the original.
+     */
+    private function createResponsiveVariants(): void
+    {
+        $src = $this->abs();
+        if (!is_file($src)) return;
+
+        $widths = [480, 768, 1024];
+        foreach ($widths as $w) {
+            $dest = storage_path('app/public/screenshots/'.$this->slug."-{$w}.webp");
+            // Skip if already exists newer than source
+            if (file_exists($dest) && filemtime($dest) >= filemtime($src)) {
+                continue;
+            }
+            SpatieImage::load($src)
+                ->width($w)
+                ->format('webp')
+                ->quality(82)
+                ->save($dest);
+        }
+    }
+
+    /**
+     * Public helper to (re)generate responsive variants for an existing PNG.
+     */
+    public function generateVariants(): void
+    {
+        $this->createResponsiveVariants();
     }
 }
