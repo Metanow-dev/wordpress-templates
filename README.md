@@ -101,6 +101,27 @@ Access the application at [http://localhost](http://localhost)
 ./vendor/bin/sail artisan templates:screenshot --w=1920 --h=1080
 ```
 
+### Variant Commands (Responsive WebP/PNG)
+
+After each capture, the app attempts to generate responsive variants automatically. You can also generate them on demand:
+
+```bash
+# Local (Sail): generate variants for all screenshots
+./vendor/bin/sail artisan templates:screenshot-variants --all
+
+# Local (Sail): generate variants for a single slug
+./vendor/bin/sail artisan templates:screenshot-variants --slug=your-template-slug
+
+# Production/Generic PHP (no Sail)
+php artisan templates:screenshot-variants --all
+php artisan templates:screenshot-variants --slug=your-template-slug
+```
+
+Notes
+- Prefers WebP with Imagick or GD when supported; otherwise falls back to PNG variants.
+- Variants are written to `storage/app/public/screenshots` as `{slug}-{480,768,1024}.{webp|png}` and are served with strong caching.
+- The UI automatically uses variants when present and gracefully falls back to the base PNG.
+
 ### Testing Screenshots Locally
 
 For local development without real WordPress sites:
@@ -148,6 +169,10 @@ DEMO_URL_PATTERN=https://{slug}/
 # Screenshot Configuration
 CHROME_BINARY_PATH=/usr/bin/google-chrome
 NODE_BINARY_PATH=/usr/bin/node
+# Ownership (Plesk/cPanel): set to your domain system user & group
+# These help the app correct ownership of new screenshots
+SCREENSHOT_SYSUSER=wp-templates.metanow_r6s2v1oe7wr
+SCREENSHOT_GROUP=psacln
 
 # API Security
 API_TOKEN=your-secure-random-token
@@ -184,6 +209,10 @@ location ~ ^/([a-zA-Z0-9\-_]+)/?(.*)$ {
 # Clean up old files weekly
 0 3 * * 0 cd /var/www/vhosts/your-domain.com/httpdocs && php artisan storage:link
 ```
+
+Permissions and ownership
+- Run artisan commands as the domain system user (not root). In Plesk, create the Scheduled Task under the subscription user, or use: `sudo -u wp-templates.metanow_r6s2v1oe7wr -- php artisan ...`.
+- The app attempts to fix file ownership automatically using `SCREENSHOT_SYSUSER` and `SCREENSHOT_GROUP`. If `chown` is disabled by your PHP config, ensure tasks run under the domain user to avoid root‑owned files that the web server won’t serve.
 
 ### Production Workflow
 
@@ -302,11 +331,15 @@ routes/api.php                   # API routes
 
 # Debug browser issues
 ./vendor/bin/sail artisan templates:screenshot --slug=test-site --force -vvv
+
+# Fix ownership/permissions (run as domain user or root)
+php artisan templates:fix-permissions --path=storage/app/public/screenshots
 ```
 
 ### Common Issues
 - **Memory errors**: Increase PHP memory limit for screenshot generation
 - **Permission issues**: Ensure storage directories are writable
+  - Run `php artisan templates:fix-permissions` and verify `.env` has `SCREENSHOT_SYSUSER` and `SCREENSHOT_GROUP`.
 - **Network timeouts**: Adjust timeout settings for slow WordPress sites
 
 ---
@@ -337,4 +370,3 @@ For issues and feature requests, please use the [GitHub issue tracker](https://g
 - Database password properly quoted for special characters
 - Ready for successful deployment
 # .env file manually recreated on server Mon Sep  8 10:06:59 CEST 2025
-

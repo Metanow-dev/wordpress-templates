@@ -115,30 +115,59 @@ final class Screenshotter
         try {
             $screenshotFile = $this->abs();
             $screenshotDir = dirname($screenshotFile);
-            
-            // Set correct file permissions
-            if (file_exists($screenshotFile)) {
-                chmod($screenshotFile, 0644);
+
+            // Permissions (readable by web server)
+            if (file_exists($screenshotFile)) @chmod($screenshotFile, 0644);
+            if (is_dir($screenshotDir)) @chmod($screenshotDir, 0755);
+
+            // Detect target owner/group
+            $targetUser = env('SCREENSHOT_SYSUSER');
+            $targetGroup = env('SCREENSHOT_GROUP');
+
+            // Try to infer from 'public/storage' symlink or storage dir if not provided
+            $probe = is_link(public_path('storage')) ? readlink(public_path('storage')) : storage_path('app/public');
+            if (!$targetUser && file_exists($probe)) {
+                $ownerId = @fileowner($probe);
+                if ($ownerId !== false && function_exists('posix_getpwuid')) {
+                    $pw = @posix_getpwuid($ownerId);
+                    if ($pw && !empty($pw['name'])) $targetUser = $pw['name'];
+                }
+                $groupId = @filegroup($probe);
+                if ($groupId !== false && function_exists('posix_getgrgid')) {
+                    $gr = @posix_getgrgid($groupId);
+                    if ($gr && !empty($gr['name'])) $targetGroup = $gr['name'];
+                }
             }
-            
-            // Set correct directory permissions
-            if (is_dir($screenshotDir)) {
-                chmod($screenshotDir, 0755);
-            }
-            
-            // Set correct ownership (Plesk domain user)
-            $sysUser = 'wp-templates.metanow_r6s2v1oe7wr';
-            $group = 'psacln';
-            
-            if (file_exists($screenshotFile)) {
-                @chown($screenshotFile, $sysUser);
-                @chgrp($screenshotFile, $group);
-            }
-            
-            if (is_dir($screenshotDir)) {
-                @chown($screenshotDir, $sysUser);
-                @chgrp($screenshotDir, $group);
-            }
+
+            // Fallback defaults for Plesk
+            if (!$targetUser) $targetUser = 'wp-templates.metanow_r6s2v1oe7wr';
+            if (!$targetGroup) $targetGroup = 'psacln';
+
+            // Apply ownership if possible
+            $applyChown = function (string $path) use ($targetUser, $targetGroup): void {
+                // Try PHP functions first
+                if (function_exists('chown')) @chown($path, $targetUser);
+                if (function_exists('chgrp')) @chgrp($path, $targetGroup);
+
+                // If still wrong owner, attempt shell chown (when allowed)
+                $ownerOk = @fileowner($path);
+                $groupOk = @filegroup($path);
+                $needShell = false;
+                if (function_exists('posix_getpwnam') && $ownerOk !== false) {
+                    $pw = @posix_getpwnam($targetUser);
+                    if ($pw && isset($pw['uid']) && $pw['uid'] !== $ownerOk) $needShell = true;
+                }
+                if (!$needShell && function_exists('posix_getgrnam') && $groupOk !== false) {
+                    $gr = @posix_getgrnam($targetGroup);
+                    if ($gr && isset($gr['gid']) && $gr['gid'] !== $groupOk) $needShell = true;
+                }
+                if ($needShell && function_exists('shell_exec')) {
+                    @shell_exec('chown '.escapeshellarg($targetUser).':'.escapeshellarg($targetGroup).' '.escapeshellarg($path));
+                }
+            };
+
+            if (file_exists($screenshotFile)) $applyChown($screenshotFile);
+            if (is_dir($screenshotDir)) $applyChown($screenshotDir);
             
         } catch (\Exception $e) {
             // Log error but don't fail screenshot capture
@@ -207,5 +236,6 @@ final class Screenshotter
     public function generateVariants(): void
     {
         $this->createResponsiveVariants();
+        $this->fixScreenshotPermissions();
     }
 }
