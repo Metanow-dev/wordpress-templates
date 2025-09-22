@@ -84,9 +84,9 @@ final class Screenshotter
         
         // Use different wait strategy for problematic sites
         if ($isProblematicSite) {
-            $shot->waitUntilNetworkIdle(1000); // Wait for network to be idle for 1 second
+            $shot->waitUntilNetworkIdle(); // Wait for network to be idle
         } else {
-            $shot->waitUntilNetworkIdle(2000); // Wait for network to be idle for 2 seconds
+            $shot->waitUntilNetworkIdle(); // Wait for network to be idle
         }
 
         if ($n = $this->nodePath())   $shot->setNodeBinary($n);
@@ -499,36 +499,48 @@ final class Screenshotter
         setTimeout(hideCookieBanners, 2000);
         
         // Set up MutationObserver to catch dynamically added banners
-        if (typeof MutationObserver !== 'undefined') {
-            const observer = new MutationObserver((mutations) => {
-                let shouldRun = false;
-                mutations.forEach((mutation) => {
-                    mutation.addedNodes.forEach((node) => {
-                        if (node.nodeType === 1) { // Element node
-                            const element = node;
-                            if (element.id === 'cmplz-cookiebanner-container' ||
-                                element.className?.includes('cmplz') ||
-                                element.className?.includes('cookie') ||
-                                element.className?.includes('consent')) {
-                                shouldRun = true;
-                            }
+        if (typeof MutationObserver !== 'undefined' && document.body) {
+            try {
+                const observer = new MutationObserver((mutations) => {
+                    let shouldRun = false;
+                    mutations.forEach((mutation) => {
+                        if (mutation.addedNodes) {
+                            mutation.addedNodes.forEach((node) => {
+                                if (node.nodeType === 1) { // Element node
+                                    const element = node;
+                                    if (element.id === 'cmplz-cookiebanner-container' ||
+                                        (element.className && element.className.includes('cmplz')) ||
+                                        (element.className && element.className.includes('cookie')) ||
+                                        (element.className && element.className.includes('consent'))) {
+                                        shouldRun = true;
+                                    }
+                                }
+                            });
                         }
                     });
+                    if (shouldRun) {
+                        console.log('Detected new cookie banner, running dismissal script');
+                        setTimeout(hideCookieBanners, 100);
+                    }
                 });
-                if (shouldRun) {
-                    console.log('Detected new cookie banner, running dismissal script');
-                    hideCookieBanners();
-                }
-            });
-            
-            observer.observe(document.body, {
-                childList: true,
-                subtree: true
-            });
-            
-            // Stop observing after 5 seconds
-            setTimeout(() => observer.disconnect(), 5000);
+                
+                observer.observe(document.body, {
+                    childList: true,
+                    subtree: true
+                });
+                
+                // Stop observing after 5 seconds
+                setTimeout(() => {
+                    try { observer.disconnect(); } catch (e) {}
+                }, 5000);
+            } catch (e) {
+                console.log('MutationObserver setup failed:', e);
+            }
         }
+        
+        // Fallback: run script multiple times with intervals for stubborn banners
+        setTimeout(hideCookieBanners, 3000);
+        setTimeout(hideCookieBanners, 4000);
         ";
     }
 }
