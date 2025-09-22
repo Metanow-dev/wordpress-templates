@@ -77,7 +77,9 @@ final class Screenshotter
                 'enable-font-antialiasing', // Smooth fonts
                 'disable-lcd-text', // Better text on screenshots
                 'force-color-profile=srgb', // Consistent colors
-                'disable-features=TranslateUI' // Prevent translation overlays
+                'disable-features=TranslateUI', // Prevent translation overlays
+                'disable-features=VizDisplayCompositor', // Prevent consent popups
+                'disable-component-extensions-with-background-pages' // Block consent manager extensions
             ]);
         
         // Use different wait strategy for problematic sites
@@ -90,6 +92,12 @@ final class Screenshotter
         if ($n = $this->nodePath())   $shot->setNodeBinary($n);
         if ($c = $this->chromePath()) $shot->setChromePath($c);
         if ($fullPage)                $shot->fullPage();
+
+        // Dismiss cookie popups and inject hiding CSS before taking screenshot
+        $shot->evaluate($this->getCookiePopupScript());
+        
+        // Additional delay to ensure cookie popups are fully dismissed
+        $shot->setDelay(1500); // Extra 1.5 seconds after script execution
 
         $shot->save($this->abs());
 
@@ -255,5 +263,171 @@ final class Screenshotter
         $this->createResponsiveVariants();
         // Always fix permissions after creating variants
         $this->fixScreenshotPermissions();
+    }
+
+    /**
+     * Generate JavaScript to dismiss common cookie popups and hide consent banners
+     */
+    private function getCookiePopupScript(): string
+    {
+        return "
+        // Wait for page to be fully loaded
+        setTimeout(() => {
+            try {
+                // Comprehensive cookie popup dismissal script
+                
+                // 1. Hide common cookie popup elements using CSS
+                const hideStyle = document.createElement('style');
+                hideStyle.textContent = `
+                    /* Common cookie popup selectors */
+                    [id*='cookie' i], [class*='cookie' i],
+                    [id*='consent' i], [class*='consent' i],
+                    [id*='gdpr' i], [class*='gdpr' i],
+                    [id*='privacy' i], [class*='privacy' i],
+                    [class*='banner' i][class*='cookie' i],
+                    [class*='notice' i][class*='cookie' i],
+                    .cookiebot-popup,
+                    .onetrust-banner-sdk,
+                    .ot-sdk-container,
+                    #CybotCookiebotDialog,
+                    .cc-banner,
+                    .cookie-notice,
+                    .cookie-law-info-bar,
+                    .moove_gdpr_cookie_info_bar,
+                    .cli-bar-container,
+                    #wpgdprc-consent-bar,
+                    .complianz-cookiebanner,
+                    .cmplz-cookiebanner,
+                    .cookie-consent,
+                    .gdpr-cookie-notice,
+                    .pea_cook_wrapper,
+                    .eu-cookie-law,
+                    .elementor-widget-eael-cookie-consent,
+                    .wp-gdpr-cookie-notice,
+                    [data-nosnippet],
+                    .cky-consent-container,
+                    .borlabs-cookie-banner,
+                    #cookie-notice,
+                    #cookie-law-info-bar
+                    {
+                        display: none !important;
+                        visibility: hidden !important;
+                        opacity: 0 !important;
+                        height: 0 !important;
+                        overflow: hidden !important;
+                        z-index: -9999 !important;
+                    }
+                    
+                    /* Remove backdrop/overlay */
+                    body .modal-backdrop,
+                    body .backdrop,
+                    body [class*='overlay' i],
+                    body [class*='modal' i][class*='cookie' i]
+                    {
+                        display: none !important;
+                    }
+                    
+                    /* Ensure body scroll is enabled */
+                    body {
+                        overflow: auto !important;
+                        position: static !important;
+                    }
+                `;
+                document.head.appendChild(hideStyle);
+                
+                // 2. Click common accept/dismiss buttons
+                const buttonSelectors = [
+                    // Generic selectors
+                    '[data-accept]', '[data-dismiss]', '[data-close]',
+                    'button[class*=\"accept\" i]', 'button[class*=\"allow\" i]',
+                    'button[class*=\"agree\" i]', 'button[class*=\"ok\" i]',
+                    'a[class*=\"accept\" i]', 'a[class*=\"allow\" i]',
+                    
+                    // Specific plugin selectors
+                    '.cc-allow', '.cc-dismiss', '.cc-accept',
+                    '.cookie-notice-dismiss', '.cn-accept-cookie',
+                    '.cli-user-preference-checkbox', '.cli_action_button',
+                    '.moove_gdpr_infobar_allow_all', '.mgbutton',
+                    '.onetrust-close-btn-handler', '#onetrust-accept-btn-handler',
+                    '.optanon-allow-all', '.ot-sdk-btn-primary',
+                    '#CybotCookiebotDialogBodyButtonAccept',
+                    '.cookiebot-dismiss', '.cookiebot-accept',
+                    '#wpgdprc-consent-bar .wpgdprc-consent-bar-option[data-gdprconsent=\"accept\"]',
+                    '.complianz-accept', '.cmplz-accept',
+                    '.pea_cook_btn[data-accept=\"1\"]',
+                    '.gdpr-accept', '.gdpr-allow',
+                    '.cky-btn-accept', '.cky-consent-accept',
+                    '.borlabs-accept-all', '.cookie-consent-accept',
+                    '.elementor-button[data-settings*=\"accept\"]'
+                ];
+                
+                buttonSelectors.forEach(selector => {
+                    try {
+                        const buttons = document.querySelectorAll(selector);
+                        buttons.forEach(button => {
+                            if (button && typeof button.click === 'function') {
+                                button.click();
+                            }
+                        });
+                    } catch (e) {
+                        // Ignore individual button errors
+                    }
+                });
+                
+                // 3. Try to find and remove any remaining visible cookie elements
+                const allElements = document.querySelectorAll('*');
+                allElements.forEach(el => {
+                    try {
+                        const text = el.textContent?.toLowerCase() || '';
+                        const className = el.className?.toLowerCase() || '';
+                        const id = el.id?.toLowerCase() || '';
+                        
+                        // Check if element contains cookie-related text/attributes
+                        if ((text.includes('cookie') || text.includes('consent') || 
+                             text.includes('gdpr') || text.includes('privacy')) &&
+                            (className.includes('banner') || className.includes('notice') ||
+                             className.includes('popup') || className.includes('modal') ||
+                             id.includes('cookie') || id.includes('consent'))) {
+                            
+                            // Additional check: element should be positioned fixed/absolute
+                            const style = window.getComputedStyle(el);
+                            if (style.position === 'fixed' || style.position === 'absolute') {
+                                el.style.display = 'none';
+                                el.style.visibility = 'hidden';
+                                el.style.opacity = '0';
+                            }
+                        }
+                    } catch (e) {
+                        // Ignore individual element errors
+                    }
+                });
+                
+                // 4. Set common cookie acceptance in localStorage/sessionStorage
+                try {
+                    const cookieKeys = [
+                        'cookieAccepted', 'cookiesAccepted', 'gdprAccepted', 
+                        'privacyAccepted', 'consentGiven', 'cookieConsent',
+                        'cookie-notice-accepted', 'cli-user-preference',
+                        'moove_gdpr_popup', 'complianz_consent_status',
+                        'wp-gdpr-cookie-notice', 'borlabs-cookie'
+                    ];
+                    
+                    cookieKeys.forEach(key => {
+                        localStorage.setItem(key, 'true');
+                        localStorage.setItem(key, '1');
+                        sessionStorage.setItem(key, 'true');
+                        sessionStorage.setItem(key, '1');
+                    });
+                } catch (e) {
+                    // Ignore storage errors
+                }
+                
+                console.log('Cookie popup dismissal script completed');
+                
+            } catch (error) {
+                console.log('Cookie popup script error:', error);
+            }
+        }, 1000); // Wait 1 second for popups to appear
+        ";
     }
 }
