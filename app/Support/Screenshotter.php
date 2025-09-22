@@ -93,17 +93,43 @@ final class Screenshotter
         if ($c = $this->chromePath()) $shot->setChromePath($c);
         if ($fullPage)                $shot->fullPage();
 
-        // Run cookie popup dismissal script multiple times for stubborn banners
-        $shot->evaluate($this->getCookiePopupScript());
-        
-        // Wait for any dynamic content to load
-        usleep(500000); // 0.5 seconds
-        
-        // Run the script again to catch dynamically loaded banners
-        $shot->evaluate($this->getCookiePopupScript());
-        
-        // Additional delay to ensure cookie popups are fully dismissed
-        $shot->setDelay(2000); // Extra 2 seconds after script execution
+        // Inject CSS/JS to hide cookie banners (Complianz & others) and set consent
+        try {
+            $host = parse_url($this->url, PHP_URL_HOST) ?: '';
+            if ($host) {
+                $shot->setOption('cookies', [
+                    ['name' => 'cmplz_preferences',    'value' => 'allow', 'domain' => $host, 'path' => '/'],
+                    ['name' => 'cmplz_functional',     'value' => 'allow', 'domain' => $host, 'path' => '/'],
+                    ['name' => 'cmplz_statistics',     'value' => 'allow', 'domain' => $host, 'path' => '/'],
+                    ['name' => 'cmplz_marketing',      'value' => 'allow', 'domain' => $host, 'path' => '/'],
+                    ['name' => 'cmplz_consent_status', 'value' => 'allow', 'domain' => $host, 'path' => '/'],
+                ]);
+            }
+
+            $selectors = [
+                '#cmplz-header-1-optin', '#cmplz-cookiebanner-container', '.cmplz-cookiebanner', '#cmplz',
+                '#cookie-notice', '.cookie-notice', '#cookie-law-info-bar', '.cli-bar-container', '.cli-modal', '#cookie-law-info',
+                '#moove_gdpr_cookie_info_bar', '#gdpr-cookie-message', '.gdpr.gdpr-cookie-message', '.gdpr.gdpr-notice',
+                '#cookie-banner', '.cookie-banner', '.cc-window', '.cc-banner', '#onetrust-banner-sdk', '#ot-sdk-cookie-policy',
+                '#cookieConsent', '.cookie-consent', '#hs-eu-cookie-confirmation'
+            ];
+            $css = implode(', ', $selectors)
+                . '{ display:none !important; visibility:hidden !important; opacity:0 !important; pointer-events:none !important; }
+                   html.cmplz-blocking, body.cmplz-blocking { overflow: auto !important; }';
+            $shot->setOption('addStyleTag', json_encode(['content' => $css]));
+
+            $js = '(function(){ try {\n'
+                . 'const sels = '.json_encode($selectors).';\n'
+                . 'const hide = function(){ for (const s of sels){ document.querySelectorAll(s).forEach(function(el){ el.style.setProperty("display","none","important"); el.style.setProperty("opacity","0","important"); el.style.setProperty("visibility","hidden","important"); el.style.setProperty("pointer-events","none","important"); }); } };\n'
+                . 'try { localStorage.setItem("cmplz_preferences","allow"); localStorage.setItem("cmplz_functional","allow"); localStorage.setItem("cmplz_statistics","allow"); localStorage.setItem("cmplz_marketing","allow"); localStorage.setItem("cmplz_consent_status","allow"); } catch(e){}\n'
+                . 'hide(); var obs=new MutationObserver(hide); obs.observe(document.documentElement,{childList:true,subtree:true}); setTimeout(hide,100); setTimeout(hide,800);\n'
+                . '} catch(e){} })();';
+            $shot->setOption('addScriptTag', json_encode(['content' => $js]));
+        } catch (\Throwable $e) {
+            // ignore injection errors
+        }
+
+        // Note: addStyleTag/addScriptTag + initial setDelay handle the cookie banners
 
         $shot->save($this->abs());
 
