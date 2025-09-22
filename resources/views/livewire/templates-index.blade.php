@@ -458,7 +458,7 @@
                         <div wire:key="list-{{ $template->id ?? $template->slug }}" class="group bg-white shadow-sm border border-gray-200/50 overflow-hidden hover:shadow-lg transition-all duration-300">
                             <div class="flex flex-col sm:flex-row">
                                 <!-- Screenshot -->
-                                <div class="sm:w-80 aspect-video sm:aspect-square bg-gradient-to-br from-gray-100 to-gray-200 relative overflow-hidden">
+                                <div class="sm:w-96 aspect-video bg-gradient-to-br from-gray-100 to-gray-200 relative overflow-hidden">
                                     @if($template->screenshot_url)
                                         @php 
                                             $isCritical = $loop->first; 
