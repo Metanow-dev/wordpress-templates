@@ -524,11 +524,29 @@
                     transition: all 0.2s ease !important;
                     cursor: pointer !important;
                 }
-                .pagination-wrapper nav a.relative.inline-flex:hover,
-                .pagination-wrapper nav a.relative.inline-flex:focus {
-                    background-color: #D53741 !important; /* same red as categories */
-                    color: #ffffff !important;
+                /* Hover: faint red like category hover */
+                .pagination-wrapper nav a.relative.inline-flex:hover {
+                    background-color: rgba(213, 55, 65, 0.06) !important; /* ~bg-[#D53741]/5 */
+                    border-color: rgba(213, 55, 65, 0.3) !important;
+                    color: #374151 !important; /* text-gray-700 */
                     text-decoration: none !important;
+                }
+                /* Focus: remove blue ring and use red */
+                .pagination-wrapper nav a.relative.inline-flex:focus {
+                    outline: none !important;
+                    box-shadow: 0 0 0 3px rgba(213, 55, 65, 0.25) !important;
+                    border-color: rgba(213, 55, 65, 0.4) !important;
+                }
+                /* Pressed state */
+                .pagination-wrapper nav a.relative.inline-flex:active {
+                    background-color: #D53741 !important;
+                    color: #ffffff !important;
+                    border-color: #D53741 !important;
+                }
+                /* Current page: solid category red */
+                .pagination-wrapper [aria-current="page"] > span {
+                    background-color: #D53741 !important;
+                    color: #ffffff !important;
                     border-color: #D53741 !important;
                 }
                 
