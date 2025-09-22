@@ -116,10 +116,6 @@ final class Screenshotter
             $screenshotFile = $this->abs();
             $screenshotDir = dirname($screenshotFile);
 
-            // Permissions (readable by web server)
-            if (file_exists($screenshotFile)) @chmod($screenshotFile, 0644);
-            if (is_dir($screenshotDir)) @chmod($screenshotDir, 0755);
-
             // Detect target owner/group
             $targetUser = env('SCREENSHOT_SYSUSER');
             $targetGroup = env('SCREENSHOT_GROUP');
@@ -145,6 +141,13 @@ final class Screenshotter
 
             // Apply ownership if possible
             $applyChown = function (string $path) use ($targetUser, $targetGroup): void {
+                // Set permissions first
+                if (is_dir($path)) {
+                    @chmod($path, 0755);
+                } else {
+                    @chmod($path, 0644);
+                }
+
                 // Try PHP functions first
                 if (function_exists('chown')) @chown($path, $targetUser);
                 if (function_exists('chgrp')) @chgrp($path, $targetGroup);
@@ -166,8 +169,22 @@ final class Screenshotter
                 }
             };
 
-            if (file_exists($screenshotFile)) $applyChown($screenshotFile);
+            // Fix directory permissions
             if (is_dir($screenshotDir)) $applyChown($screenshotDir);
+
+            // Fix main screenshot file permissions
+            if (file_exists($screenshotFile)) $applyChown($screenshotFile);
+
+            // Fix all variant files permissions (the missing piece!)
+            $basePath = storage_path('app/public/screenshots/');
+            $widths = [480, 768, 1024];
+            foreach ($widths as $w) {
+                $webpPath = $basePath . $this->slug . "-{$w}.webp";
+                $pngPath = $basePath . $this->slug . "-{$w}.png";
+                
+                if (file_exists($webpPath)) $applyChown($webpPath);
+                if (file_exists($pngPath)) $applyChown($pngPath);
+            }
             
         } catch (\Exception $e) {
             // Log error but don't fail screenshot capture
@@ -236,6 +253,7 @@ final class Screenshotter
     public function generateVariants(): void
     {
         $this->createResponsiveVariants();
+        // Always fix permissions after creating variants
         $this->fixScreenshotPermissions();
     }
 }
