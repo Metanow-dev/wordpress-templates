@@ -400,16 +400,33 @@ final class Screenshotter
                         const elements = document.querySelectorAll(selector);
                         elements.forEach(el => {
                             if (el) {
-                                el.remove(); // Completely remove from DOM
+                                // Use the proven browser console method
+                                el.hidden = true;
                                 el.style.display = 'none !important';
                                 el.style.visibility = 'hidden !important';
                                 el.style.opacity = '0 !important';
+                                el.style.zIndex = '-9999 !important';
+                                // Try to remove from DOM as backup
+                                try { el.remove(); } catch (e) {}
                             }
                         });
                     } catch (e) {
                         // Ignore errors
                     }
                 });
+                
+                // Specific handling for the exact container you found
+                try {
+                    const cmplzContainer = document.getElementById('cmplz-cookiebanner-container');
+                    if (cmplzContainer) {
+                        cmplzContainer.hidden = true;
+                        cmplzContainer.style.display = 'none !important';
+                        cmplzContainer.style.visibility = 'hidden !important';
+                        cmplzContainer.style.opacity = '0 !important';
+                    }
+                } catch (e) {
+                    // Ignore errors
+                }
                 
                 // 4. Try to find and remove any remaining visible cookie elements
                 const allElements = document.querySelectorAll('*');
