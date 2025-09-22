@@ -119,6 +119,19 @@ class TemplatesIndex extends Component
         ];
     }
 
+    public function getCategoryCounts()
+    {
+        $locale = app()->getLocale();
+        $categories = CategoryHelper::getCategoriesForLocale($locale);
+        $counts = [];
+        
+        foreach ($categories as $key => $name) {
+            $counts[$key] = Template::where('primary_category', $key)->count();
+        }
+        
+        return $counts;
+    }
+
     public function render()
     {
         $q = Template::query();
@@ -169,9 +182,10 @@ class TemplatesIndex extends Component
 
         $locale = app()->getLocale();
         $categories = CategoryHelper::getCategoriesForLocale($locale);
+        $categoryCounts = $this->getCategoryCounts();
         $tags = config('catalog.tags');
         $stats = $this->getFilterStats();
 
-        return view('livewire.templates-index', compact('templates', 'categories', 'tags', 'stats'));
+        return view('livewire.templates-index', compact('templates', 'categories', 'categoryCounts', 'tags', 'stats'));
     }
 }

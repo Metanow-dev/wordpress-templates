@@ -172,13 +172,16 @@
                                             : 'border-gray-200 bg-white text-gray-700 hover:border-[#D53741]/30 hover:bg-[#D53741]/5' }}">
                                     <div class="flex items-center justify-between">
                                         <span class="truncate">{{ $category }}</span>
-                                        @if(in_array($key, $selectedCategories))
-                                            <svg class="w-4 h-4 ml-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                                            </svg>
-                                        @else
-                                            
-                                        @endif
+                                        <div class="flex items-center ml-2 space-x-1">
+                                            <span class="text-xs px-1.5 py-0.5 rounded {{ in_array($key, $selectedCategories) ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-600' }}">
+                                                {{ $categoryCounts[$key] ?? 0 }}
+                                            </span>
+                                            @if(in_array($key, $selectedCategories))
+                                                <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                                </svg>
+                                            @endif
+                                        </div>
                                     </div>
                                 </button>
                             @endforeach
