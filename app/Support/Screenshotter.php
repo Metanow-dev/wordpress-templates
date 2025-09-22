@@ -304,6 +304,8 @@ final class Screenshotter
                     .cmplz-cookiebanner.cmplz-bottom-right,
                     .cmplz-cookiebanner.cmplz-categories-type-view-preferences,
                     .cmplz-cookiebanner.cmplz-show,
+                    #cmplz-cookiebanner-container,
+                    [id*='cmplz' i],
                     [class*='cmplz-' i],
                     [class*='complianz' i],
                     .cookie-consent,
@@ -385,7 +387,31 @@ final class Screenshotter
                     }
                 });
                 
-                // 3. Try to find and remove any remaining visible cookie elements
+                // 3. Specifically target known stubborn containers
+                const stubbornContainers = [
+                    '#cmplz-cookiebanner-container',
+                    '.cmplz-cookiebanner',
+                    '[id*=\"cmplz\"]',
+                    '[class*=\"cmplz\"]'
+                ];
+                
+                stubbornContainers.forEach(selector => {
+                    try {
+                        const elements = document.querySelectorAll(selector);
+                        elements.forEach(el => {
+                            if (el) {
+                                el.remove(); // Completely remove from DOM
+                                el.style.display = 'none !important';
+                                el.style.visibility = 'hidden !important';
+                                el.style.opacity = '0 !important';
+                            }
+                        });
+                    } catch (e) {
+                        // Ignore errors
+                    }
+                });
+                
+                // 4. Try to find and remove any remaining visible cookie elements
                 const allElements = document.querySelectorAll('*');
                 allElements.forEach(el => {
                     try {
@@ -413,7 +439,7 @@ final class Screenshotter
                     }
                 });
                 
-                // 4. Set common cookie acceptance in localStorage/sessionStorage
+                // 5. Set common cookie acceptance in localStorage/sessionStorage
                 try {
                     const cookieKeys = [
                         'cookieAccepted', 'cookiesAccepted', 'gdprAccepted', 
