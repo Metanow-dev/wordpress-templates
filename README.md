@@ -169,6 +169,10 @@ DEMO_URL_PATTERN=https://{slug}/
 # Screenshot Configuration
 CHROME_BINARY_PATH=/usr/bin/google-chrome
 NODE_BINARY_PATH=/usr/bin/node
+# Delay timing for screenshots (milliseconds)
+SCREENSHOT_DELAY_MS=3000
+SCREENSHOT_DELAY_PROBLEM_MS=2500
+SCREENSHOT_FALLBACK_DELAY_MS=3500
 # Ownership (Plesk/cPanel): set to your domain system user & group
 # These help the app correct ownership of new screenshots
 SCREENSHOT_SYSUSER=wp-templates.metanow_r6s2v1oe7wr

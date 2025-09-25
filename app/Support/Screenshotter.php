@@ -53,14 +53,19 @@ final class Screenshotter
     {
         File::ensureDirectoryExists(dirname($this->abs()), 0775, true);
 
-        // Special handling for problematic sites
-        $isProblematicSite = in_array($this->slug, ['albaniatourguide']);
+        // Special handling for problematic sites (continuous network activity, heavy trackers, etc.)
+        $isProblematicSite = in_array($this->slug, ['albaniatourguide', 'matheus767']);
+
+        // Timing from environment (fallbacks keep current behavior)
+        $delayNormalMs   = (int) (env('SCREENSHOT_DELAY_MS', 3000));
+        $delayProblemMs  = (int) (env('SCREENSHOT_DELAY_PROBLEM_MS', 2500));
+        $delayFallbackMs = (int) (env('SCREENSHOT_FALLBACK_DELAY_MS', 3500));
         
         $shot = Browsershot::url($this->url)
             ->windowSize($width, $height)
             ->deviceScaleFactor(1) // 1:1 pixel ratio - no scaling
-            ->timeout($isProblematicSite ? 45 : 90) // Increased timeouts
-            ->setDelay($isProblematicSite ? 2000 : 3000) // Longer delays for proper loading
+            ->timeout($isProblematicSite ? 120 : 90) // Allow more time on problematic sites
+            ->setDelay($isProblematicSite ? $delayProblemMs : $delayNormalMs) // Longer delays for proper loading
             ->quality(100) // Maximum quality for text clarity
             ->format('png') // PNG for better text rendering
             ->addChromiumArguments([
@@ -84,9 +89,10 @@ final class Screenshotter
         
         // Use different wait strategy for problematic sites
         if ($isProblematicSite) {
-            $shot->waitUntilNetworkIdle(); // Wait for network to be idle
+            // Some sites never reach true network idle; be more lenient
+            $shot->setOption('waitUntil', 'domcontentloaded');
         } else {
-            $shot->waitUntilNetworkIdle(); // Wait for network to be idle
+            $shot->waitUntilNetworkIdle();
         }
 
         if ($n = $this->nodePath())   $shot->setNodeBinary($n);
@@ -131,7 +137,51 @@ final class Screenshotter
 
         // Note: addStyleTag/addScriptTag + initial setDelay handle the cookie banners
 
-        $shot->save($this->abs());
+        // Try primary capture; on failure, fall back to a more lenient strategy
+        try {
+            $shot->save($this->abs());
+        } catch (\Throwable $e) {
+            // Fallback: give up on strict waits and block known analytics/ads domains
+            try {
+                $fallback = Browsershot::url($this->url)
+                    ->windowSize($width, $height)
+                    ->deviceScaleFactor(1)
+                    ->timeout(120)
+                    ->setDelay($delayFallbackMs)
+                    ->quality(100)
+                    ->format('png')
+                    ->blockDomains([
+                        'www.google-analytics.com', 'ssl.google-analytics.com',
+                        'analytics.google.com', 'googletagmanager.com', 'stats.g.doubleclick.net',
+                        'connect.facebook.net', 'static.hotjar.com', 'script.hotjar.com', 'cdn.segment.com',
+                        'cdn.mxpnl.com', 'clarity.ms', 'cdn.jsdelivr.net/npm/cookieconsent',
+                    ])
+                    ->setOption('waitUntil', 'domcontentloaded');
+
+                if ($n = $this->nodePath())   $fallback->setNodeBinary($n);
+                if ($c = $this->chromePath()) $fallback->setChromePath($c);
+
+                // Reuse the same consent-style/JS injection
+                if (!empty($css)) $fallback->setOption('addStyleTag', json_encode(['content' => $css]));
+                if (!empty($js))  $fallback->setOption('addScriptTag', json_encode(['content' => $js]));
+
+                // Reuse cookies
+                if (!empty($host)) {
+                    $fallback->setOption('cookies', [
+                        ['name' => 'cmplz_preferences',    'value' => 'allow', 'domain' => $host, 'path' => '/'],
+                        ['name' => 'cmplz_functional',     'value' => 'allow', 'domain' => $host, 'path' => '/'],
+                        ['name' => 'cmplz_statistics',     'value' => 'allow', 'domain' => $host, 'path' => '/'],
+                        ['name' => 'cmplz_marketing',      'value' => 'allow', 'domain' => $host, 'path' => '/'],
+                        ['name' => 'cmplz_consent_status', 'value' => 'allow', 'domain' => $host, 'path' => '/'],
+                    ]);
+                }
+
+                $fallback->save($this->abs());
+            } catch (\Throwable $e2) {
+                // Re-throw original, but include fallback info
+                throw $e2;
+            }
+        }
 
         // Create responsive, optimized variants for faster delivery
         try {
