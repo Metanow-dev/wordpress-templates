@@ -1,51 +1,81 @@
-<div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 overflow-x-hidden">
-    <!-- Header -->
-    <header class="bg-white border-b border-gray-200 sticky top-0 z-40"style="margin-bottom:80px">
-        <div class="container mx-auto px-2 sm:px-4 py-4 flex items-center justify-between">
-            <div class="flex items-center space-x-2">
-                <div class="text-2xl font-bold text-[#D53741]">
-                    <a href="https://metanow.dev">
-                    <img src="{{ asset('storage/img/logo/Metanow.webp') }}" width="120" class="sm:w-[180px]" alt="Metanow Logo">
-                    </a>
-                </div>
-            </div>
-            
-            <div class="flex items-center space-x-1 sm:space-x-4">
-                <div class="flex space-x-3">
-                            <a href="{{ route('templates.index') }}"
-                               class="flex items-center space-x-2 px-3 py-1 rounded-md transition-all duration-200 @if(app()->getLocale() === 'en') bg-red-50 text-[#B12A31] @else text-gray-400 hover:text-gray-900 hover:bg-gray-200 @endif">
-                                <span class="fi fi-gb" style="width: 20px; height: 15px;"></span>                                
-                            </a>
-                            <a href="{{ route('templates.index.de') }}"
-                               class="flex items-center space-x-2 px-3 py-1 rounded-md transition-all duration-200 @if(app()->getLocale() === 'de') bg-red-50 text-[#B12A31] @else text-gray-400 hover:text-gray-900 hover:bg-gray-200 @endif">
-                                <span class="fi fi-de" style="width: 20px; height: 15px;"></span>
-                            </a>
-                        </div>
-                <a href="https://metanow.dev"
-                    class="bg-[#D53741] hover:bg-[#B12A31] text-white px-3 py-2 text-xs sm:text-sm sm:px-6 font-medium transition-colors duration-200 whitespace-nowrap">
-                    <span class="hidden sm:inline">Back to Metanow</span>
-                    <span class="sm:hidden">Back to Metanow</span>
-                </a>
+<div class="min-h-screen overflow-x-hidden">
+    <!-- Background Image wrapper that extends into next section -->
+    <div class="relative" style="padding-bottom: 200px;">
+        <!-- Background Image with Gradient Fade -->
+        <div class="absolute inset-0 z-0" style="height: 120%;">
+            <img src="{{ asset('img/background.png') }}" alt="Hero Background" class="w-full h-full object-cover" >
+            <!-- Gradient overlay that gradually fades from top to bottom -->
+            <div 
+                class="absolute inset-0 bg-gradient-to-b from-transparent from-0% via-white/40 via-40% via-white/70 via-70% to-white to-100%" 
+                style="background-image:linear-gradient(180deg, #ffffff7a, #ffffff 85%);z-index:2">
             </div>
         </div>
-    </header>
 
-    <!-- Page Title Section -->
-    <div style="margin-bottom: 50px;">
-        <div class="container mx-auto px-2 sm:px-4 text-center ">
-            <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#D53741] mb-1">
-                Handcrafted WordPress Projects
-            </h1>
-            <p class="text-lg text-gray-600 max-w-2xl mx-auto">
-                {{ app()->getLocale() === 'de' ? 'Entdecken Sie unsere Sammlung professionell gestalteter WordPress-Vorlagen' : 'Discover our collection of professionally designed WordPress templates' }}
-            </p>
+        <!-- Hero Section with Background -->
+        <div class="relative">
+            <!-- Header with transparent background -->
+            <header class="relative z-40 bg-transparent border-b border-white/30 backdrop-blur-sm" >
+                <div class="container mx-auto px-2 sm:px-4 py-4 flex items-center justify-between">
+                    <div class="flex items-center space-x-2">
+                        <div class="text-2xl font-bold text-[#D53741]">
+                            <a href="https://metanow.dev">
+                            <img src="{{ asset('storage/img/logo/Metanow.webp') }}" width="120" class="sm:w-[180px]"  alt="Metanow Logo">
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center space-x-1 sm:space-x-4">
+                        <div class="flex space-x-3">
+                                    <a href="{{ route('templates.index') }}"
+                                       class="flex items-center space-x-2 px-3 py-1 transition-all duration-200 @if(app()->getLocale() === 'en') bg-red-50 text-[#B12A31] @else text-gray-400 hover:text-gray-900 hover:bg-gray-200/50 @endif">
+                                        <span class="fi fi-gb" style="width: 20px; height: 15px;"></span>
+                                    </a>
+                                    <a href="{{ route('templates.index.de') }}"
+                                       class="flex items-center space-x-2 px-3 py-1 transition-all duration-200 @if(app()->getLocale() === 'de') bg-red-50 text-[#B12A31] @else text-gray-400 hover:text-gray-900 hover:bg-gray-200/50 @endif">
+                                        <span class="fi fi-de" style="width: 20px; height: 15px;"></span>
+                                    </a>
+                                </div>
+                        <a href="https://metanow.dev"
+                            class="bg-[#D53741] hover:bg-[#B12A31] text-white px-3 py-2 text-xs sm:text-sm sm:px-6 font-medium transition-colors duration-200 whitespace-nowrap">
+                            <span class="hidden sm:inline">Back to Metanow</span>
+                            <span class="sm:hidden">Back to Metanow</span>
+                        </a>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Hero Content -->
+            <div class="relative z-10" style="padding-top: 100px; padding-bottom: 10px;">
+                <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="text-center mx-auto" style="max-width: 1400px;">
+                        <!-- Main Title -->
+                        <h1 class="font-extrabold tracking-tight mb-10" style="font-size: clamp(2.5rem, 8vw, 4.2rem); line-height: 1.1;">
+                            <span class="block text-[#D53741]">{{ app()->getLocale() === 'de' ? 'Handgefertigte WordPress Projekte' : 'Handcrafted WordPress Projects' }}</span>
+                        </h1>
+
+                        <!-- Description -->
+                        <p class="text-gray-700 mx-auto leading-relaxed" style="font-size: clamp(1.125rem, 2.5vw, 1.5rem); max-width: 1100px;">
+                            {{ app()->getLocale() === 'de' ? 'Entdecken Sie unsere Sammlung professionell gestalteter WordPress-Vorlagen für Ihr nächstes Projekt' : 'Discover our collection of professionally designed WordPress templates for your next project' }}
+                        </p>
+
+                        <!-- Stats Counter -->
+                        <div class="mt-8 inline-flex items-center gap-3 bg-white/80 backdrop-blur-sm px-6 py-3  shadow-lg border border-gray-200">
+                            <div class="flex items-center gap-2">
+                                <span class="text-3xl font-bold text-[#D53741]">{{ $stats['total'] ?? count($templates) }}</span>
+                                <span class="text-gray-600 font-medium">{{ app()->getLocale() === 'de' ? 'aus 1500+ Projekten' : 'from 1500+ projects' }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="container mx-auto px-2 sm:px-4">
-        
-        <!-- Enhanced Search & Controls Bar -->
-        <div class="mb-6">
+    <div >
+        <div class="container mx-auto px-2 sm:px-4 ">
+
+            <!-- Enhanced Search & Controls Bar -->
+        <div class="mb-6 relative z-10 bg-white w-full">
             <div class="bg-white shadow-sm border border-gray-200/50 p-6">
                 <div class="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
                     
@@ -670,23 +700,110 @@
         @endif
         </div>
         <!-- Call to Action Section -->
-        <section class="bg-gradient-to-r from-[#D53741] to-[#B12A31] text-white mb-8 mt-16 py-16">
-            <div class="container mx-auto px-2 sm:px-4 text-center">
-                <h2 class="text-3xl md:text-4xl font-bold mb-4">
-                    {{ app()->getLocale() === 'de' ? 'Bereit für Ihr nächstes Projekt?' : 'Ready for Your Next Project?' }}
-                </h2>
-                <p class="text-xl mb-8 opacity-90 max-w-2xl mx-auto">
-                    {{ app()->getLocale() === 'de' ? 'Lassen Sie uns Ihre Vision in eine professionelle WordPress-Website verwandeln. Kontaktieren Sie unser Expertenteam noch heute.' : 'Let us turn your vision into a professional WordPress website. Contact our expert team today.' }}
-                </p>
-                <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                    <a href="https://api.leadconnectorhq.com/widget/bookings/gleni" 
-                       class="bg-white px-4 text-[#D53741] hover:bg-gray-100 px-8 py-4 font-semibold text-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
-                        {{ app()->getLocale() === 'de' ? 'Termin buchen' : 'Book a meeting' }}
-                    </a>
-                    <a href="https://www.metanow.dev/get-a-quote" 
-                       class="border-2 px-3 border-white text-white px-8 py-4 font-semibold text-lg transition-all duration-200 hover:bg-white hover:text-[#D53741]">
-                        {{ app()->getLocale() === 'de' ? 'Kontakt aufnehmen' : 'Contact us' }}
-                    </a>
+        <section class="relative overflow-hidden bg-gradient-to-br from-gray-900 via-[#B12A31] to-[#D53741] text-white mb-8 mt-16 py-20">
+            <!-- Decorative elements -->
+            <div class="absolute inset-0 overflow-hidden opacity-10">
+                <div class="absolute top-0 right-0 w-96 h-96 bg-white rounded-full blur-3xl"></div>
+                <div class="absolute bottom-0 left-0 w-80 h-80 bg-white rounded-full blur-3xl"></div>
+            </div>
+
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                <div class="grid lg:grid-cols-2 gap-12 items-center">
+                    <!-- Left Side - Visual Element -->
+                    <div class="hidden lg:flex flex-col space-y-6">
+                        <!-- Decorative cards showing benefits -->
+                        <div class="bg-white/10 backdrop-blur-sm border border-white/20  p-6 transform hover:scale-105 transition-transform duration-300">
+                            <div class="flex items-start space-x-4">
+                                <div class="flex-shrink-0">
+                                    <div class="w-12 h-12 bg-white/20  flex items-center justify-center">
+                                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-lg mb-1">{{ app()->getLocale() === 'de' ? 'Schnelle Lieferung' : 'Fast Delivery' }}</h3>
+                                    <p class="text-white/80 text-sm">{{ app()->getLocale() === 'de' ? 'Ihr Projekt in Rekordzeit umgesetzt' : 'Your project delivered in record time' }}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white/10 backdrop-blur-sm border border-white/20 p-6 transform hover:scale-105 transition-transform duration-300">
+                            <div class="flex items-start space-x-4">
+                                <div class="flex-shrink-0">
+                                    <div class="w-12 h-12 bg-white/20  flex items-center justify-center">
+                                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-lg mb-1">{{ app()->getLocale() === 'de' ? 'Premium Qualität' : 'Premium Quality' }}</h3>
+                                    <p class="text-white/80 text-sm">{{ app()->getLocale() === 'de' ? 'Professionelle Designs nach Maß' : 'Professional custom-made designs' }}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-6 transform hover:scale-105 transition-transform duration-300">
+                            <div class="flex items-start space-x-4">
+                                <div class="flex-shrink-0">
+                                    <div class="w-12 h-12 bg-white/20  flex items-center justify-center">
+                                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"/>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-lg mb-1">{{ app()->getLocale() === 'de' ? 'Experten Support' : 'Expert Support' }}</h3>
+                                    <p class="text-white/80 text-sm">{{ app()->getLocale() === 'de' ? 'Persönliche Betreuung vom Start bis zum Ende' : 'Personal support from start to finish' }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Side - Content -->
+                    <div class="text-center lg:text-left">
+                        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-bold mb-6 leading-tight">
+                            {{ app()->getLocale() === 'de' ? 'Bereit für Ihr nächstes Projekt?' : 'Ready for Your Next Project?' }}
+                        </h2>
+                        <p class="text-lg sm:text-xl text-white/90 mb-8 leading-relaxed max-w-xl">
+                            {{ app()->getLocale() === 'de' ? 'Lassen Sie uns Ihre Vision in eine professionelle WordPress-Website verwandeln. Kontaktieren Sie unser Expertenteam noch heute.' : 'Let us turn your vision into a professional WordPress website. Contact our expert team today.' }}
+                        </p>
+                        <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                            <a href="https://api.leadconnectorhq.com/widget/bookings/gleni"
+                               class="group inline-flex items-center justify-center px-8 py-4 bg-white text-[#D53741] font-bold text-lg transition-all duration-300 hover:scale-105 hover:shadow-2xl">
+                                <span>{{ app()->getLocale() === 'de' ? 'Termin buchen' : 'Book a Meeting' }}</span>
+                                <svg class="w-5 h-5 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+                                </svg>
+                            </a>
+                            <a href="https://www.metanow.dev/get-a-quote"
+                               class="group inline-flex items-center justify-center px-8 py-4 border-2 border-white text-white font-bold text-lg backdrop-blur-sm transition-all duration-300 hover:bg-white hover:text-[#D53741] hover:scale-105">
+                                {{ app()->getLocale() === 'de' ? 'Angebot erhalten' : 'Get a Quote' }}
+                                <svg class="w-5 h-5 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                </svg>
+                            </a>
+                        </div>
+
+                        <!-- Trust badges mobile -->
+                        <div class="lg:hidden mt-10 pt-8 border-t border-white/20">
+                            <div class="flex flex-wrap justify-center gap-8 text-white/80">
+                                <div class="flex items-center gap-2">
+                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                    </svg>
+                                    <span class="text-sm font-medium">{{ app()->getLocale() === 'de' ? 'Premium Qualität' : 'Premium Quality' }}</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                    </svg>
+                                    <span class="text-sm font-medium">{{ app()->getLocale() === 'de' ? 'Schnelle Lieferung' : 'Fast Delivery' }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -708,12 +825,12 @@
                         <!-- Language Flags -->
                         <div class="flex justify-center space-x-3">
                             <a href="{{ route('templates.index') }}"
-                               class="flex items-center space-x-1 px-2 py-1 rounded-md transition-all duration-200 @if(app()->getLocale() === 'en') bg-red-50 text-[#B12A31] @else text-gray-400 hover:text-gray-900 hover:bg-gray-200 @endif">
+                               class="flex items-center space-x-1 px-2 py-1 transition-all duration-200 @if(app()->getLocale() === 'en') bg-red-50 text-[#B12A31] @else text-gray-400 hover:text-gray-900 hover:bg-gray-200 @endif">
                                 <span class="fi fi-us" style="width: 16px; height: 12px;"></span>
                                 <span class="text-xs">EN</span>                             
                             </a>
                             <a href="{{ route('templates.index.de') }}"
-                               class="flex items-center space-x-1 px-2 py-1 rounded-md transition-all duration-200 @if(app()->getLocale() === 'de') bg-red-50 text-[#B12A31] @else text-gray-400 hover:text-gray-900 hover:bg-gray-200 @endif">
+                               class="flex items-center space-x-1 px-2 py-1 transition-all duration-200 @if(app()->getLocale() === 'de') bg-red-50 text-[#B12A31] @else text-gray-400 hover:text-gray-900 hover:bg-gray-200 @endif">
                                 <span class="fi fi-de" style="width: 16px; height: 12px;"></span>
                                 <span class="text-xs">DE</span>
                             </a>
@@ -748,11 +865,11 @@
                         <!-- Language Flags -->
                         <div class="flex space-x-3">
                             <a href="{{ route('templates.index') }}"
-                               class="flex items-center space-x-2 px-3 py-1 rounded-md transition-all duration-200 @if(app()->getLocale() === 'en') bg-red-50 text-[#B12A31] @else text-gray-400 hover:text-gray-900 hover:bg-gray-200 @endif">
+                               class="flex items-center space-x-2 px-3 py-1 transition-all duration-200 @if(app()->getLocale() === 'en') bg-red-50 text-[#B12A31] @else text-gray-400 hover:text-gray-900 hover:bg-gray-200 @endif">
                                 <span class="fi fi-gb" style="width: 20px; height: 15px;"></span>                                
                             </a>
                             <a href="{{ route('templates.index.de') }}"
-                               class="flex items-center space-x-2 px-3 py-1 rounded-md transition-all duration-200 @if(app()->getLocale() === 'de') bg-red-50 text-[#B12A31] @else text-gray-400 hover:text-gray-900 hover:bg-gray-200 @endif">
+                               class="flex items-center space-x-2 px-3 py-1 transition-all duration-200 @if(app()->getLocale() === 'de') bg-red-50 text-[#B12A31] @else text-gray-400 hover:text-gray-900 hover:bg-gray-200 @endif">
                                 <span class="fi fi-de" style="width: 20px; height: 15px;"></span>
                             </a>
                         </div>
