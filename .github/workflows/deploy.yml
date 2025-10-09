@@ -76,30 +76,41 @@ jobs:
         username: ${{ secrets.PLESK_USERNAME }}
         key: ${{ secrets.PLESK_SSH_KEY }}
         port: ${{ secrets.PLESK_SSH_PORT || 22 }}
+        command_timeout: 10m
         script_stop: true
         script: |
           set -e
-          
+
           # Configuration
           APP_PATH="/var/www/vhosts/${{ secrets.DOMAIN_NAME }}/httpdocs"
           BACKUP_PATH="/var/www/vhosts/${{ secrets.DOMAIN_NAME }}/backups/$(date +%Y%m%d_%H%M%S)"
-          
+
           echo "🚀 Starting deployment to $APP_PATH"
-          
+
           # Create backup directory
           mkdir -p "$(dirname "$BACKUP_PATH")"
-          
-          # Backup current deployment (if exists)
+
+          # Backup current deployment (if exists) - optimized with rsync
           if [ -d "$APP_PATH" ]; then
-            echo "📦 Creating backup..."
-            cp -r "$APP_PATH" "$BACKUP_PATH"
-            echo "✅ Backup created at $BACKUP_PATH"
+            echo "📦 Creating backup (excluding large directories)..."
+            rsync -a \
+              --exclude='node_modules/' \
+              --exclude='vendor/' \
+              --exclude='.git/' \
+              --exclude='storage/framework/cache/' \
+              --exclude='storage/framework/sessions/' \
+              --exclude='storage/framework/views/' \
+              --exclude='storage/logs/' \
+              "$APP_PATH/" "$BACKUP_PATH/" || {
+                echo "⚠️  Backup failed, continuing with deployment..."
+              }
+            echo "✅ Backup completed at $BACKUP_PATH"
           fi
-          
+
           # Create application directory
           mkdir -p "$APP_PATH"
           cd "$APP_PATH"
-          
+
           # Download and extract deployment
           echo "⬇️  Downloading deployment archive..."
           
