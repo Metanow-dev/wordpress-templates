@@ -685,7 +685,8 @@
                     -moz-osx-font-smoothing: auto;
                 }
             </style>
-            
+            </div>
+
         @else
             <!-- Empty State -->
             <div class="text-center py-16">
@@ -708,7 +709,9 @@
             </div>
         @endif
         </div>
-        <!-- Call to Action Section -->
+    </div>
+
+    <!-- Call to Action Section -->
         <section class="relative overflow-hidden bg-gradient-to-br from-gray-900 via-[#B12A31] to-[#D53741] text-white mb-8 mt-16 py-20">
             <!-- Decorative elements -->
             <div class="absolute inset-0 overflow-hidden opacity-10">
@@ -909,6 +912,4 @@
                 </div>
             </div>
         </footer>
-    
-</div>
 </div>
