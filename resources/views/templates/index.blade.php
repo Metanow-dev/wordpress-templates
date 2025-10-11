@@ -40,5 +40,26 @@
 <body class="h-full">
     <livewire:templates-index />
     @livewireScripts
+    <script>
+        // Debug Livewire loading
+        document.addEventListener('livewire:init', () => {
+            console.log('✅ Livewire initialized successfully');
+        });
+
+        document.addEventListener('livewire:navigating', () => {
+            console.log('🔄 Livewire navigating...');
+        });
+
+        document.addEventListener('livewire:navigated', () => {
+            console.log('✅ Livewire navigation complete');
+        });
+
+        // Log any Livewire errors
+        window.addEventListener('error', (e) => {
+            if (e.message.includes('Livewire') || e.message.includes('wire:')) {
+                console.error('❌ Livewire error:', e);
+            }
+        });
+    </script>
 </body>
 </html>

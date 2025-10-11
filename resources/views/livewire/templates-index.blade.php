@@ -105,12 +105,20 @@
                     <!-- Controls Section -->
                     <div class="flex flex-wrap items-center gap-3">
                         <!-- Filter Toggle -->
-                        <button wire:click="toggleFilters" 
+                        <button wire:click="toggleFilters"
+                            wire:loading.attr="disabled"
+                            wire:loading.class="opacity-50 cursor-not-allowed"
                             class="flex items-center space-x-2 px-4 py-2 font-medium transition-all duration-200 {{ $showFilters ? 'bg-red-50 text-[#D53741] border border-red-200' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.414A1 1 0 013 6.707V4z"/>
                             </svg>
                             <span>{{ $this->filterToggleText }}</span>
+                            <span wire:loading wire:target="toggleFilters" class="ml-2">
+                                <svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                            </span>
                         </button>
 
                         <!-- View Toggle -->
