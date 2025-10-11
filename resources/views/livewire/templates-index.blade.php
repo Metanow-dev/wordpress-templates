@@ -1,12 +1,12 @@
 <div class="min-h-screen overflow-x-hidden">
-    <!-- Background Image wrapper that extends into next section -->
-    <div class="relative" style="padding-bottom: 200px;">
+    <!-- Static Hero Section (Non-reactive) -->
+    <div class="relative" style="padding-bottom: 200px;" wire:ignore.self>
         <!-- Background Image with Gradient Fade -->
         <div class="absolute inset-0 z-0" style="height: 120%;">
             <img src="{{ asset('img/background.png') }}" alt="Hero Background" class="w-full h-full object-cover" >
             <!-- Gradient overlay that gradually fades from top to bottom -->
-            <div 
-                class="absolute inset-0 bg-gradient-to-b from-transparent from-0% via-white/40 via-40% via-white/70 via-70% to-white to-100%" 
+            <div
+                class="absolute inset-0 bg-gradient-to-b from-transparent from-0% via-white/40 via-40% via-white/70 via-70% to-white to-100%"
                 style="background-image:linear-gradient(180deg, #ffffff7a, #ffffff 85%);z-index:2">
             </div>
         </div>
@@ -71,11 +71,12 @@
         </div>
     </div>
 
-    <div >
-        <div class="container mx-auto px-2 sm:px-4 ">
+    <!-- Main Content Area (Livewire Reactive) -->
+    <div class="relative z-10 bg-white w-full">
+        <div class="container mx-auto px-2 sm:px-4">
 
             <!-- Enhanced Search & Controls Bar -->
-        <div class="mb-6 relative z-10 bg-white w-full">
+        <div class="mb-6" wire:key="search-controls">
             <div class="bg-white shadow-sm border border-gray-200/50 p-6">
                 <div class="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
                     
@@ -351,12 +352,12 @@
 
         <!-- Results -->
         @if($templates->count())
-            <div class="container mx-auto" style="margin-bottom:50px">
-                
+            <div class="container mx-auto" style="margin-bottom:50px" wire:key="templates-container">
+
                 <!-- Grid View -->
             @if($view === 'grid')
                 <!-- Grid View -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mb-12" style="gap: 20px;">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mb-12" style="gap: 20px;" wire:key="grid-view">
                     @foreach($templates as $template)
                         <div wire:key="grid-{{ $template->id ?? $template->slug }}" class="group bg-white shadow-sm border border-gray-200/50 overflow-hidden hover:shadow-xl hover:shadow-gray-200/50 px-2 py-2 transition-all duration-300 hover:-translate-y-1">
                             <!-- Screenshot -->
@@ -491,7 +492,7 @@
                 </div>
             @else
                 <!-- List View -->
-                <div class="space-y-4 mb-12">
+                <div class="space-y-4 mb-12" wire:key="list-view">
                     @foreach($templates as $template)
                         <div wire:key="list-{{ $template->id ?? $template->slug }}" class="group bg-white shadow-sm border border-gray-200/50 overflow-hidden hover:shadow-lg transition-all duration-300">
                             <div class="flex flex-col sm:flex-row">
@@ -606,7 +607,7 @@
             @endif
 
             <!-- Pagination -->
-            <div class="flex justify-center" style="margin-top: 50px">
+            <div class="flex justify-center" style="margin-top: 50px" wire:key="pagination">
                 <div class="pagination-wrapper">
                     {{ $templates->links() }}
                 </div>
