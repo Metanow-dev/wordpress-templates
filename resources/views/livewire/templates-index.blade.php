@@ -55,7 +55,10 @@
 
                         <!-- Description -->
                         <p class="text-gray-700 mx-auto leading-relaxed" style="font-size: clamp(1.125rem, 2.5vw, 1.5rem); max-width: 1100px;">
-                            {{ app()->getLocale() === 'de' ? 'Entdecken Sie unsere Sammlung professionell gestalteter WordPress-Vorlagen für Ihr nächstes Projekt' : 'Discover our collection of professionally designed WordPress templates for your next project' }}
+                            {{ app()->getLocale() === 'de' 
+                                ? 'Entdecken Sie unsere Sammlung professionell gestalteter WordPress-Websites für Ihr nächstes Projekt' 
+                                : 'Discover our collection of professionally designed WordPress websites for your next project' 
+                            }}
                         </p>
 
                         <!-- Stats Counter -->
