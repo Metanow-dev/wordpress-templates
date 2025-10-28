@@ -24,8 +24,8 @@ class RateLimitMiddleware
             return $next($request);
         }
 
-        $maxAttempts = $config['max_attempts'];
-        $decayMinutes = $config['decay_minutes'];
+        $maxAttempts = (int) $config['max_attempts'];
+        $decayMinutes = (int) $config['decay_minutes'];
 
         // Generate unique key for this IP and tier
         $key = $this->resolveRequestSignature($request, $tier);
