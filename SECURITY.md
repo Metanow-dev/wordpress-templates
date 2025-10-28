@@ -10,9 +10,10 @@ This document describes the security and performance features implemented to pre
 4. [Request Size Limiting](#request-size-limiting)
 5. [Queue-Based Processing](#queue-based-processing)
 6. [Health Monitoring](#health-monitoring)
-7. [Configuration](#configuration)
-8. [Production Deployment](#production-deployment)
-9. [Troubleshooting](#troubleshooting)
+7. [Chrome/Puppeteer Process Management](#chromepuppeteer-process-management)
+8. [Configuration](#configuration)
+9. [Production Deployment](#production-deployment)
+10. [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -376,6 +377,93 @@ HEALTH_CHECK_CACHE=true
 
 - Controller: `app/Http/Controllers/Api/HealthController.php`
 - Routes: `routes/api.php`
+
+---
+
+## Chrome/Puppeteer Process Management
+
+### Purpose
+Prevent zombie Chrome/Puppeteer processes from accumulating and consuming massive amounts of RAM.
+
+### The Problem
+
+**Previous Production Issue**:
+- 389 zombie Chrome/Puppeteer processes
+- 48.4 GB RAM consumed by Chrome processes
+- Processes running for days without cleanup
+- Temporary directories accumulating in `/tmp`
+
+### Solution
+
+#### 1. Automatic Cleanup Command
+
+```bash
+# Clean up zombie Chrome processes and temp directories
+php artisan chrome:cleanup --force
+
+# Dry run to see what would be cleaned
+php artisan chrome:cleanup --dry-run
+```
+
+**What it cleans**:
+- Zombie Chrome/Chromium/Puppeteer processes
+- Orphaned `/tmp/puppeteer_dev_chrome_profile-*` directories
+- Shows memory statistics and logs all actions
+
+#### 2. Process Limits
+
+The memory circuit breaker and PHP-FPM limits prevent unlimited Chrome processes:
+- Max 10 concurrent PHP-FPM processes
+- Max 2 concurrent screenshot operations
+- 30-second timeout per screenshot
+
+#### 3. Scheduled Cleanup
+
+Add to crontab for automatic cleanup:
+
+```bash
+# Clean up Chrome zombies every 15 minutes
+*/15 * * * * cd /var/www/vhosts/wp-templates.metanow.dev/httpdocs && php artisan chrome:cleanup --force >> /var/log/chrome-cleanup.log 2>&1
+
+# Emergency cleanup: kill processes older than 10 minutes
+*/10 * * * * pkill -9 -f 'chrome.*--enable-automation' --older-than 600 2>/dev/null
+
+# Clean old temp directories
+0 * * * * find /tmp -name 'puppeteer_dev_chrome_profile-*' -type d -mmin +60 -exec rm -rf {} \; 2>/dev/null
+```
+
+### Configuration
+
+```env
+# Screenshot process management
+SCREENSHOT_TIMEOUT=30
+MAX_CONCURRENT_SCREENSHOTS=2
+
+# Auto-cleanup thresholds
+CHROME_PROCESS_MAX_AGE=300      # 5 minutes
+CHROME_TEMP_DIR_MAX_AGE=3600    # 1 hour
+```
+
+### Monitoring Chrome Processes
+
+```bash
+# Count Chrome processes
+ps aux | grep chrome | grep -v grep | wc -l
+
+# Show Chrome memory usage
+ps aux | grep chrome | awk '{sum+=$4} END {print "Chrome Memory: " sum "%"}'
+
+# List Puppeteer temp directories
+ls -d /tmp/puppeteer_dev_chrome_profile-* 2>/dev/null | wc -l
+```
+
+### Files
+
+- Command: `app/Console/Commands/CleanupChromeProcessesCommand.php`
+- Documentation: `CHROME-CLEANUP.md`
+- Config: `config/security.php` → `process`
+
+### **See CHROME-CLEANUP.md for complete documentation**
 
 ---
 

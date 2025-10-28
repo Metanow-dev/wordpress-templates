@@ -106,6 +106,12 @@ return [
 
         // Maximum concurrent screenshot processes
         'max_concurrent_screenshots' => env('MAX_CONCURRENT_SCREENSHOTS', 2),
+
+        // Auto-cleanup Chrome processes older than this (seconds)
+        'chrome_process_max_age' => env('CHROME_PROCESS_MAX_AGE', 300), // 5 minutes
+
+        // Auto-cleanup Puppeteer temp dirs older than this (seconds)
+        'chrome_temp_dir_max_age' => env('CHROME_TEMP_DIR_MAX_AGE', 3600), // 1 hour
     ],
 
     /*
