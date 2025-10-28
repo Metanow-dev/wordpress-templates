@@ -32,7 +32,7 @@ Route::get('/media/{slug}/{path}', function (string $slug, string $path) {
 
 
 // EN
-Route::prefix('en')->middleware('set.locale')->group(function () {
+Route::prefix('en')->middleware(['set.locale', 'rate.limit:web'])->group(function () {
     // Allow crawling of main gallery page
     Route::get('templates', fn () => view('templates.index'))->name('templates.index');
     // Block crawling of individual template detail pages
@@ -40,7 +40,7 @@ Route::prefix('en')->middleware('set.locale')->group(function () {
 });
 
 // DE
-Route::prefix('de')->middleware('set.locale')->group(function () {
+Route::prefix('de')->middleware(['set.locale', 'rate.limit:web'])->group(function () {
     // Allow crawling of main gallery page
     Route::get('vorlagen', fn () => view('templates.index'))->name('templates.index.de');
     // Block crawling of individual template detail pages

@@ -198,20 +198,38 @@ class TemplateClassificationController extends Controller
     
     /**
      * Get classification statistics
+     * Optimized to use single query with aggregations to prevent memory issues
      */
     public function getStats(): JsonResponse
     {
+        // Use a single aggregated query instead of multiple count queries
+        $stats = \DB::select("
+            SELECT
+                COUNT(*) as total_templates,
+                COUNT(primary_category) as classified_templates,
+                SUM(CASE WHEN classification_source = 'ai' THEN 1 ELSE 0 END) as ai_classified,
+                SUM(CASE WHEN classification_source = 'human' THEN 1 ELSE 0 END) as human_classified,
+                SUM(CASE WHEN needs_review = 1 THEN 1 ELSE 0 END) as needs_review,
+                SUM(CASE WHEN classification_confidence > 0.8 THEN 1 ELSE 0 END) as high_confidence
+            FROM templates
+        ")[0];
+
+        // Get category distribution with limit to prevent memory issues
+        $categoriesDistribution = Template::whereNotNull('primary_category')
+            ->selectRaw('primary_category, COUNT(*) as count')
+            ->groupBy('primary_category')
+            ->orderBy('count', 'desc')
+            ->limit(50) // Limit to top 50 categories
+            ->pluck('count', 'primary_category');
+
         return response()->json([
-            'total_templates' => Template::count(),
-            'classified_templates' => Template::whereNotNull('primary_category')->count(),
-            'ai_classified' => Template::where('classification_source', 'ai')->count(),
-            'human_classified' => Template::where('classification_source', 'human')->count(),
-            'needs_review' => Template::where('needs_review', true)->count(),
-            'high_confidence' => Template::where('classification_confidence', '>', 0.8)->count(),
-            'categories_distribution' => Template::whereNotNull('primary_category')
-                ->selectRaw('primary_category, COUNT(*) as count')
-                ->groupBy('primary_category')
-                ->pluck('count', 'primary_category'),
+            'total_templates' => (int) $stats->total_templates,
+            'classified_templates' => (int) $stats->classified_templates,
+            'ai_classified' => (int) $stats->ai_classified,
+            'human_classified' => (int) $stats->human_classified,
+            'needs_review' => (int) $stats->needs_review,
+            'high_confidence' => (int) $stats->high_confidence,
+            'categories_distribution' => $categoriesDistribution,
             'available_categories' => config('catalog.categories'),
             'available_tags' => config('catalog.tags'),
         ]);
