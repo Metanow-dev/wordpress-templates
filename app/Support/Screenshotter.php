@@ -156,7 +156,16 @@ final class Screenshotter
                         'connect.facebook.net', 'static.hotjar.com', 'script.hotjar.com', 'cdn.segment.com',
                         'cdn.mxpnl.com', 'clarity.ms', 'cdn.jsdelivr.net/npm/cookieconsent',
                     ])
-                    ->setOption('waitUntil', 'domcontentloaded');
+                    ->setOption('waitUntil', 'domcontentloaded')
+                    ->addChromiumArguments([
+                        '--no-sandbox',
+                        '--disable-dev-shm-usage',
+                        '--ignore-certificate-errors',
+                        '--disable-setuid-sandbox',
+                        '--disable-background-timer-throttling',
+                        '--disable-backgrounding-occluded-windows',
+                        '--disable-renderer-backgrounding',
+                    ]);
 
                 if ($n = $this->nodePath())   $fallback->setNodeBinary($n);
                 if ($c = $this->chromePath()) $fallback->setChromePath($c);
