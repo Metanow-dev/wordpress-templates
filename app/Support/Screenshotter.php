@@ -69,22 +69,22 @@ final class Screenshotter
             ->quality(100) // Maximum quality for text clarity
             ->format('png') // PNG for better text rendering
             ->addChromiumArguments([
-                'no-sandbox',
-                'disable-dev-shm-usage',
-                'ignore-certificate-errors',
-                'disable-background-timer-throttling',
-                'disable-backgrounding-occluded-windows',
-                'disable-renderer-backgrounding',
-                'disable-extensions',
-                'disable-plugins',
-                'disable-web-security', // Help with CORS issues
-                'force-device-scale-factor=1', // No scaling
-                'enable-font-antialiasing', // Smooth fonts
-                'disable-lcd-text', // Better text on screenshots
-                'force-color-profile=srgb', // Consistent colors
-                'disable-features=TranslateUI', // Prevent translation overlays
-                'disable-features=VizDisplayCompositor', // Prevent consent popups
-                'disable-component-extensions-with-background-pages' // Block consent manager extensions
+                '--no-sandbox',
+                '--disable-dev-shm-usage',
+                '--ignore-certificate-errors',
+                '--disable-background-timer-throttling',
+                '--disable-backgrounding-occluded-windows',
+                '--disable-renderer-backgrounding',
+                '--disable-extensions',
+                '--disable-plugins',
+                '--disable-web-security', // Help with CORS issues
+                '--force-device-scale-factor=1', // No scaling
+                '--enable-font-antialiasing', // Smooth fonts
+                '--disable-lcd-text', // Better text on screenshots
+                '--force-color-profile=srgb', // Consistent colors
+                '--disable-features=TranslateUI', // Prevent translation overlays
+                '--disable-features=VizDisplayCompositor', // Prevent consent popups
+                '--disable-component-extensions-with-background-pages' // Block consent manager extensions
             ]);
         
         // Use different wait strategy for problematic sites
