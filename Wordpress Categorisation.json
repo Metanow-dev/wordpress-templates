@@ -1,0 +1,676 @@
+{
+  "name": "Wordpress Categorisation",
+  "nodes": [
+    {
+      "parameters": {
+        "url": "={{ $json.body.api_catalog_url }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "id": "b8672c91-9a6a-4bad-ba18-372da64af096",
+      "name": "Fetch Catalog Config",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        2896,
+        528
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "4InZm74eIehxvUcK",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an expert WordPress template classifier with access to comprehensive WordPress data. Analyze the provided information to categorize templates accurately and generate a descriptive template name.\n\n**ANALYSIS APPROACH:**\n1. **WordPress-First Analysis**: Prioritize actual WordPress data (plugins, themes, file structure) over HTML content\n2. **Evidence-Based Classification**: Only assign tags you can prove from the WordPress data or clear content evidence\n3. **Industry-Focused Categories**: Use the business industry as primary categorization factor\n4. **Conservative Tagging**: Better to have fewer accurate tags than many uncertain ones\n5. **Handle Missing HTML**: If no HTML content available, rely entirely on WordPress data\n6. **Generate Descriptive Names**: Create a clear, marketable name that describes what the template is for\n\n**AVAILABLE CATEGORIES:** {{ $json.availableCategories.join(', ') }}\n\n**AVAILABLE TAGS:** {{ $json.availableTags.join(', ') }}\n\n**WORDPRESS DATA ANALYSIS:**\nCurrent Name: {{ $json.templateData.name }} ({{ $json.templateData.slug }})\nURL: {{ $json.templateData.demo_url }}\n\n**WordPress Technical Info:**\n- WordPress Version: {{ $json.content.wordpressInfo.version }}\n- Active Theme: {{ $json.content.wordpressInfo.theme }}\n- Installed Plugins: {{ $json.content.wordpressInfo.plugins.join(', ') }}\n- Customization Level: {{ $json.content.wordpressInfo.customization_level }}\n- Content Size: {{ $json.content.wordpressInfo.content_size }} bytes\n- Plugin Count: {{ $json.content.indicators.pluginCount }}\n- HTML Content Available: {{ $json.content.indicators.htmlContentAvailable }}\n\n**Content Analysis:**\n- Title: \"{{ $json.content.title }}\"\n- Description: \"{{ $json.content.description }}\"\n- Main Headings: {{ $json.content.headings.join(', ') }}\n- Content Length: {{ $json.content.bodyText.length }} characters\n- Is Customized: {{ $json.content.indicators.isCustomized }}\n- Minimal Content: {{ $json.content.indicators.isMinimalContent }}\n\n**DETECTED FEATURES (WordPress-verified):**\nE-commerce: WooCommerce={{ $json.content.indicators.hasWooCommerce }}, Shopify={{ $json.content.indicators.hasShopify }}, General={{ $json.content.indicators.hasEcommerce }}\nPage Builders: Elementor={{ $json.content.indicators.hasElementor }}, Divi={{ $json.content.indicators.hasDivi }}, Gutenberg={{ $json.content.indicators.hasGutenberg }}, Visual Composer={{ $json.content.indicators.hasVisualComposer }}\nFunctionality: Booking={{ $json.content.indicators.hasBooking }}, Events={{ $json.content.indicators.hasEvents }}, Contact Forms={{ $json.content.indicators.hasContactForm }}, Newsletter={{ $json.content.indicators.hasNewsletter }}, Multilingual={{ $json.content.indicators.hasMultilingual }}\nContent Types: Portfolio={{ $json.content.indicators.hasPortfolio }}, Blog={{ $json.content.indicators.hasBlog }}, Gallery={{ $json.content.indicators.hasGallery }}, Team={{ $json.content.indicators.hasTeam }}, Testimonials={{ $json.content.indicators.hasTestimonials }}\n\n**BUSINESS TYPE INDICATORS:**\nRestaurant={{ $json.content.indicators.isRestaurant }}, Real Estate={{ $json.content.indicators.isRealEstate }}, Healthcare={{ $json.content.indicators.isHealthcare }}, Legal={{ $json.content.indicators.isLegal }}, Education={{ $json.content.indicators.isEducation }}, Automotive={{ $json.content.indicators.isAutomotive }}, Beauty={{ $json.content.indicators.isBeauty }}, Construction={{ $json.content.indicators.isConstruction }}, Finance={{ $json.content.indicators.isFinance }}, Technology={{ $json.content.indicators.isTechnology }}, Creative={{ $json.content.indicators.isCreative }}, Nonprofit={{ $json.content.indicators.isNonprofit }}, Events={{ $json.content.indicators.isEvent }}, Travel={{ $json.content.indicators.isTravel }}\n\n**TEMPLATE NAMING GUIDELINES:**\n1. Create a descriptive, marketable name that immediately tells users what the template is for\n2. Use industry/business type + design style/purpose (e.g., \"Modern Restaurant Menu\", \"Corporate Law Firm\", \"Creative Portfolio\")\n3. Keep names concise but descriptive (3-6 words max)\n4. Avoid generic terms like \"template\", \"site\", \"website\" in the name\n5. Use the website content, theme, and business type to generate the name\n6. Examples: \"Minimalist Photography Portfolio\", \"Medical Clinic Landing Page\", \"E-commerce Fashion Store\"\n\n**CLASSIFICATION RULES:**\n1. If minimal content or default WordPress, use 'portfolio' category with basic tags only\n2. Prioritize business type over technical features for primary category\n3. Only add technical tags (elementor, woocommerce, etc.) if detected in WordPress data\n4. Maximum 5 tags, focus on most relevant ones\n5. Confidence should reflect certainty based on available data\n6. If HTML content unavailable, lower confidence but still classify based on WordPress data\n\n**ENHANCED CONTENT SAMPLE:** {{ $json.content.bodyText }}\n\nBased on this comprehensive WordPress analysis, provide accurate classification and generate a descriptive template name. Prioritize the WordPress plugin/theme data over HTML content analysis.\n\n**CRITICAL: You MUST include the ai_generated_name field in your response. This is required.**\n\nRespond with valid JSON only. ALL FIELDS ARE REQUIRED:\n{\n  \"primary_category\": \"most_appropriate_industry_category\",\n  \"tags\": [\"max_5_evidence_based_tags\"],\n  \"confidence\": 0.XX,\n  \"rationale\": \"Detailed explanation citing specific WordPress data and content evidence\",\n  \"description_en\": \"English description (max 100 chars)\",\n  \"description_de\": \"German description (max 100 chars)\",\n  \"ai_generated_name\": \"REQUIRED: Descriptive template name based on content and purpose (max 50 chars)\"\n}\n\nExample valid response:\n{\n  \"primary_category\": \"construction\",\n  \"tags\": [\"elementor\", \"business\", \"corporate\"],\n  \"confidence\": 0.85,\n  \"rationale\": \"Site shows construction equipment rental with Elementor page builder\",\n  \"description_en\": \"Construction equipment rental company website\",\n  \"description_de\": \"Baumaschinen-Vermietung Firmenwebsite\",\n  \"ai_generated_name\": \"Construction Equipment Rental\"\n}",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        3392,
+        640
+      ],
+      "id": "2d9b4340-60f2-40d9-a2b6-d010550b8239",
+      "name": "Enhanced AI Classifier"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "wordpress-template-classify",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "37ca24b9-199e-46a7-84a1-67b82f6a8f7d",
+      "name": "Webhook Trigger3",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        2672,
+        528
+      ],
+      "webhookId": "template-classify-webhook"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.body.demo_url }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "redirect": {
+            "redirect": {
+              "maxRedirects": 5
+            }
+          },
+          "timeout": 30000
+        }
+      },
+      "id": "cdb9e000-776c-4c82-952e-4f8f8d3b3f9b",
+      "name": "Fetch Website Content3",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        2896,
+        736
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "4InZm74eIehxvUcK",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Enhanced content extraction with WordPress-specific analysis\nconst webhookData = $('Webhook Trigger3').first().json.body;\nconst catalogData = $('Fetch Catalog Config').first().json;\n\n// Handle potential website content fetch failure\nconst websiteContentNodes = $('Fetch Website Content3').all();\nlet websiteContent = null;\nlet html = '';\n\nif (websiteContentNodes.length > 0 && websiteContentNodes[0].json) {\n  websiteContent = websiteContentNodes[0].json;\n  html = websiteContent.data || websiteContent.body || websiteContent.html || '';\n} else {\n  console.log('Warning: Website content fetch failed, proceeding with WordPress data only');\n}\n\nconst extractEnhancedFeatures = (html, wordpressData) => {\n  // Clean HTML\n  let cleaned = html.replace(/<script[^>]*>.*?<\\/script>/gis, '')\n                   .replace(/<style[^>]*>.*?<\\/style>/gis, '');\n  \n  // Extract basic info\n  const titleMatch = cleaned.match(/<title[^>]*>([^<]*)<\\/title>/i);\n  const title = titleMatch ? titleMatch[1].trim() : '';\n  \n  const descMatch = cleaned.match(/<meta[^>]*name=[\\\"']description[\\\"'][^>]*content=[\\\"']([^\\\"']*)[\\\"']/i);\n  const description = descMatch ? descMatch[1] : '';\n  \n  // Extract visible text content\n  const bodyText = cleaned.replace(/<[^>]*>/g, ' ')\n                          .replace(/\\\\s+/g, ' ')\n                          .trim();\n  \n  // Extract headings\n  const headings = [];\n  const headingMatches = cleaned.match(/<h[1-6][^>]*>([^<]*)<\\/h[1-6]>/gi) || [];\n  headingMatches.forEach(match => {\n    const text = match.replace(/<[^>]*>/g, '').trim();\n    if (text.length > 2) headings.push(text);\n  });\n  \n  // Enhanced WordPress-specific detection using actual WP data\n  const wpPlugins = wordpressData?.plugins_info || {};\n  const wpTheme = wordpressData?.theme_info || {};\n  const contentAnalysis = wordpressData?.content_analysis || {};\n  const fileStructure = wordpressData?.file_structure || {};\n  \n  const indicators = {\n    // E-commerce detection\n    hasWooCommerce: wpPlugins.hasOwnProperty('woocommerce') || /woocommerce|add.to.cart|shop|product|cart/i.test(html),\n    hasShopify: /shopify/i.test(html),\n    hasEcommerce: /shop|store|buy|purchase|cart|checkout|product/i.test(bodyText),\n    \n    // Page builders (from actual WordPress data)\n    hasElementor: wpPlugins.hasOwnProperty('elementor') || /elementor/i.test(html),\n    hasDivi: wpTheme?.name?.toLowerCase().includes('divi') || /divi/i.test(html),\n    hasGutenberg: /wp-block-/i.test(html) && !/(hello.world|sample|default)/i.test(bodyText),\n    hasVisualComposer: wpPlugins.hasOwnProperty('js_composer'),\n    hasBeaver: wpPlugins.hasOwnProperty('bb-plugin'),\n    \n    // Content types\n    hasBooking: wpPlugins.hasOwnProperty('booking') || contentAnalysis?.content_indicators?.includes('booking') || /booking|reservation|appointment/i.test(bodyText),\n    hasEvents: wpPlugins.hasOwnProperty('the-events-calendar') || contentAnalysis?.content_indicators?.includes('events') || /event|calendar|schedule/i.test(bodyText),\n    hasPortfolio: /portfolio|work|project|gallery|showcase/i.test(bodyText),\n    hasBlog: /blog|post|article|news|read.more/i.test(bodyText),\n    hasTestimonials: /testimonial|review|client|customer/i.test(bodyText),\n    hasTeam: /team|staff|member|about.us|meet/i.test(bodyText),\n    hasGallery: contentAnalysis?.content_indicators?.includes('gallery') || /gallery|photos/i.test(bodyText),\n    \n    // Functional features\n    hasContactForm: wpPlugins.hasOwnProperty('contact-form-7') || contentAnalysis?.content_indicators?.includes('contact_forms') || /contact.form|get.in.touch/i.test(bodyText),\n    hasNewsletter: wpPlugins.hasOwnProperty('mailchimp-for-wp') || contentAnalysis?.content_indicators?.includes('newsletter') || /newsletter|subscribe/i.test(bodyText),\n    hasSocialMedia: /facebook|twitter|instagram|linkedin|social/i.test(html),\n    hasSlider: contentAnalysis?.content_indicators?.includes('slider') || /slider|carousel/i.test(html),\n    hasVideo: /video|youtube|vimeo/i.test(html),\n    \n    // Language/Accessibility\n    hasMultilingual: wpPlugins.hasOwnProperty('sitepress-multilingual-cms') || wpPlugins.hasOwnProperty('polylang') || contentAnalysis?.content_indicators?.includes('multilingual'),\n    \n    // Business type indicators\n    isRestaurant: /restaurant|cafe|bistro|menu|food|dining/i.test(bodyText),\n    isRealEstate: /real.estate|property|house|apartment|rent|buy|mortgage/i.test(bodyText),\n    isHealthcare: /health|medical|doctor|clinic|hospital|patient|therapy/i.test(bodyText),\n    isLegal: /law|legal|lawyer|attorney|court|justice/i.test(bodyText),\n    isEducation: /education|school|university|course|learn|student|teacher/i.test(bodyText),\n    isAutomotive: /car|auto|vehicle|garage|repair|dealership/i.test(bodyText),\n    isBeauty: /beauty|salon|spa|wellness|massage|hair|nail/i.test(bodyText),\n    isConstruction: /construction|building|contractor|architect|engineering/i.test(bodyText),\n    isFinance: /finance|bank|insurance|investment|loan|mortgage/i.test(bodyText),\n    isTechnology: /technology|software|app|digital|IT|development|saas/i.test(bodyText),\n    isCreative: /creative|design|art|photography|studio|agency/i.test(bodyText),\n    isNonprofit: /nonprofit|charity|donation|volunteer|foundation/i.test(bodyText),\n    isEvent: /event|conference|wedding|party|celebration/i.test(bodyText),\n    isTravel: /travel|tourism|hotel|vacation|trip|destination/i.test(bodyText),\n    \n    // Theme and customization level\n    isCustomized: fileStructure?.custom_themes > 0 || fileStructure?.has_custom_uploads,\n    isMinimalContent: bodyText.length < 1000 || /hello.world|sample.page|coming.soon|default|lorem.ipsum/i.test(bodyText),\n    hasChildTheme: fileStructure?.has_child_theme,\n    \n    // Plugin count indicators\n    pluginCount: Object.keys(wpPlugins).length,\n    hasMultiplePlugins: Object.keys(wpPlugins).length > 3,\n    \n    // Add fallback indicator when no HTML content available\n    htmlContentAvailable: html.length > 0\n  };\n  \n  return {\n    title,\n    description,\n    bodyText: bodyText.substring(0, 3500), // More content for better analysis\n    headings: headings.slice(0, 10),\n    indicators,\n    wordpressInfo: {\n      version: wordpressData?.wp_info?.version,\n      theme: wpTheme?.name || wordpressData?.theme_info?.active_theme,\n      plugins: Object.keys(wpPlugins).slice(0, 10), // Top 10 plugins\n      customization_level: fileStructure?.custom_themes > 0 ? 'high' : 'low',\n      content_size: contentAnalysis?.uploads_size || 0\n    }\n  };\n};\n\nconst templateData = {\n  slug: webhookData.slug,\n  name: webhookData.name,\n  demo_url: webhookData.demo_url,\n  screenshot_url: webhookData.screenshot_url,\n  api_callback_url: webhookData.api_callback_url,\n  api_token: webhookData.api_token\n};\n\nconst content = extractEnhancedFeatures(html, webhookData.wordpress_data);\nconst availableCategories = catalogData.categories;\nconst availableTags = catalogData.tags;\n\nreturn [{ templateData, content, availableCategories, availableTags }];"
+      },
+      "id": "a4ebaa57-2772-4fd8-8efa-5d9f3eaeeee8",
+      "name": "Enhanced Content Analysis1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3232,
+        640
+      ]
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "gpt-4o"
+        },
+        "options": {
+          "maxTokens": 600,
+          "temperature": 0.1
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        3344,
+        880
+      ],
+      "id": "087cfa44-e71c-42f7-84f8-d044547ba30d",
+      "name": "OpenAI GPT-4o2",
+      "credentials": {
+        "openAiApi": {
+          "id": "5bxlgiW82CWa6JUS",
+          "name": "Metanow open api - Lead Generation API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n    \"primary_category\": \"category_name\",\n    \"tags\": [\"max_5_evidence_based_tags\"],\n    \"confidence\": 0.85,\n    \"rationale\": \"WordPress data and content evidence explanation\",\n    \"description_en\": \"English description (max 100 chars)\",\n    \"description_de\": \"German description (max 100 chars)\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        3536,
+        880
+      ],
+      "id": "415f4b9f-226a-4c48-ac17-892927d3eb4f",
+      "name": "Structured Output Parser3"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Enhanced validation with WordPress data verification\nconst aiResponse = $input.first().json;\nconst templateData = $('Enhanced Content Analysis1').first().json.templateData;\nconst content = $('Enhanced Content Analysis1').first().json.content;\nconst availableTags = $('Enhanced Content Analysis1').first().json.availableTags;\nconst availableCategories = $('Enhanced Content Analysis1').first().json.availableCategories;\n\ntry {\n  let classification;\n  \n  if (typeof aiResponse === 'string') {\n    const cleanResponse = aiResponse.replace(/```json\\n?/, '').replace(/```\\n?$/, '').trim();\n    classification = JSON.parse(cleanResponse);\n  } else if (aiResponse && typeof aiResponse === 'object') {\n    classification = aiResponse.output || aiResponse.text || aiResponse.response || aiResponse;\n    \n    if (typeof classification === 'string') {\n      const cleanResponse = classification.replace(/```json\\n?/, '').replace(/```\\n?$/, '').trim();\n      classification = JSON.parse(cleanResponse);\n    }\n  } else {\n    throw new Error('Invalid AI response format');\n  }\n  \n  // Validate structure\n  if (!classification.primary_category || !Array.isArray(classification.tags)) {\n    throw new Error('Invalid classification structure');\n  }\n  \n  // Validate category\n  if (!availableCategories.includes(classification.primary_category)) {\n    console.log('Invalid category, defaulting to portfolio:', classification.primary_category);\n    classification.primary_category = 'portfolio';\n  }\n  \n  // Validate and filter tags\n  classification.tags = classification.tags\n    .filter(tag => availableTags.includes(tag))\n    .slice(0, 5); // Max 5 tags\n  \n  // Enhanced WordPress-based validation\n  const wpPlugins = Object.keys(content.wordpressInfo?.plugins || []);\n  \n  classification.tags = classification.tags.filter(tag => {\n    if (tag === 'woocommerce' && !wpPlugins.includes('woocommerce') && !content.indicators.hasWooCommerce) {\n      console.log('Removing woocommerce tag - not found in WordPress data');\n      return false;\n    }\n    if (tag === 'elementor' && !wpPlugins.includes('elementor') && !content.indicators.hasElementor) {\n      console.log('Removing elementor tag - not found in WordPress data');\n      return false;\n    }\n    if (tag === 'divi' && !content.indicators.hasDivi) {\n      console.log('Removing divi tag - not found in WordPress data');\n      return false;\n    }\n    return true;\n  });\n  \n  // Handle minimal content or no HTML content\n  if (content.indicators.isMinimalContent || !content.indicators.htmlContentAvailable) {\n    classification.tags = classification.tags.filter(tag => \n      ['responsive', 'contact_form', 'social_media'].includes(tag)\n    ).slice(0, 2);\n    \n    if (classification.confidence > 0.4) {\n      classification.confidence = Math.min(0.4, classification.confidence);\n    }\n  }\n  \n  // Validate confidence\n  if (typeof classification.confidence !== 'number' || classification.confidence < 0 || classification.confidence > 1) {\n    classification.confidence = 0.5;\n  }\n  \n  // Ensure descriptions exist\n  if (!classification.description_en) {\n    classification.description_en = `${classification.primary_category.replace('_', ' ')} WordPress template`;\n  }\n  if (!classification.description_de) {\n    classification.description_de = `${classification.primary_category.replace('_', ' ')} WordPress-Vorlage`;\n  }\n  \n  // Add metadata about the analysis\n  classification.metadata = {\n    wordpress_version: content.wordpressInfo?.version,\n    plugin_count: content.indicators?.pluginCount || 0,\n    customization_level: content.wordpressInfo?.customization_level,\n    analysis_source: 'enhanced_wordpress_data',\n    html_content_available: content.indicators?.htmlContentAvailable || false\n  };\n  \n  return [{\n    json: {\n      templateData,\n      classification,\n      success: true\n    }\n  }];\n  \n} catch (error) {\n  // Conservative fallback\n  return [{\n    json: {\n      templateData,\n      classification: {\n        primary_category: 'portfolio',\n        tags: ['responsive'], // Only very basic tag\n        confidence: 0.2,\n        rationale: `Enhanced validation failed: ${error.message}. Using conservative fallback.`,\n        description_en: 'WordPress template',\n        description_de: 'WordPress-Vorlage',\n        metadata: {\n          analysis_source: 'fallback',\n          error: error.message\n        }\n      },\n      success: false,\n      error: error.message\n    }\n  }];\n}"
+      },
+      "id": "cf4023a3-f8e2-4f8f-8aad-82370109e86d",
+      "name": "Enhanced Validation1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3760,
+        640
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.templateData.api_callback_url }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.classification }}",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "id": "22c1f86c-5eb0-49f7-8e5c-c13bf2aaa346",
+      "name": "Update Classification3",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        3984,
+        640
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "4InZm74eIehxvUcK",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"success\": {{ $json.success !== false }},\n  \"message\": \"Enhanced WordPress classification completed\",\n  \"template\": {\n    \"slug\": \"{{ $json.template.slug }}\",\n    \"classification\": \"{{ $('Enhanced Validation1').item.json.classification }}\",\n    \"metadata\": \"{{ $('Enhanced Validation1').item.json.classification.metadata }}\"\n  }\n}",
+        "options": {}
+      },
+      "id": "860a39a5-046b-4490-8e48-de70050750e9",
+      "name": "Webhook Response3",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        4208,
+        640
+      ]
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        3088,
+        640
+      ],
+      "id": "850f7ccc-a342-46e1-b9f7-4f383857c024",
+      "name": "Merge"
+    }
+  ],
+  "pinData": {
+    "Webhook Trigger3": [
+      {
+        "json": {
+          "headers": {
+            "host": "metanow.app.n8n.cloud",
+            "user-agent": "GuzzleHttp/7",
+            "content-length": "9603",
+            "accept-encoding": "gzip, br",
+            "cdn-loop": "cloudflare; loops=1; subreqs=1",
+            "cf-connecting-ip": "2a01:4f9:3070:1bd2::2",
+            "cf-ew-via": "15",
+            "cf-ipcountry": "FI",
+            "cf-ray": "97d6e049f07ca875-RIX",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "cf-worker": "n8n.cloud",
+            "content-type": "application/json",
+            "x-forwarded-for": "2a01:4f9:3070:1bd2::2, 172.69.192.163",
+            "x-forwarded-host": "metanow.app.n8n.cloud",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "traefik-prod-users-gwc-28-7b57cfbbf9-4ckpg",
+            "x-is-trusted": "yes",
+            "x-real-ip": "2a01:4f9:3070:1bd2::2"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "slug": "vanmancool1",
+            "name": "Vanmancool1",
+            "demo_url": "https://wp-templates.metanow.dev/vanmancool1/",
+            "screenshot_url": "https://wp-templates.metanow.dev/vanmancool1/wp-content/themes/javax-child/screenshot.png",
+            "wordpress_data": {
+              "slug": "vanmancool1",
+              "demo_url": "https://wp-templates.metanow.dev/vanmancool1/",
+              "wp_info": {
+                "version": "6.8.2",
+                "multisite": true,
+                "debug_mode": false,
+                "language": "en_US"
+              },
+              "theme_info": {
+                "active_theme": "childtheme",
+                "theme_features": {
+                  "name": "Mein Storefront Child",
+                  "description": "Ein Child-Theme des Storefront-Themes.",
+                  "version": "1.0.0",
+                  "author": "Pascal Jeising",
+                  "parent_theme": "storefront"
+                },
+                "parent_theme": null
+              },
+              "plugins_info": {
+                "akismet": {
+                  "name": "Akismet Anti-spam: Spam Protection",
+                  "description": "Used by millions, Akismet is quite possibly the best way in the world to <strong>protect your blog from spam</strong>. Akismet Anti-spam keeps your site protected even while you sleep. To get started: activate the Akismet plugin and then go to your Akismet Settings page to set up your API key.",
+                  "version": "5.5",
+                  "author": "Automattic - Anti-spam Team",
+                  "folder": "akismet"
+                },
+                "all-in-one-wp-migration": {
+                  "name": "All-in-One WP Migration and Backup",
+                  "description": "All-in-One WP Migration makes moving your entire WordPress site simple. Export or import your database, media, plugins, and themes with just a few clicks.",
+                  "version": "7.99",
+                  "author": "ServMask",
+                  "folder": "all-in-one-wp-migration"
+                },
+                "all-in-one-wp-migration-unlimited-extension": {
+                  "name": "All-in-One WP Migration Unlimited Extension",
+                  "description": "Extension for All-in-One WP Migration that enables unlimited size exports and imports",
+                  "version": "2.76",
+                  "author": "ServMask",
+                  "folder": "all-in-one-wp-migration-unlimited-extension"
+                },
+                "dynamicconditions": {
+                  "name": "DynamicConditions",
+                  "description": "Activates conditions for dynamic tags to show/hides a widget.",
+                  "version": "1.7.5",
+                  "author": "RTO GmbH",
+                  "folder": "dynamicconditions"
+                },
+                "elementor": {
+                  "name": "Elementor",
+                  "description": "The Elementor Website Builder has it all: drag and drop page builder, pixel perfect design, mobile responsive editing, and more. Get started now!",
+                  "version": "3.31.5",
+                  "author": "Elementor.com",
+                  "folder": "elementor"
+                },
+                "elementor-pro": {
+                  "name": "Elementor Pro",
+                  "description": "Elevate your designs and unlock the full power of Elementor. Gain access to dozens of Pro widgets and kits, Theme Builder, Pop Ups, Forms and WooCommerce building capabilities.",
+                  "version": "3.25.2",
+                  "author": "Elementor.com",
+                  "folder": "elementor-pro"
+                },
+                "embed-privacy": {
+                  "name": "Embed Privacy",
+                  "description": "Embed Privacy prevents from loading external embeds directly and lets the user control which one should be loaded.",
+                  "version": "1.11.2",
+                  "author": "Epiphyt",
+                  "folder": "embed-privacy"
+                },
+                "envato-market": {
+                  "name": "Envato Market",
+                  "description": "WordPress Theme & Plugin management for the Envato Market.",
+                  "version": "2.0.12",
+                  "author": "Envato",
+                  "folder": "envato-market"
+                },
+                "google-listings-and-ads": {
+                  "name": "Google for WooCommerce",
+                  "description": "Native integration with Google that allows merchants to easily display their products across Google’s network.",
+                  "version": "3.4.2",
+                  "author": "WooCommerce",
+                  "folder": "google-listings-and-ads"
+                },
+                "javax-core": {
+                  "name": "Javax Core",
+                  "description": "The plugin for Javax WordPress Theme",
+                  "version": "1.0.1",
+                  "author": "Novaworks",
+                  "folder": "javax-core"
+                },
+                "javax-demo-data": {
+                  "folder": "javax-demo-data"
+                },
+                "kitify": {
+                  "name": "Kitify by Novaworks",
+                  "description": "A perfect plugin for Elementor",
+                  "version": "1.1.6",
+                  "author": "Novaworks",
+                  "folder": "kitify"
+                },
+                "loco-translate": {
+                  "name": "Loco Translate",
+                  "description": "Translate themes and plugins directly in WordPress",
+                  "version": "2.8.0",
+                  "author": "Tim Whitlock",
+                  "folder": "loco-translate"
+                },
+                "mailpoet": {
+                  "name": "MailPoet",
+                  "description": "Create and send newsletters, post notifications and welcome emails from your WordPress.",
+                  "version": "5.14.2",
+                  "author": "MailPoet",
+                  "folder": "mailpoet"
+                },
+                "metanow-remove-product-tabs": {
+                  "name": "Metanow WooCommerce Remove Product Tabs",
+                  "description": "Allows users to remove Description, Additional Information, and Reviews tabs from WooCommerce product pages.",
+                  "version": "1.0",
+                  "author": "Metanow",
+                  "folder": "metanow-remove-product-tabs"
+                },
+                "nova-ajax-product-filter": {
+                  "folder": "nova-ajax-product-filter"
+                },
+                "pinterest-for-woocommerce": {
+                  "name": "Pinterest for WooCommerce",
+                  "description": "Grow your business on Pinterest! Use this official plugin to allow shoppers to Pin products while browsing your store, track conversions, and advertise on Pinterest.",
+                  "version": "1.4.21",
+                  "author": "WooCommerce",
+                  "folder": "pinterest-for-woocommerce"
+                },
+                "real-cookie-banner": {
+                  "name": "Real Cookie Banner (Free)",
+                  "description": "Obtain GDPR (DSGVO) and ePrivacy (EU cookie law) compliant opt-in consent. Find cookies and fill all legal information in your cookie banner. More than just a cookie notice!",
+                  "version": "5.2.1",
+                  "author": "devowl.io",
+                  "folder": "real-cookie-banner"
+                },
+                "sina-extension-for-elementor": {
+                  "name": "Sina Extension for Elementor",
+                  "description": "A collection of high-quality widgets for Elementor page builder.",
+                  "version": "3.7.1",
+                  "author": "SinaExtra",
+                  "folder": "sina-extension-for-elementor"
+                },
+                "statify": {
+                  "name": "Statify",
+                  "description": "Compact, easy-to-use and privacy-compliant stats plugin for WordPress.",
+                  "version": "1.8.5",
+                  "author": "pluginkollektiv",
+                  "folder": "statify"
+                },
+                "tiktok-for-business": {
+                  "folder": "tiktok-for-business"
+                },
+                "translatepress-multilingual": {
+                  "folder": "translatepress-multilingual"
+                },
+                "wc-quantity-plus-minus-button": {
+                  "folder": "wc-quantity-plus-minus-button"
+                },
+                "woo-jtl-connector": {
+                  "name": "JTL-Connector for WooCommerce",
+                  "description": "Connect your woocommerce-shop with JTL-Wawi, the free multichannel-erp for mail order business.",
+                  "version": "2.3.3",
+                  "author": "JTL-Software GmbH",
+                  "folder": "woo-jtl-connector"
+                },
+                "woo-product-filter": {
+                  "name": "Product Filter by WBW",
+                  "description": "Filter products in your store in most efficient way",
+                  "version": "2.9.7",
+                  "author": "woobewoo",
+                  "folder": "woo-product-filter"
+                },
+                "woo-variation-swatches": {
+                  "name": "Variation Swatches for WooCommerce",
+                  "description": "Beautiful colors, images and buttons variation swatches for woocommerce product attributes. Requires WooCommerce 7.5+",
+                  "version": "2.2.0",
+                  "author": "Emran Ahmed",
+                  "folder": "woo-variation-swatches"
+                },
+                "woocommerce": {
+                  "name": "WooCommerce",
+                  "description": "An ecommerce toolkit that helps you sell anything. Beautifully.",
+                  "version": "10.1.2",
+                  "author": "Automattic",
+                  "folder": "woocommerce"
+                },
+                "woocommerce-german-market-light": {
+                  "name": "German Market Light",
+                  "description": "Extension for WooCommerce providing features for legal compliance when your e-commerce business is based in Germany or Austria.",
+                  "version": "3.36",
+                  "author": "MarketPress",
+                  "folder": "woocommerce-german-market-light"
+                },
+                "woocommerce-payments": {
+                  "name": "WooPayments",
+                  "description": "Accept payments via credit card. Manage transactions within WordPress.",
+                  "version": "9.9.0",
+                  "author": "WooCommerce",
+                  "folder": "woocommerce-payments"
+                },
+                "woocommerce-product-filters": {
+                  "name": "Product Filters for WooCommerce",
+                  "description": "This is a tool to create product filters that make the process of finding products in your store simple and fast.",
+                  "version": "1.4.33",
+                  "author": "WooCommerce",
+                  "folder": "woocommerce-product-filters"
+                },
+                "woocommerce-services": {
+                  "name": "WooCommerce Tax",
+                  "description": "Automated tax calculation for WooCommerce.",
+                  "version": "3.0.11",
+                  "author": "WooCommerce",
+                  "folder": "woocommerce-services"
+                },
+                "woofilter-pro": {
+                  "name": "WBW Product Filter PRO",
+                  "description": "Product Filter by WBW PRO. Best plugins from WBW!",
+                  "version": "2.7.2",
+                  "author": "WBW",
+                  "folder": "woofilter-pro"
+                },
+                "woolementor": {
+                  "name": "CoDesigner",
+                  "description": "<strong>CoDesigner (Formerly Woolementor)</strong> connects the #1 page builder plugin on the earth, <strong>Elementor</strong> with the most popular eCommerce plugin, <strong>WooCommerce</strong>.",
+                  "version": "4.25.2",
+                  "author": "Codexpert, Inc",
+                  "folder": "woolementor"
+                },
+                "woolementor-pro": {
+                  "name": "CoDesigner Pro",
+                  "description": "Pro features unlocker for CoDesigner.",
+                  "version": "4.5.3",
+                  "author": "Codexpert, Inc",
+                  "folder": "woolementor-pro"
+                },
+                "wordpress-seo": {
+                  "folder": "wordpress-seo"
+                },
+                "wp-optimize": {
+                  "name": "WP-Optimize - Clean, Compress, Cache",
+                  "description": "WP-Optimize makes your site fast and efficient. It cleans the database, compresses images and caches pages. Fast sites attract more traffic and users.",
+                  "version": "4.2.4",
+                  "author": "TeamUpdraft, DavidAnderson",
+                  "folder": "wp-optimize"
+                },
+                "yith-woocommerce-barcodes-premium": {
+                  "folder": "yith-woocommerce-barcodes-premium"
+                },
+                "yith-woocommerce-wishlist": {
+                  "name": "YITH WooCommerce Wishlist",
+                  "description": "<code><strong>YITH WooCommerce Wishlist</strong></code> gives your users the possibility to create, fill, manage and share their wishlists allowing you to analyze their interests and needs to improve your marketing strategies. <a href=\"https://yithemes.com/\" target=\"_blank\">Get more plugins for your e-commerce on <strong>YITH</strong></a>",
+                  "version": "4.9.0",
+                  "author": "YITH",
+                  "folder": "yith-woocommerce-wishlist"
+                }
+              },
+              "content_analysis": {
+                "uploads_size": 241696775,
+                "uploads_types": {
+                  "jpg": 849,
+                  "svg": 12,
+                  "png": 801,
+                  "html": 10,
+                  "css": 831,
+                  "woff2": 79,
+                  "htaccess": 5,
+                  "csv": 1,
+                  "less": 2,
+                  "webp": 145,
+                  "json": 5,
+                  "js": 2,
+                  "jpeg": 7,
+                  "log": 57,
+                  "php": 2,
+                  "zip": 2
+                },
+                "has_custom_content": true,
+                "content_indicators": [
+                  "woocommerce",
+                  "elementor"
+                ]
+              },
+              "file_structure": {
+                "custom_themes": 8,
+                "custom_plugins": 38,
+                "mu_plugins": 2,
+                "has_child_theme": true,
+                "has_custom_uploads": true
+              }
+            },
+            "api_callback_url": "https://wp-templates.metanow.dev/api/templates/vanmancool1/classification",
+            "api_catalog_url": "https://wp-templates.metanow.dev/api/catalog",
+            "api_token": "wp_templates_2024_secure_token_abc123def456ghi789jkl012mno345pqr678stu"
+          },
+          "webhookUrl": "https://metanow.app.n8n.cloud/webhook/wordpress-template-classify",
+          "executionMode": "production"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Fetch Catalog Config": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Enhanced AI Classifier": {
+      "main": [
+        [
+          {
+            "node": "Enhanced Validation1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook Trigger3": {
+      "main": [
+        [
+          {
+            "node": "Fetch Catalog Config",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Fetch Website Content3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Website Content3": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enhanced Content Analysis1": {
+      "main": [
+        [
+          {
+            "node": "Enhanced AI Classifier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI GPT-4o2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Enhanced AI Classifier",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser3": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Enhanced AI Classifier",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enhanced Validation1": {
+      "main": [
+        [
+          {
+            "node": "Update Classification3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Classification3": {
+      "main": [
+        [
+          {
+            "node": "Webhook Response3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Enhanced Content Analysis1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "fa35d0d0-151f-47d2-864c-363c076b3aa3",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "9cf9df93adedf9a3cf8c947adbbfa5421022dc8224ec7057f8a23aa28853148a"
+  },
+  "id": "kwqPVVXkAzza7Mi1",
+  "tags": []
+}

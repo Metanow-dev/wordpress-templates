@@ -1,0 +1,35 @@
+# Normalize line endings
+* text=auto eol=lf
+
+# Treat these as text
+*.php text
+*.js  text
+*.ts  text
+*.css text
+*.scss text
+*.json text
+*.yml text
+*.yaml text
+*.md  text
+
+# Keep vendor/node_modules out of source exports (e.g., git archive)
+vendor/ export-ignore
+node_modules/ export-ignore
+storage/ export-ignore
+bootstrap/cache/ export-ignore
+public/build/ export-ignore
+.env.example export-ignore
+.env* export-ignore
+
+# Improve GitHub linguist stats (count Blade as PHP)
+*.blade.php linguist-language=PHP
+
+# Better diffs for lockfiles
+composer.lock -diff
+package-lock.json -diff
+pnpm-lock.yaml -diff
+yarn.lock -diff
+
+# Ignore IDE files in archives
+.idea/ export-ignore
+.vscode/ export-ignore

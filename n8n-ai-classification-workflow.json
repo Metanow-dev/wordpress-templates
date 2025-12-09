@@ -1,0 +1,198 @@
+{
+  "name": "WordPress Template AI Classification",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "wordpress-template-classify",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "d4c1d4e5-1234-4567-8901-234567890abc",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300],
+      "webhookId": "template-classify-webhook"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.demo_url }}",
+        "options": {
+          "timeout": 30000,
+          "followRedirect": true,
+          "fullResponse": false
+        }
+      },
+      "id": "e5d2e5f6-2345-5678-9012-345678901bcd",
+      "name": "Fetch Website Content",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract key content from HTML for AI analysis\nconst html = $input.first().json.body;\n\n// Simple text extraction without cheerio dependency\nconst extractText = (html) => {\n  // Remove script and style tags\n  let cleaned = html.replace(/<script[^>]*>.*?<\\/script>/gis, '')\n                   .replace(/<style[^>]*>.*?<\\/style>/gis, '');\n  \n  // Extract title\n  const titleMatch = cleaned.match(/<title[^>]*>([^<]*)<\\/title>/i);\n  const title = titleMatch ? titleMatch[1].trim() : '';\n  \n  // Extract meta description\n  const descMatch = cleaned.match(/<meta[^>]*name=[\"']description[\"'][^>]*content=[\"']([^\"']*)[\"']/i);\n  const description = descMatch ? descMatch[1] : '';\n  \n  // Extract text content (simplified)\n  const bodyText = cleaned.replace(/<[^>]*>/g, ' ')\n                          .replace(/\\s+/g, ' ')\n                          .trim()\n                          .substring(0, 2000);\n  \n  // Look for indicators\n  const hasWooCommerce = /woocommerce|shop|cart|product/i.test(html);\n  const hasBooking = /booking|reservation|appointment/i.test(html);\n  const hasMenu = /menu|restaurant|food/i.test(html);\n  const hasElementor = /elementor/i.test(html);\n  const hasDivi = /divi-/i.test(html);\n  const hasGutenberg = /wp-block|gutenberg/i.test(html);\n  \n  return {\n    title,\n    description,\n    bodyText,\n    indicators: {\n      hasWooCommerce,\n      hasBooking,\n      hasMenu,\n      hasElementor,\n      hasDivi,\n      hasGutenberg\n    }\n  };\n};\n\n// Get webhook data\nconst webhookData = $('Webhook Trigger').first().json.body;\n\nconst templateData = {\n  slug: webhookData.slug,\n  name: webhookData.name,\n  demo_url: webhookData.demo_url,\n  active_theme: webhookData.active_theme || '',\n  api_callback_url: webhookData.api_callback_url,\n  api_token: webhookData.api_token\n};\n\nconst content = extractText(html);\n\nreturn [{ templateData, content }];"
+      },
+      "id": "f6e3f6g7-3456-6789-0123-456789012cde",
+      "name": "Process Content",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "resource": "chat",
+        "operation": "create",
+        "model": "gpt-4o-mini",
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "You are an expert at categorizing WordPress websites. Analyze the provided website content and categorize it.\n\nAvailable categories: ecommerce, portfolio, restaurant, hotel, real_estate, healthcare, education, agency, saas, blog_media, nonprofit, event, local_services, beauty_salon, automotive, construction, legal, finance, fitness_wellness\n\nAvailable tags: woocommerce, booking, menu, multilingual, elementor, divi, gutenberg, blog_heavy, gallery, rtl, dark_mode, one_page, lms, directory, events, portfolio_heavy\n\nRespond ONLY with valid JSON in this exact format:\n{\n  \"primary_category\": \"category_name\",\n  \"tags\": [\"tag1\", \"tag2\"],\n  \"confidence\": 0.85,\n  \"rationale\": \"Brief explanation\",\n  \"description_en\": \"Short English description\",\n  \"description_de\": \"Short German description\"\n}"
+            },
+            {
+              "role": "user",
+              "content": "=Website: {{ $json.templateData.name }}\\nURL: {{ $json.templateData.demo_url }}\\nTheme: {{ $json.templateData.active_theme }}\\n\\nTitle: {{ $json.content.title }}\\nDescription: {{ $json.content.description }}\\n\\nContent: {{ $json.content.bodyText }}\\n\\nFeatures:\\n- WooCommerce: {{ $json.content.indicators.hasWooCommerce }}\\n- Booking: {{ $json.content.indicators.hasBooking }}\\n- Menu/Restaurant: {{ $json.content.indicators.hasMenu }}\\n- Elementor: {{ $json.content.indicators.hasElementor }}\\n- Divi: {{ $json.content.indicators.hasDivi }}\\n- Gutenberg: {{ $json.content.indicators.hasGutenberg }}"
+            }
+          ]
+        },
+        "options": {
+          "temperature": 0.3,
+          "maxTokens": 500
+        }
+      },
+      "id": "g7h4g7h8-4567-7890-1234-567890123def",
+      "name": "AI Classify Template",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1,
+      "position": [900, 300],
+      "credentials": {
+        "openAiApi": {
+          "id": "openai-creds",
+          "name": "OpenAI API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse and validate AI response\nconst aiResponse = $input.first().json.choices[0].message.content;\nconst templateData = $('Process Content').first().json.templateData;\n\ntry {\n  // Clean and parse AI response\n  const cleanResponse = aiResponse.replace(/```json\\n?/, '').replace(/```\\n?$/, '').trim();\n  const classification = JSON.parse(cleanResponse);\n  \n  // Validate structure\n  if (!classification.primary_category || !classification.tags) {\n    throw new Error('Missing required fields');\n  }\n  \n  // Ensure tags is array\n  if (!Array.isArray(classification.tags)) {\n    classification.tags = [];\n  }\n  \n  // Validate confidence\n  if (typeof classification.confidence !== 'number' || classification.confidence < 0 || classification.confidence > 1) {\n    classification.confidence = 0.5;\n  }\n  \n  // Add default descriptions if missing\n  if (!classification.description_en) {\n    classification.description_en = `WordPress template for ${classification.primary_category}`;\n  }\n  if (!classification.description_de) {\n    classification.description_de = `WordPress-Vorlage für ${classification.primary_category}`;\n  }\n  \n  return [{\n    templateData,\n    classification,\n    success: true\n  }];\n  \n} catch (error) {\n  // Fallback classification\n  return [{\n    templateData,\n    classification: {\n      primary_category: 'portfolio',\n      tags: ['gutenberg'],\n      confidence: 0.3,\n      rationale: 'AI parsing failed, using fallback',\n      description_en: 'WordPress template',\n      description_de: 'WordPress-Vorlage'\n    },\n    success: false,\n    error: error.message\n  }];\n}"
+      },
+      "id": "h8i5h8i9-5678-8901-2345-678901234efg",
+      "name": "Validate Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1120, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.templateData.api_callback_url }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyContentType": "json",
+        "jsonBody": "={{ JSON.stringify($json.classification) }}",
+        "options": {}
+      },
+      "id": "i9j6i9j0-6789-9012-3456-789012345fgh",
+      "name": "Update Classification",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [1340, 300],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "wp-api-auth",
+          "name": "WordPress API Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ {\n  \"success\": $json.success !== false,\n  \"slug\": $json.templateData.slug,\n  \"message\": $json.success !== false ? \"Template classified successfully\" : \"Classification completed with errors\"\n} }}"
+      },
+      "id": "j0k7j0k1-7890-0123-4567-890123456ghi",
+      "name": "Webhook Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1560, 300]
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Fetch Website Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Website Content": {
+      "main": [
+        [
+          {
+            "node": "Process Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Content": {
+      "main": [
+        [
+          {
+            "node": "AI Classify Template",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Classify Template": {
+      "main": [
+        [
+          {
+            "node": "Validate Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Response": {
+      "main": [
+        [
+          {
+            "node": "Update Classification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Classification": {
+      "main": [
+        [
+          {
+            "node": "Webhook Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": ["wordpress", "ai", "classification"],
+  "triggerCount": 1,
+  "updatedAt": "2024-01-15T10:00:00.000Z",
+  "versionId": "1"
+}

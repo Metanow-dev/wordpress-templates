@@ -1,0 +1,46 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+@theme {
+    --font-sans: 'Helvetica', 'Helvetica Neue', 'Arial', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+    --color-custom-blue: #3490dc; /* Define your custom color with a CSS variable */
+    --color-custom-red: #D53741; /* Updated to your specified red color */
+    --color-brand-primary: #D53741; /* Brand primary color */
+}
+
+.line-clamp-1 {
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Brand utility classes */
+.bg-brand { background-color: var(--color-brand-primary); }
+.bg-brand-dark { background-color: var(--color-brand-dark); }
+.bg-brand-light { background-color: var(--color-brand-light); }
+.text-brand { color: var(--color-brand-primary); }
+.text-brand-dark { color: var(--color-brand-dark); }
+.text-brand-light { color: var(--color-brand-light); }
+.border-brand { border-color: var(--color-brand-primary); }
+.hover\:bg-brand:hover { background-color: var(--color-brand-primary); }
+.hover\:bg-brand-dark:hover { background-color: var(--color-brand-dark); }
+
+@theme {
+    /* Brand color utilities */
+    --color-brand: #D53741;
+    --color-brand-dark: #B12A31;
+    --color-brand-light: #E15D68;
+}
