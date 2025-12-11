@@ -54,8 +54,12 @@ final class Screenshotter
         // Force garbage collection before heavy operation
         gc_collect_cycles();
 
-        // Get Chrome processes count before
-        $chromeCountBefore = $this->getChromeProcessCount();
+        // Smart cleanup: only if processes are accumulating dangerously
+        $chromeCount = $this->getChromeProcessCount();
+        if ($chromeCount > 30) {
+            // Emergency: too many processes, clean old ones only
+            $this->cleanupOldChrome();
+        }
 
         File::ensureDirectoryExists(dirname($this->abs()), 0775, true);
 
@@ -97,13 +101,10 @@ final class Screenshotter
             ->ignoreHttpsErrors()
             ->dismissDialogs();
         
-        // Use different wait strategy for problematic sites
-        if ($isProblematicSite) {
-            // Some sites never reach true network idle; be more lenient
-            $shot->setOption('waitUntil', 'domcontentloaded');
-        } else {
-            $shot->waitUntilNetworkIdle();
-        }
+        // SPEED OPTIMIZATION: Use domcontentloaded instead of network idle
+        // NetworkIdle waits for ALL requests (analytics, ads, etc.) which is too slow
+        // DOMContentLoaded is much faster and usually sufficient
+        $shot->setOption('waitUntil', 'domcontentloaded');
 
         if ($n = $this->nodePath())   $shot->setNodeBinary($n);
         if ($c = $this->chromePath()) $shot->setChromePath($c);
@@ -148,11 +149,9 @@ final class Screenshotter
         // Note: addStyleTag/addScriptTag + initial setDelay handle the cookie banners
 
         // Try primary capture; on failure, fall back to a more lenient strategy
-        // Wrap everything in try-finally to ensure Chrome cleanup
         try {
-            try {
-                $shot->save($this->abs());
-            } catch (\Throwable $e) {
+            $shot->save($this->abs());
+        } catch (\Throwable $e) {
             // Fallback: give up on strict waits and block known analytics/ads domains
             try {
                 $fallback = Browsershot::url($this->url)
@@ -215,11 +214,6 @@ final class Screenshotter
                 // Re-throw original, but include fallback info
                 throw $e2;
             }
-            }
-        } finally {
-            // CRITICAL: Always cleanup Chrome processes after screenshot attempt
-            // This ensures no zombie processes remain even if screenshot fails
-            $this->cleanupChromeProcesses($chromeCountBefore);
         }
 
         // Create responsive, optimized variants for faster delivery
@@ -253,39 +247,21 @@ final class Screenshotter
     }
 
     /**
-     * Cleanup Chrome processes that were spawned during screenshot
-     * This is critical to prevent zombie processes from accumulating
-     *
-     * AGGRESSIVE CLEANUP: Kills ALL Chrome processes after screenshot
-     * This is safe because screenshots should not run concurrently
+     * Smart cleanup: Only kill OLD Chrome processes (>5 minutes)
+     * Let recent ones close naturally - they will when Puppeteer finishes
+     * NO SLEEPS = FAST!
      */
-    private function cleanupChromeProcesses(int $beforeCount): void
+    private function cleanupOldChrome(): void
     {
         try {
-            // Give Chrome a moment to close gracefully
-            usleep(500000); // 0.5 seconds
+            // Kill Chrome processes older than 5 minutes
+            shell_exec("ps -eo pid,etimes,comm | grep chrome | awk '\$2 > 300 {print \$1}' | xargs -r kill -9 2>/dev/null &");
 
-            // AGGRESSIVE: Kill ALL Chrome processes
-            // This is the only reliable way to prevent accumulation
-            // Since we have concurrency locks, no other screenshots should be running
-            shell_exec("pkill chrome 2>/dev/null");
-
-            // Give graceful kill time to work
-            usleep(1000000); // 1 second
-
-            // Force kill any survivors
-            shell_exec("pkill -9 chrome 2>/dev/null");
-
-            // Also kill any zombie Chrome processes by name variants
-            shell_exec("pkill -9 -f 'google-chrome' 2>/dev/null");
-            shell_exec("pkill -9 -f 'chrome-sandbox' 2>/dev/null");
-
-            // Clean up Puppeteer temp directories
-            shell_exec("find /tmp -maxdepth 1 -name 'puppeteer_dev_chrome_profile-*' -mmin +5 -exec rm -rf {} \\; 2>/dev/null");
+            // Clean old temp directories (>10 minutes) in background
+            shell_exec("find /tmp -maxdepth 1 -name 'puppeteer_dev_chrome_profile-*' -mmin +10 -exec rm -rf {} \\; 2>/dev/null &");
 
         } catch (\Throwable $e) {
-            // Log but don't fail - cleanup is best-effort
-            error_log("Chrome cleanup warning: " . $e->getMessage());
+            // Ignore - cleanup is best-effort
         }
     }
 
