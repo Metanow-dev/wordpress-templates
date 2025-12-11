@@ -366,11 +366,44 @@ This project is open-sourced software licensed under the [MIT license](LICENSE).
 
 ## Support
 
-For issues and feature requests, please use the [GitHub issue tracker](https://github.com/your-org/wordpress-templates/issues).# Deployment test
-🚀 **Deployment Status**: Ready for production deployment to wp-templates.metanow.dev
-## Deployment Notes
+For issues and feature requests, please use the [GitHub issue tracker](https://github.com/Metanow-dev/wordpress-templates/issues).
 
-- Fixed .env file format issues with API_TOKEN
-- Database password properly quoted for special characters
-- Ready for successful deployment
-# .env file manually recreated on server Mon Sep  8 10:06:59 CEST 2025
+---
+
+## Current Deployment
+
+**Production Server:** https://megasandboxs.com/
+**Repository Branch:** `server-sync` (server-specific configuration)
+**Main Branch:** `main` (development)
+
+### Server Configuration
+
+The application is deployed on a Plesk/CloudLinux environment with:
+- **PHP Version:** 8.3 (Alt-PHP via CloudLinux)
+- **Document Root:** `/var/www/vhosts/megasandboxs.com/httpdocs`
+- **System User:** `megasandboxs.com_c9h1nddlyw`
+- **Screenshot Storage:** `screenshots/` (at root level)
+- **WordPress Templates:** Located at `/var/www/vhosts/megasandboxs.com/httpdocs/{slug}/`
+
+### Quick Server Commands
+
+```bash
+# Capture screenshots (using wrapper)
+artisan-wp templates:screenshot --slug=SLUG --force
+
+# Scan for WordPress installations
+artisan-wp templates:scan
+
+# Clean up Chrome processes
+artisan-wp chrome:cleanup --force
+
+# Fix screenshot permissions
+artisan-wp templates:fix-permissions
+```
+
+### Additional Documentation
+
+For detailed server setup and troubleshooting:
+- **[MIGRATION_CHECKLIST.md](MIGRATION_CHECKLIST.md)** - Complete migration guide
+- **[SCREENSHOT_SETUP_GUIDE.md](SCREENSHOT_SETUP_GUIDE.md)** - Detailed setup instructions
+- **[SCREENSHOT_QUICK_REFERENCE.md](SCREENSHOT_QUICK_REFERENCE.md)** - Quick troubleshooting reference
