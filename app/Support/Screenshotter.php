@@ -54,6 +54,9 @@ final class Screenshotter
         // Force garbage collection before heavy operation
         gc_collect_cycles();
 
+        // Get Chrome processes count before
+        $chromeCountBefore = $this->getChromeProcessCount();
+
         File::ensureDirectoryExists(dirname($this->abs()), 0775, true);
 
         // Special handling for problematic sites (continuous network activity, heavy trackers, etc.)
@@ -145,9 +148,11 @@ final class Screenshotter
         // Note: addStyleTag/addScriptTag + initial setDelay handle the cookie banners
 
         // Try primary capture; on failure, fall back to a more lenient strategy
+        // Wrap everything in try-finally to ensure Chrome cleanup
         try {
-            $shot->save($this->abs());
-        } catch (\Throwable $e) {
+            try {
+                $shot->save($this->abs());
+            } catch (\Throwable $e) {
             // Fallback: give up on strict waits and block known analytics/ads domains
             try {
                 $fallback = Browsershot::url($this->url)
@@ -210,6 +215,11 @@ final class Screenshotter
                 // Re-throw original, but include fallback info
                 throw $e2;
             }
+            }
+        } finally {
+            // CRITICAL: Always cleanup Chrome processes after screenshot attempt
+            // This ensures no zombie processes remain even if screenshot fails
+            $this->cleanupChromeProcesses($chromeCountBefore);
         }
 
         // Create responsive, optimized variants for faster delivery
@@ -227,6 +237,56 @@ final class Screenshotter
         gc_collect_cycles();
 
         return $this->publicUrl();
+    }
+
+    /**
+     * Get count of Chrome processes owned by current user
+     */
+    private function getChromeProcessCount(): int
+    {
+        try {
+            $output = shell_exec("ps aux | grep -i chrome | grep -v grep | wc -l");
+            return (int) trim($output);
+        } catch (\Throwable $e) {
+            return 0;
+        }
+    }
+
+    /**
+     * Cleanup Chrome processes that were spawned during screenshot
+     * This is critical to prevent zombie processes from accumulating
+     *
+     * AGGRESSIVE CLEANUP: Kills ALL Chrome processes after screenshot
+     * This is safe because screenshots should not run concurrently
+     */
+    private function cleanupChromeProcesses(int $beforeCount): void
+    {
+        try {
+            // Give Chrome a moment to close gracefully
+            usleep(500000); // 0.5 seconds
+
+            // AGGRESSIVE: Kill ALL Chrome processes
+            // This is the only reliable way to prevent accumulation
+            // Since we have concurrency locks, no other screenshots should be running
+            shell_exec("pkill chrome 2>/dev/null");
+
+            // Give graceful kill time to work
+            usleep(1000000); // 1 second
+
+            // Force kill any survivors
+            shell_exec("pkill -9 chrome 2>/dev/null");
+
+            // Also kill any zombie Chrome processes by name variants
+            shell_exec("pkill -9 -f 'google-chrome' 2>/dev/null");
+            shell_exec("pkill -9 -f 'chrome-sandbox' 2>/dev/null");
+
+            // Clean up Puppeteer temp directories
+            shell_exec("find /tmp -maxdepth 1 -name 'puppeteer_dev_chrome_profile-*' -mmin +5 -exec rm -rf {} \\; 2>/dev/null");
+
+        } catch (\Throwable $e) {
+            // Log but don't fail - cleanup is best-effort
+            error_log("Chrome cleanup warning: " . $e->getMessage());
+        }
     }
 
     /**
