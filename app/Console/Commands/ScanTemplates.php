@@ -13,7 +13,7 @@ use App\Services\WordPressAnalyzer;
 
 class ScanTemplates extends Command
 {
-    protected $signature = 'templates:scan {--path=} {--limit=0} {--capture : If no theme screenshot found, capture a browser screenshot}';
+    protected $signature = 'templates:scan {--path=} {--limit=0} {--capture : If no theme screenshot found, capture a browser screenshot} {--no-gc : Skip garbage collection after scan}';
 
     protected $description = 'Scan templates root for WordPress installs and upsert into DB';
 
@@ -132,26 +132,33 @@ class ScanTemplates extends Command
         }
 
         $this->info("Scan complete. Indexed {$count} sites.");
-        
+
+        // Run garbage collection to remove orphaned templates (unless disabled)
+        if (!$this->option('no-gc')) {
+            $this->newLine();
+            $this->info("Running garbage collection...");
+            $this->call('templates:gc', ['--clean-screenshots' => true]);
+        }
+
         // Run screenshot command for new templates only using correct PHP path
         $this->info("Starting screenshot capture for new templates...");
-        
+
         // Use the correct PHP binary path for screenshot dependencies
         $phpBin = '/opt/alt/php83/usr/bin/php';
         if (!file_exists($phpBin)) {
             $phpBin = 'php'; // fallback
         }
-        
+
         $artisanPath = base_path('artisan');
         $command = "{$phpBin} {$artisanPath} templates:screenshot --new-only --skip-problematic";
-        
+
         $this->info("Running: {$command}");
         $result = shell_exec("{$command} 2>&1");
-        
+
         if ($result) {
             $this->line($result);
         }
-        
+
         return self::SUCCESS;
     }
 

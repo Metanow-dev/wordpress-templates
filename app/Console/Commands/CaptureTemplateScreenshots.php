@@ -31,12 +31,16 @@ class CaptureTemplateScreenshots extends Command
         $force = (bool)$this->option('force');
         $newOnly = (bool)$this->option('new-only');
         $skipProblematic = (bool)$this->option('skip-problematic');
-        
+
         // Known problematic sites that frequently timeout
         $problematicSites = ['albaniatourguide'];
 
+        // Memory management settings
+        $memoryLimit = env('SCREENSHOT_MEMORY_LIMIT_MB', 256); // MB
+        $delayBetweenCaptures = env('SCREENSHOT_DELAY_BETWEEN_MS', 2000); // milliseconds
+
         $count = 0;
-        $q->lazy()->each(function (Template $t) use (&$count, $w, $h, $full, $force, $newOnly, $skipProblematic, $problematicSites) {
+        $q->lazy()->each(function (Template $t) use (&$count, $w, $h, $full, $force, $newOnly, $skipProblematic, $problematicSites, $memoryLimit, $delayBetweenCaptures) {
             if (!$t->demo_url) {
                 $this->warn("{$t->slug}: no demo_url, skipping");
                 return;
@@ -68,6 +72,14 @@ class CaptureTemplateScreenshots extends Command
                 $this->info("{$t->slug}: replacing theme screenshot with captured screenshot");
             }
 
+            // Check memory usage before capture
+            $currentMemoryMB = memory_get_usage(true) / 1024 / 1024;
+            if ($currentMemoryMB > $memoryLimit) {
+                $this->warn("{$t->slug}: memory limit reached ({$currentMemoryMB}MB), forcing cleanup");
+                gc_collect_cycles();
+                sleep(2); // Give system time to free resources
+            }
+
             $this->info("{$t->slug}: capturing {$t->demo_url} …");
             try {
                 $url = Screenshotter::for($t->slug, $t->demo_url)->capture($w, $h, $full);
@@ -75,8 +87,17 @@ class CaptureTemplateScreenshots extends Command
                 $t->save();
                 $this->line(" → saved: ".$url);
                 $count++;
+
+                // Add delay between captures to prevent server overload
+                if ($delayBetweenCaptures > 0) {
+                    usleep($delayBetweenCaptures * 1000);
+                }
             } catch (\Throwable $e) {
                 $this->error("{$t->slug}: capture failed: ".$e->getMessage());
+
+                // Force cleanup after error
+                gc_collect_cycles();
+                sleep(1);
             }
         });
 

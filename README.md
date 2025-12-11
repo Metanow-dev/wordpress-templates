@@ -94,6 +94,12 @@ Access the application at [http://localhost](http://localhost)
 # Capture specific template
 ./vendor/bin/sail artisan templates:screenshot --slug=template-name
 
+# Capture only new templates without captured screenshots
+./vendor/bin/sail artisan templates:screenshot --new-only
+
+# Skip known problematic sites that timeout
+./vendor/bin/sail artisan templates:screenshot --skip-problematic
+
 # Full-page screenshots
 ./vendor/bin/sail artisan templates:screenshot --fullpage
 
@@ -205,13 +211,17 @@ location ~ ^/([a-zA-Z0-9\-_]+)/?(.*)$ {
 #### Scheduled Tasks (Cron)
 ```bash
 # Scan for new WordPress installations every 15 minutes
+# (includes automatic garbage collection)
 */15 * * * * cd /var/www/vhosts/your-domain.com/httpdocs && php artisan templates:scan
 
 # Update screenshots daily at 2 AM
-0 2 * * * cd /var/www/vhosts/your-domain.com/httpdocs && php artisan templates:screenshot
+0 2 * * * cd /var/www/vhosts/your-domain.com/httpdocs && php artisan templates:screenshot --new-only --skip-problematic
 
-# Clean up old files weekly
-0 3 * * 0 cd /var/www/vhosts/your-domain.com/httpdocs && php artisan storage:link
+# Weekly full screenshot refresh (Sundays at 3 AM)
+0 3 * * 0 cd /var/www/vhosts/your-domain.com/httpdocs && php artisan templates:screenshot --force
+
+# Manual garbage collection (optional, scan does this automatically)
+# 0 4 * * 0 cd /var/www/vhosts/your-domain.com/httpdocs && php artisan templates:gc --clean-screenshots
 ```
 
 Permissions and ownership
@@ -287,11 +297,13 @@ NODE_BINARY_PATH=/usr/local/bin/node
 ./vendor/bin/sail up -d                    # Start containers
 ./vendor/bin/sail artisan templates:scan  # Scan for WordPress sites
 ./vendor/bin/sail artisan templates:screenshot --force  # Generate screenshots
+./vendor/bin/sail artisan templates:gc --dry-run  # Preview orphaned templates
 ./vendor/bin/sail npm run dev             # Watch frontend assets
 
 # Production
 php artisan templates:scan                # Scan for new installations
 php artisan templates:screenshot          # Update screenshots
+php artisan templates:gc --clean-screenshots  # Remove orphaned templates
 php artisan config:cache                  # Cache configuration
 php artisan route:cache                   # Cache routes
 ```
@@ -304,7 +316,8 @@ php artisan route:cache                   # Cache routes
 app/
 ├── Console/Commands/
 │   ├── ScanTemplates.php         # WordPress site scanner
-│   └── CaptureTemplateScreenshots.php  # Screenshot generator
+│   ├── CaptureTemplateScreenshots.php  # Screenshot generator
+│   └── GarbageCollectTemplates.php  # Cleanup orphaned templates
 ├── Http/
 │   └── Middleware/SetLocale.php  # Language detection
 ├── Livewire/
@@ -340,11 +353,59 @@ routes/api.php                   # API routes
 php artisan templates:fix-permissions --path=storage/app/public/screenshots
 ```
 
+### Database Cleanup
+
+The system automatically maintains database integrity by detecting and removing orphaned templates.
+
+```bash
+# Preview what would be deleted (safe to run)
+php artisan templates:gc --dry-run
+
+# Remove orphaned templates from database
+php artisan templates:gc
+
+# Also remove orphaned screenshot files
+php artisan templates:gc --clean-screenshots
+```
+
+**When to use:**
+- After manually deleting WordPress installations
+- After bulk cleanup of template directories
+- When database and filesystem are out of sync
+
+**Automatic Cleanup:** The `templates:scan` command now automatically runs garbage collection after scanning (disable with `--no-gc` flag).
+
+### Memory Management
+
+The screenshot system includes memory optimization to prevent 503 errors:
+
+**Features:**
+- Garbage collection between captures
+- Configurable memory limits
+- Automatic cleanup after errors
+- Delays between captures to prevent server overload
+
+**Configuration (.env):**
+```env
+# Memory limit before forcing cleanup (MB)
+SCREENSHOT_MEMORY_LIMIT_MB=256
+
+# Delay between screenshot captures (milliseconds)
+SCREENSHOT_DELAY_BETWEEN_MS=3000
+```
+
+**Recommended Settings:**
+- **Shared Hosting:** 256MB limit, 3000ms delay
+- **VPS/Dedicated:** 512MB limit, 2000ms delay
+- **High-Memory Server:** 1024MB limit, 1000ms delay
+
 ### Common Issues
+- **503 Errors during screenshots**: Reduce `SCREENSHOT_MEMORY_LIMIT_MB` and increase `SCREENSHOT_DELAY_BETWEEN_MS`
 - **Memory errors**: Increase PHP memory limit for screenshot generation
 - **Permission issues**: Ensure storage directories are writable
   - Run `php artisan templates:fix-permissions` and verify `.env` has `SCREENSHOT_SYSUSER` and `SCREENSHOT_GROUP`.
 - **Network timeouts**: Adjust timeout settings for slow WordPress sites
+- **Orphaned templates**: Run `php artisan templates:gc` to clean up deleted templates
 
 ---
 

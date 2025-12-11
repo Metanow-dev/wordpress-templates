@@ -51,6 +51,9 @@ final class Screenshotter
 
     public function capture(int $width = 343, int $height = 192, bool $fullPage = false): string
     {
+        // Force garbage collection before heavy operation
+        gc_collect_cycles();
+
         File::ensureDirectoryExists(dirname($this->abs()), 0775, true);
 
         // Special handling for problematic sites (continuous network activity, heavy trackers, etc.)
@@ -219,7 +222,10 @@ final class Screenshotter
         
         // Automatically fix permissions for new screenshots
         $this->fixScreenshotPermissions();
-        
+
+        // Force cleanup after heavy operation
+        gc_collect_cycles();
+
         return $this->publicUrl();
     }
 
