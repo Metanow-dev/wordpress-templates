@@ -5,7 +5,6 @@ use Illuminate\Support\Facades\Route;
 // Redirect bare root to EN listing
 Route::get('/', fn () => redirect('/en/templates'));
 
-
 Route::get('/media/{slug}/{path}', function (string $slug, string $path) {
     // only allow simple slug format
     abort_unless(preg_match('/^[a-z0-9\-]+$/i', $slug), 404);

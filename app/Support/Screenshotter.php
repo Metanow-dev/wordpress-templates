@@ -20,8 +20,8 @@ final class Screenshotter
     }
 
     private function rel(): string { return $this->dir.'/'.$this->slug.'.png'; }
-    private function abs(): string { return storage_path('app/public/'.$this->rel()); }
-    private function publicUrl(): string { return asset('storage/'.$this->rel()); }
+    private function abs(): string { return base_path($this->rel()); }
+    private function publicUrl(): string { return asset($this->rel()); }
 
     private function chromePath(): ?string
     {
@@ -66,9 +66,28 @@ final class Screenshotter
             ->deviceScaleFactor(1) // 1:1 pixel ratio - no scaling
             ->timeout($isProblematicSite ? 120 : 90) // Allow more time on problematic sites
             ->setDelay($isProblematicSite ? $delayProblemMs : $delayNormalMs) // Longer delays for proper loading
-            ->quality(100) // Maximum quality for text clarity
             ->format('png') // PNG for better text rendering
-            ->noSandbox()
+            ->addChromiumArguments([
+                'no-sandbox',
+                'disable-setuid-sandbox',
+                'disable-dev-shm-usage',
+                'disable-gpu',
+                'disable-software-rasterizer',
+                'disable-dbus',
+                'disable-notifications',
+                'disable-background-networking',
+                'disable-background-timer-throttling',
+                'disable-backgrounding-occluded-windows',
+                'disable-breakpad',
+                'disable-extensions',
+                'disable-features=TranslateUI',
+                'disable-ipc-flooding-protection',
+                'disable-renderer-backgrounding',
+                'metrics-recording-only',
+                'mute-audio',
+                'no-first-run',
+                'no-zygote',
+            ])
             ->ignoreHttpsErrors()
             ->dismissDialogs();
         
@@ -133,7 +152,6 @@ final class Screenshotter
                     ->deviceScaleFactor(1)
                     ->timeout(120)
                     ->setDelay($delayFallbackMs)
-                    ->quality(100)
                     ->format('png')
                     ->blockDomains([
                         'www.google-analytics.com', 'ssl.google-analytics.com',
@@ -142,7 +160,27 @@ final class Screenshotter
                         'cdn.mxpnl.com', 'clarity.ms', 'cdn.jsdelivr.net/npm/cookieconsent',
                     ])
                     ->setOption('waitUntil', 'domcontentloaded')
-                    ->noSandbox()
+                    ->addChromiumArguments([
+                        'no-sandbox',
+                        'disable-setuid-sandbox',
+                        'disable-dev-shm-usage',
+                        'disable-gpu',
+                        'disable-software-rasterizer',
+                        'disable-dbus',
+                        'disable-notifications',
+                        'disable-background-networking',
+                        'disable-background-timer-throttling',
+                        'disable-backgrounding-occluded-windows',
+                        'disable-breakpad',
+                        'disable-extensions',
+                        'disable-features=TranslateUI',
+                        'disable-ipc-flooding-protection',
+                        'disable-renderer-backgrounding',
+                        'metrics-recording-only',
+                        'mute-audio',
+                        'no-first-run',
+                        'no-zygote',
+                    ])
                     ->ignoreHttpsErrors()
                     ->dismissDialogs();
 
@@ -254,7 +292,7 @@ final class Screenshotter
             if (file_exists($screenshotFile)) $applyChown($screenshotFile);
 
             // Fix all variant files permissions (the missing piece!)
-            $basePath = storage_path('app/public/screenshots/');
+            $basePath = base_path('screenshots/');
             $widths = [480, 768, 1024];
             foreach ($widths as $w) {
                 $webpPath = $basePath . $this->slug . "-{$w}.webp";
@@ -290,8 +328,8 @@ final class Screenshotter
         if (! $driver) return; // No image library available
 
         foreach ($widths as $w) {
-            $webpDest = storage_path('app/public/screenshots/'.$this->slug."-{$w}.webp");
-            $pngDest  = storage_path('app/public/screenshots/'.$this->slug."-{$w}.png");
+            $webpDest = base_path('screenshots/'.$this->slug."-{$w}.webp");
+            $pngDest  = base_path('screenshots/'.$this->slug."-{$w}.png");
 
             $srcMtime = filemtime($src) ?: time();
             $webpFresh = file_exists($webpDest) && filemtime($webpDest) >= $srcMtime;
