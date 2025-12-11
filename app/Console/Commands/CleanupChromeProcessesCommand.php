@@ -158,9 +158,22 @@ class CleanupChromeProcessesCommand extends Command
     {
         $processes = [];
 
-        $output = shell_exec("ps aux | grep -E 'chrome|chromium|puppeteer' | grep -v grep 2>/dev/null");
+        // Use auxww to prevent line truncation
+        exec("/bin/ps auxww 2>&1", $psOutput, $returnCode);
 
-        if (!$output) {
+        if ($returnCode !== 0 || empty($psOutput)) {
+            return [];
+        }
+
+        // Filter for Chrome/Chromium processes
+        $filtered = array_filter($psOutput, function($line) {
+            return (stripos($line, 'google-chrome') !== false || stripos($line, 'chromium') !== false)
+                   && stripos($line, 'grep') === false;
+        });
+
+        $output = implode("\n", $filtered);
+
+        if (empty($output)) {
             return [];
         }
 
@@ -171,29 +184,35 @@ class CleanupChromeProcessesCommand extends Command
                 continue;
             }
 
-            preg_match('/^(\S+)\s+(\d+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(.+)$/', $line, $matches);
+            // Parse ps output: USER PID ...
+            $parts = preg_split('/\s+/', $line, 11);
 
-            if (!$matches) {
+            if (count($parts) < 11) {
                 continue;
             }
 
-            // Skip if it's a user's active browser
-            if (str_contains($matches[11], '--user-data-dir=/home') ||
-                str_contains($matches[11], '--user-data-dir=/root/.config')) {
+            $user = $parts[0];
+            $pid = $parts[1];
+            $command = $parts[10] ?? '';
+
+            // Skip if it's a user's active browser (has user data in home directory)
+            if (str_contains($command, '--user-data-dir=/home') ||
+                str_contains($command, '--user-data-dir=/root/.config/google-chrome')) {
                 continue;
             }
 
-            // Include if it's in /tmp or looks like Puppeteer
-            if (str_contains($matches[11], '/tmp/puppeteer') ||
-                str_contains($matches[11], 'browsershot') ||
-                str_contains($matches[11], '--enable-automation')) {
+            // Include Puppeteer/headless Chrome
+            // These have: --user-data-dir=/tmp/puppeteer, --headless, --enable-automation
+            if (str_contains($command, '/tmp/puppeteer') ||
+                str_contains($command, '--headless') ||
+                str_contains($command, '--enable-automation')) {
 
                 $processes[] = [
-                    'user' => $matches[1],
-                    'pid' => $matches[2],
-                    'cpu' => $matches[3],
-                    'mem' => $matches[4],
-                    'command' => substr($matches[11], 0, 60),
+                    'user' => $user,
+                    'pid' => $pid,
+                    'cpu' => $parts[2],
+                    'mem' => $parts[3],
+                    'command' => substr($command, 0, 80),
                 ];
             }
         }
