@@ -5,6 +5,7 @@ This guide covers database maintenance and memory optimization features for the 
 ## Table of Contents
 - [Garbage Collection](#garbage-collection)
 - [Memory Optimization](#memory-optimization)
+- [Batch Screenshot Processing](#batch-screenshot-processing)
 - [Troubleshooting](#troubleshooting)
 
 ---
@@ -270,6 +271,354 @@ Or check logs for memory warnings:
 ```bash
 tail -f storage/logs/laravel.log | grep -i memory
 ```
+
+---
+
+## Batch Screenshot Processing
+
+### Overview
+
+The batch screenshot command allows you to recapture screenshots for multiple templates at once, perfect for fixing 503 errors or updating specific sites.
+
+### Use Cases
+
+1. **Recapture Failed Screenshots**: Templates that had 503 errors during initial capture
+2. **Update Specific Sites**: After WordPress updates or theme changes
+3. **Quality Improvements**: Re-capture with different dimensions or settings
+4. **Bulk Operations**: Process exported lists from database queries
+
+### Command Syntax
+
+```bash
+php artisan templates:batch-screenshot [options]
+```
+
+**Options:**
+- `--slugs=slug1,slug2,slug3` - Comma-separated list of template slugs
+- `--file=path/to/file` - Read slugs from text or CSV file
+- `--column=name` - CSV column to read (default: first column)
+- `--force` - Force recapture even if screenshot exists
+- `--fullpage` - Capture full page instead of viewport
+- `--w=1200` - Viewport width (default: 1200)
+- `--h=800` - Viewport height (default: 800)
+- `--delay=3` - Seconds between captures (default: 3)
+- `--continue-on-error` - Keep processing even if some captures fail
+
+### Basic Usage
+
+#### From Comma-Separated List
+
+```bash
+# Recapture specific templates
+php artisan templates:batch-screenshot --slugs=site1,site2,site3 --force
+
+# With custom dimensions
+php artisan templates:batch-screenshot --slugs=site1,site2 --force --w=1920 --h=1080
+```
+
+#### From Text File
+
+Create a text file with one slug per line:
+
+```bash
+# Create file
+cat > failed_slugs.txt << EOF
+template-with-503
+another-timeout-site
+problematic-wordpress
+site-needing-update
+EOF
+
+# Process the list
+php artisan templates:batch-screenshot --file=failed_slugs.txt --force
+```
+
+**Text File Format:**
+```
+template-one
+template-two
+template-three
+# Comments are supported
+template-four
+```
+
+Empty lines and lines starting with `#` are automatically skipped.
+
+#### From CSV File
+
+Export from your database or spreadsheet:
+
+**Simple CSV (first column used automatically):**
+```csv
+slug,status,last_updated
+template-one,failed,2024-01-15
+template-two,failed,2024-01-16
+template-three,failed,2024-01-17
+```
+
+```bash
+# Process CSV (uses first column by default)
+php artisan templates:batch-screenshot --file=export.csv --force
+```
+
+**CSV with Specific Column:**
+```csv
+id,template_slug,error_code,timestamp
+1,my-site-one,503,2024-01-15
+2,my-site-two,503,2024-01-16
+3,my-site-three,503,2024-01-17
+```
+
+```bash
+# Specify which column to use
+php artisan templates:batch-screenshot --file=export.csv --column=template_slug --force
+
+# Or use column index (0-based)
+php artisan templates:batch-screenshot --file=export.csv --column=1 --force
+```
+
+**CSV Features:**
+- Auto-detects header row
+- Supports common delimiters (comma, semicolon, tab)
+- Handles quoted fields with commas inside
+- Skips empty rows automatically
+
+### Advanced Usage
+
+#### Continue on Error
+
+By default, processing stops on first failure. Use `--continue-on-error` to process all templates:
+
+```bash
+php artisan templates:batch-screenshot \
+  --file=slugs.txt \
+  --force \
+  --continue-on-error
+```
+
+This ensures all templates are attempted even if some fail.
+
+#### Custom Delays
+
+Adjust delay between captures based on server load:
+
+```bash
+# Faster processing (less safe)
+php artisan templates:batch-screenshot --slugs=site1,site2 --force --delay=1
+
+# Conservative (better for shared hosting)
+php artisan templates:batch-screenshot --slugs=site1,site2 --force --delay=5
+```
+
+**Recommended Delays:**
+- **Shared Hosting**: 5-10 seconds
+- **VPS/Dedicated**: 2-3 seconds
+- **High-Performance**: 1 second
+
+#### Full-Page Screenshots
+
+Capture entire page instead of viewport:
+
+```bash
+php artisan templates:batch-screenshot \
+  --file=landing_pages.txt \
+  --force \
+  --fullpage \
+  --w=1920
+```
+
+### Progress Tracking
+
+The command provides real-time progress:
+
+```
+Batch Screenshot Capture
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Total templates: 5
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[1/5] Processing: template-one
+  ✓ Success
+  Waiting 3s before next capture...
+
+[2/5] Processing: template-two
+  ✓ Success
+  Waiting 3s before next capture...
+
+[3/5] Processing: template-three
+  ✗ Failed (exit code: 1)
+
+...
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Batch Processing Complete
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Total processed:  5
+Successful:       3
+Failed:           2
+
+Failed Slugs (for retry):
+  • template-three
+  • template-five
+
+To retry failed slugs, use:
+  php artisan templates:batch-screenshot --slugs=template-three,template-five --force
+```
+
+### Error Recovery
+
+If some captures fail, the command provides retry instructions:
+
+**Option 1: Direct Retry**
+```bash
+# Copy-paste the suggested command
+php artisan templates:batch-screenshot --slugs=failed-site-1,failed-site-2 --force
+```
+
+**Option 2: Save to File**
+```bash
+# Save failed slugs
+echo 'failed-site-1
+failed-site-2' > retry.txt
+
+# Retry from file
+php artisan templates:batch-screenshot --file=retry.txt --force --delay=5
+```
+
+### Real-World Examples
+
+#### Example 1: Fix 503 Errors from Server Migration
+
+After migrating to a new server, some screenshots show 503 errors:
+
+```bash
+# Step 1: Identify failed templates (check logs or visually)
+# Create list
+cat > 503_errors.txt << EOF
+ecommerce-store
+fitness-pro
+restaurant-deluxe
+EOF
+
+# Step 2: Recapture with conservative settings
+php artisan templates:batch-screenshot \
+  --file=503_errors.txt \
+  --force \
+  --delay=5 \
+  --continue-on-error
+
+# Step 3: Verify results
+ls -lh screenshots/ | grep -E "(ecommerce|fitness|restaurant)"
+```
+
+#### Example 2: Database Export and Batch Update
+
+Export from database and process:
+
+```bash
+# Step 1: Export from database (MySQL example)
+mysql -u user -p database -e \
+  "SELECT slug FROM templates WHERE screenshot_url LIKE '%503%' OR screenshot_url IS NULL" \
+  > needs_capture.txt
+
+# Step 2: Clean up MySQL output (remove header and formatting)
+tail -n +2 needs_capture.txt | tr -d '\t' > clean_slugs.txt
+
+# Step 3: Batch capture
+php artisan templates:batch-screenshot \
+  --file=clean_slugs.txt \
+  --force \
+  --continue-on-error
+```
+
+#### Example 3: CSV from Spreadsheet
+
+Export quality review from Google Sheets:
+
+**quality_review.csv:**
+```csv
+Template Name,Slug,Issue,Priority
+Restaurant Template,restaurant-deluxe,Outdated screenshot,High
+Fitness Site,fitness-pro,503 Error,High
+Portfolio,portfolio-creative,Low quality,Medium
+```
+
+```bash
+# Process high-priority issues
+php artisan templates:batch-screenshot \
+  --file=quality_review.csv \
+  --column=Slug \
+  --force \
+  --w=1920 \
+  --h=1080
+```
+
+#### Example 4: Parallel Processing (Advanced)
+
+For very large batches on high-performance servers:
+
+```bash
+# Split file into chunks
+split -l 10 large_list.txt chunk_
+
+# Process chunks in parallel (use with caution!)
+for chunk in chunk_*; do
+  php artisan templates:batch-screenshot --file=$chunk --force &
+done
+
+# Wait for all to complete
+wait
+
+# Clean up
+rm chunk_*
+```
+
+**⚠️ Warning**: Parallel processing can overwhelm your server. Only use on dedicated servers with sufficient resources.
+
+### Best Practices
+
+1. **Start Small**: Test with 2-3 templates before processing large batches
+2. **Use --dry-run First**: Always preview what will be processed (if implementing)
+3. **Monitor Memory**: Check server resources during batch processing
+4. **Adjust Delays**: Increase delay if server shows signs of stress
+5. **Continue on Error**: Use `--continue-on-error` for large batches
+6. **Log Output**: Redirect output to file for large batches
+   ```bash
+   php artisan templates:batch-screenshot --file=large_list.txt --force > batch_log.txt 2>&1
+   ```
+7. **Schedule Off-Peak**: Run large batches during low-traffic periods
+
+### Integration with Existing Commands
+
+The batch command works alongside existing screenshot commands:
+
+```bash
+# Daily: Capture new templates only
+php artisan templates:screenshot --new-only --skip-problematic
+
+# Weekly: Batch recapture problem sites
+php artisan templates:batch-screenshot --file=weekly_recapture.txt --force
+
+# Monthly: Full refresh
+php artisan templates:screenshot --force
+```
+
+### Performance Considerations
+
+**Memory Usage:**
+- Each template processed sequentially
+- Automatic garbage collection between captures
+- Memory limits from main screenshot command apply
+
+**Time Estimation:**
+- Base capture time: 5-15 seconds per template
+- Plus delay time (default 3 seconds)
+- Example: 50 templates × 10 seconds = ~8 minutes
+
+**Server Load:**
+- Each capture spawns Chrome process
+- CPU and memory intensive
+- Use longer delays on shared hosting
 
 ---
 

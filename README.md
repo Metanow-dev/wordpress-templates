@@ -84,6 +84,8 @@ Access the application at [http://localhost](http://localhost)
 
 ### Screenshot Commands
 
+#### Single Template Capture
+
 ```bash
 # Capture screenshots for all templates
 ./vendor/bin/sail artisan templates:screenshot
@@ -106,6 +108,36 @@ Access the application at [http://localhost](http://localhost)
 # Custom dimensions
 ./vendor/bin/sail artisan templates:screenshot --w=1920 --h=1080
 ```
+
+#### Batch Capture (Multiple Templates)
+
+```bash
+# Capture multiple templates by slug
+./vendor/bin/sail artisan templates:batch-screenshot --slugs=site1,site2,site3 --force
+
+# From plain text file (one slug per line)
+./vendor/bin/sail artisan templates:batch-screenshot --file=failed_slugs.txt --force
+
+# From CSV file (automatically detects first column)
+./vendor/bin/sail artisan templates:batch-screenshot --file=export.csv --force
+
+# From CSV with specific column
+./vendor/bin/sail artisan templates:batch-screenshot --file=templates.csv --column=slug --force
+
+# Continue processing even if some fail
+./vendor/bin/sail artisan templates:batch-screenshot --file=slugs.txt --force --continue-on-error
+
+# Custom delay between captures (default: 3 seconds)
+./vendor/bin/sail artisan templates:batch-screenshot --slugs=site1,site2 --force --delay=5
+```
+
+**Batch Processing Features:**
+- Progress tracking (X/Y completed)
+- Success/failure reporting
+- Failed slugs are listed for easy retry
+- Supports TXT (one per line) and CSV files
+- Configurable delays between captures
+- Memory-safe with automatic cleanup
 
 ### Variant Commands (Responsive WebP/PNG)
 
@@ -317,7 +349,8 @@ app/
 ├── Console/Commands/
 │   ├── ScanTemplates.php         # WordPress site scanner
 │   ├── CaptureTemplateScreenshots.php  # Screenshot generator
-│   └── GarbageCollectTemplates.php  # Cleanup orphaned templates
+│   ├── BatchScreenshotTemplates.php    # Batch screenshot capture
+│   └── GarbageCollectTemplates.php     # Cleanup orphaned templates
 ├── Http/
 │   └── Middleware/SetLocale.php  # Language detection
 ├── Livewire/
