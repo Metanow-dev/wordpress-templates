@@ -4,8 +4,8 @@
 
 set -e
 
-DOMAIN="wp-templates.metanow.dev"
-SYSUSER="wp-templates.metanow_r6s2v1oe7wr"  # Plesk domain system user
+DOMAIN="megasandboxs.com"
+SYSUSER="megasandboxs.com_c9h1nddlyw"  # Plesk domain system user
 APP_PATH="/var/www/vhosts/$DOMAIN/httpdocs"
 PUBLIC_PATH="$APP_PATH/public"
 

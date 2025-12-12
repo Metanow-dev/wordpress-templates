@@ -1,3 +1,14 @@
+# Force CloudLinux alt-php 8.3 for this vhost
+<IfModule mime_module>
+    AddType application/x-httpd-alt-php83 .php
+</IfModule>
+<IfModule lsapi_module>
+    AddHandler application/x-httpd-alt-php83 .php
+</IfModule>
+
+DirectoryIndex index.php index.html
+
+# Laravel Framework Routing
 <IfModule mod_rewrite.c>
     <IfModule mod_negotiation.c>
         Options -MultiViews -Indexes
@@ -8,10 +19,6 @@
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
-
-    # Handle X-XSRF-Token Header
-    RewriteCond %{HTTP:x-xsrf-token} .
-    RewriteRule .* - [E=HTTP_X_XSRF_TOKEN:%{HTTP:X-XSRF-Token}]
 
     # Redirect Trailing Slashes If Not A Folder...
     RewriteCond %{REQUEST_FILENAME} !-d

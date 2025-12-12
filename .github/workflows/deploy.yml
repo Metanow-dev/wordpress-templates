@@ -130,25 +130,22 @@ jobs:
           mkdir -p bootstrap/cache
           touch storage/logs/laravel.log
           
-          # Set permissions
-          echo "🔒 Setting permissions..."
+          # Set permissions and ownership for Plesk
+          echo "🔒 Setting permissions and Plesk ownership..."
+
+          # Get Plesk domain user from the path
+          PLESK_USER=$(stat -c '%U' "$APP_PATH")
+          echo "Detected Plesk user: $PLESK_USER"
+
+          # Set ownership to Plesk domain user:psacln
+          chown -R "$PLESK_USER:psacln" "$APP_PATH"
+
+          # Set file and directory permissions
           find . -type f -exec chmod 644 {} \;
           find . -type d -exec chmod 755 {} \;
+
+          # Set Laravel writable directories
           chmod -R 775 storage bootstrap/cache
-          
-          # Detect and set correct web user (CloudLinux/CentOS uses apache, Ubuntu uses www-data)
-          if id -u apache >/dev/null 2>&1; then
-            echo "Using apache:apache ownership"
-            chown -R apache:apache storage bootstrap/cache
-          elif id -u www-data >/dev/null 2>&1; then
-            echo "Using www-data:www-data ownership"
-            chown -R www-data:www-data storage bootstrap/cache
-          elif id -u nginx >/dev/null 2>&1; then
-            echo "Using nginx:nginx ownership"
-            chown -R nginx:nginx storage bootstrap/cache
-          else
-            echo "⚠️  Could not detect web user, skipping chown"
-          fi
           
           # Laravel deployment commands
           echo "⚡ Running Laravel commands..."
