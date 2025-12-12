@@ -21,4 +21,5 @@
 /vendor
 Homestead.json
 Homestead.yaml
+/storage/screenshots
 Thumbs.db
