@@ -26,40 +26,54 @@ The application automatically captures screenshots of WordPress sites and displa
 ## Local Development
 
 ### Requirements
-- Docker + Docker Compose (via [Laravel Sail](https://laravel.com/docs/sail))
-- Node.js 18+ with npm
-- Chrome/Chromium browser (managed automatically by Puppeteer)
+- Docker Desktop (includes Docker + Docker Compose)
+- No PHP or Node.js installation needed on host! (Laravel Sail handles everything via Docker)
 
 ### Quick Start
 
+**Automated Setup (Recommended):**
+
 ```bash
-# Clone repository
-git clone <your-repo-url>
-cd wordpress-templates
+# Linux/Mac
+./setup-new-pc.sh
 
-# Install PHP dependencies
-composer install
+# Windows PowerShell
+./setup-new-pc.ps1
+```
 
-# Install Node.js dependencies (includes Puppeteer)
-npm install
+**Manual Setup:**
 
-# Copy environment file
+```bash
+# 1. Install Composer dependencies via Docker
+docker run --rm \
+    -v "$(pwd):/var/www/html" \
+    -w /var/www/html \
+    laravelsail/php83-composer:latest \
+    composer install --ignore-platform-reqs
+
+# 2. Setup environment
 cp .env.example .env
 
-# Start Docker containers
+# 3. Start Docker containers
 ./vendor/bin/sail up -d
 
-# Generate application key
+# 4. Generate application key
 ./vendor/bin/sail artisan key:generate
 
-# Run database migrations
+# 5. Run database migrations
 ./vendor/bin/sail artisan migrate
 
-# Build frontend assets
+# 6. Install Node.js dependencies and build assets
+./vendor/bin/sail npm install
 ./vendor/bin/sail npm run dev
+
+# 7. Create storage link
+./vendor/bin/sail artisan storage:link
 ```
 
 Access the application at [http://localhost](http://localhost)
+
+**Setting Up on a New PC?** See [SETUP_NEW_PC.md](SETUP_NEW_PC.md) for detailed instructions.
 
 ### Setting up Test Data
 
@@ -497,7 +511,10 @@ artisan-wp templates:fix-permissions
 
 ### Additional Documentation
 
-For detailed server setup and troubleshooting:
-- **[MIGRATION_CHECKLIST.md](MIGRATION_CHECKLIST.md)** - Complete migration guide
-- **[SCREENSHOT_SETUP_GUIDE.md](SCREENSHOT_SETUP_GUIDE.md)** - Detailed setup instructions
+For detailed setup and operations:
+- **[SETUP_NEW_PC.md](SETUP_NEW_PC.md)** - Complete guide for setting up on a new PC
+- **[MAINTENANCE.md](MAINTENANCE.md)** - Database maintenance and memory optimization
+- **[BATCH_SCREENSHOT_GUIDE.md](BATCH_SCREENSHOT_GUIDE.md)** - Batch screenshot processing guide
+- **[MIGRATION_CHECKLIST.md](MIGRATION_CHECKLIST.md)** - Server migration guide
+- **[SCREENSHOT_SETUP_GUIDE.md](SCREENSHOT_SETUP_GUIDE.md)** - Detailed screenshot setup
 - **[SCREENSHOT_QUICK_REFERENCE.md](SCREENSHOT_QUICK_REFERENCE.md)** - Quick troubleshooting reference
