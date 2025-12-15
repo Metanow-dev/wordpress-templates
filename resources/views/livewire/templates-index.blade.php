@@ -64,13 +64,13 @@
                         <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
                             <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
                         </svg>
-                        {{ app()->getLocale() === 'de' ? 'Professionell Handgefertigt' : 'Professionally Handcrafted' }}
+                        {{ app()->getLocale() === 'de' ? 'megasandboxs' : 'megasandboxs' }}
                     </span>
                 </div>
 
                 <!-- Main Heading -->
                 <h1 class="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight max-w-5xl animate-fade-in-up">
-                    {{ app()->getLocale() === 'de' ? 'Premium WordPress Vorlagen für Ihr' : 'Premium WordPress Templates for Your' }}
+                    {{ app()->getLocale() === 'de' ? 'Premium WordPress Designs für Ihr' : 'Premium WordPress Designs for Your' }}
                     <span class="block mt-2 bg-gradient-to-r from-brand via-rose-600 to-pink-600 bg-clip-text text-transparent animate-gradient">
                         {{ app()->getLocale() === 'de' ? 'Erfolgreiches Business' : 'Successful Business' }}
                     </span>
@@ -79,8 +79,8 @@
                 <!-- Subheading -->
                 <p class="text-base md:text-lg text-white mb-8 max-w-3xl mx-auto leading-relaxed animate-fade-in-up animation-delay-200">
                     {{ app()->getLocale() === 'de'
-                        ? 'Entdecken Sie über 1500+ professionell entwickelte WordPress-Templates.'
-                        : 'Discover 1500+ professionally crafted WordPress templates.'
+                        ? 'Entdecken Sie über 1500+ professionell entwickelte WordPress-Projekte .'
+                        : 'Discover 1500+ professionally crafted WordPress projects.'
                     }}
                 </p>
 
@@ -91,7 +91,7 @@
                             1500<span class="text-white">+</span>
                         </div>
                         <div class="text-sm text-white/90 uppercase tracking-wider font-semibold">
-                            {{ app()->getLocale() === 'de' ? 'Premium Vorlagen' : 'Premium Templates' }}
+                            {{ app()->getLocale() === 'de' ? 'Premium Designs' : 'Premium Designs' }}
                         </div>
                     </div>
                     <div class="text-center">
@@ -294,7 +294,7 @@
                                     </svg>
                                 </div>
                                 <input type="text" wire:model.live.debounce.300ms="search"
-                                    placeholder="{{ app()->getLocale() === 'de' ? 'Nach Vorlagen suchen...' : 'Search templates...' }}"
+                                    placeholder="{{ app()->getLocale() === 'de' ? 'Nach Projekten suchen...' : 'Search projects...' }}"
                                     class="w-full pl-10 pr-10 py-3 text-sm border border-gray-300 rounded-lg bg-white focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all placeholder:text-gray-400">
 
                                 @if($search)
@@ -366,7 +366,7 @@
                     <!-- Results Stats -->
                     <div class="flex items-center justify-between mt-4 pt-4 border-t border-gray-200">
                         <div class="text-sm text-gray-600">
-                            <span class="font-semibold text-gray-900">{{ $templates->total() }}</span> {{ app()->getLocale() === 'de' ? 'Vorlagen gefunden' : 'templates found' }}
+                            <span class="font-semibold text-gray-900">{{ $templates->total() }}</span> {{ app()->getLocale() === 'de' ? 'Projekte gefunden' : 'projects found' }}
                             @if($search || !empty($selectedCategories) || !empty($selectedTags) || $onlyWithScreenshots || $onlyClassified)
                             <span class="text-gray-500">• {{ app()->getLocale() === 'de' ? 'Gefiltert von' : 'Filtered from' }} {{ $stats['total'] }} {{ app()->getLocale() === 'de' ? 'insgesamt' : 'total' }}</span>
                             @endif
@@ -565,7 +565,7 @@
 
             <!-- Results -->
             @if($templates->count())
-            <div class="container mx-auto"  wire:key="templates-container">
+            <div class="container mx-auto" wire:key="templates-container">
 
                 <!-- Grid View -->
                 @if($view === 'grid')
@@ -919,7 +919,7 @@
                         </svg>
                     </div>
                     <h3 class="text-xl font-semibold text-gray-900 mb-2">
-                        {{ app()->getLocale() === 'de' ? 'Keine Vorlagen gefunden' : 'No templates found' }}
+                        {{ app()->getLocale() === 'de' ? 'Keine Projekte gefunden' : 'No projects found' }}
                     </h3>
                     <p class="text-gray-600 mb-6 text-sm">
                         {{ app()->getLocale() === 'de' ? 'Versuchen Sie, Ihre Suchkriterien zu ändern.' : 'Try adjusting your search criteria.' }}
@@ -1025,15 +1025,15 @@
                                 : 'Your Perfect WordPress'
                             }}
                             <span class="block mt-2 bg-gradient-to-r from-brand via-rose-600 to-pink-600 bg-clip-text text-transparent">
-                                {{ app()->getLocale() === 'de' ? 'Template wartet' : 'Template Awaits' }}
+                                {{ app()->getLocale() === 'de' ? 'Design wartet' : 'Design Awaits' }}
                             </span>
                         </h2>
 
                         <!-- Subheadline -->
                         <p class="text-base md:text-lg text-gray-600 mb-8 leading-relaxed">
                             {{ app()->getLocale() === 'de'
-                                ? 'Starten Sie noch heute mit einem professionellen WordPress-Template. Vollständig anpassbar, SEO-optimiert und sofort einsatzbereit.'
-                                : 'Launch your website today with a professional WordPress template. Fully customizable, SEO-optimized, and ready to deploy.'
+                                ? 'Entdecken Sie unsere professionellen WordPress-Designs und Projekte. Jedes Design zeigt unsere Expertise und Kreativität — modern, anspruchsvoll und inspirierend.'
+                                : 'Explore our professional WordPress designs and projects. Each design showcases our expertise and creativity — modern, sophisticated, and inspiring.'
                             }}
                         </p>
 
@@ -1058,7 +1058,7 @@
                                 <svg class="w-4 h-4 mr-2 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                                 </svg>
-                                <span>{{ app()->getLocale() === 'de' ? 'Templates durchsuchen' : 'Browse Templates' }}</span>
+                                <span>{{ app()->getLocale() === 'de' ? 'Projekte durchsuchen' : 'Browse Projects' }}</span>
                             </a>
                         </div>
                     </div>
