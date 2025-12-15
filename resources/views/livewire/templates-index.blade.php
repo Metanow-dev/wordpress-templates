@@ -1,4 +1,4 @@
-<div class="min-h-screen overflow-x-hidden bg-white">
+<div class="min-h-screen overflow-x-hidden bg-gray-50">
     <!-- Minimalist Header Section -->
     <header class="sticky top-0 z-50 bg-white border-b border-gray-200">
         <div class="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -40,27 +40,28 @@
 
 
     <!-- Hero Section -->
-    <section id="hero-section" class="relative overflow-hidden" style="background: linear-gradient(to right, #fff1ed, #ffb0b5); transition: opacity 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);">
+    <section id="hero-section" class="relative overflow-hidden" style="background: linear-gradient(to right, #00000070, #000000); transition: opacity 0.3s cubic-bezier(0.4, 0.0, 0.2, 1); padding-bottom: 20px;">
         {{-- Illustration Background with Genie Effect --}}
-        <div class="absolute inset-0 overflow-hidden pointer-events-none">
-            <div class="genie-container" style="width: 100%; height: 100%;">
-                <img src="{{ asset('img/screen-collage-showing-business-advertisement.jpg') }}"
+        <div class="absolute inset-0 overflow-hidden pointer-events-none" style="min-height: 100%;">
+            <div class="genie-container" style="width: 100%; height: 100%; min-height: 100%;">
+                <img src="{{ asset('img/background.png') }}"
                      alt="Template Illustration"
                      class="genie-image"
-                     style="width: 100%; height: 100%; object-fit: cover; opacity: 0.15;">
+                     style="width: 100%; height: 100%; min-height: 100%; object-fit: cover; opacity: 0.15; filter: blur(2px);">
             </div>
         </div>
 
-        {{-- Overlay for better text readability --}}
-        <div class="absolute inset-0 bg-gradient-to-b from-white/30 via-transparent to-white/20"></div>
+        {{-- Overlay to reduce redness and improve readability --}}
+        <div class="absolute inset-0 bg-white/40" style="min-height: 100%;"></div>
+        <div class="absolute inset-0 bg-gradient-to-b from-white/20 via-transparent to-white/10" style="min-height: 100%;"></div>
 
         <div class="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div class="flex flex-col items-center justify-center min-h-[600px] lg:min-h-[700px] text-center py-20 lg:py-24">
+            <div class="flex flex-col items-center justify-center text-center" style="padding-top: 90px; padding-bottom: 90px;">
 
                 <!-- Badge -->
                 <div class="mb-8 animate-fade-in-down">
-                    <span class="inline-flex items-center gap-2 px-4 py-2 bg-white/60 backdrop-blur-sm border border-white/80 rounded-full text-gray-800 text-sm font-medium shadow-sm">
-                        <svg class="w-4 h-4 text-brand" fill="currentColor" viewBox="0 0 20 20">
+                    <span class="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-sm border border-white/40 rounded-full text-white text-sm font-medium shadow-sm">
+                        <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
                             <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
                         </svg>
                         {{ app()->getLocale() === 'de' ? 'Professionell Handgefertigt' : 'Professionally Handcrafted' }}
@@ -68,7 +69,7 @@
                 </div>
 
                 <!-- Main Heading -->
-                <h1 class="text-4xl md:text-6xl lg:text-7xl font-bold text-gray-900 mb-6 leading-tight max-w-5xl animate-fade-in-up">
+                <h1 class="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight max-w-5xl animate-fade-in-up">
                     {{ app()->getLocale() === 'de' ? 'Premium WordPress Vorlagen für Ihr' : 'Premium WordPress Templates for Your' }}
                     <span class="block mt-2 bg-gradient-to-r from-brand via-rose-600 to-pink-600 bg-clip-text text-transparent animate-gradient">
                         {{ app()->getLocale() === 'de' ? 'Erfolgreiches Business' : 'Successful Business' }}
@@ -76,55 +77,55 @@
                 </h1>
 
                 <!-- Subheading -->
-                <p class="text-lg md:text-xl lg:text-2xl text-gray-700 mb-8 max-w-3xl mx-auto leading-relaxed animate-fade-in-up animation-delay-200">
+                <p class="text-base md:text-lg text-white mb-8 max-w-3xl mx-auto leading-relaxed animate-fade-in-up animation-delay-200">
                     {{ app()->getLocale() === 'de'
-                        ? 'Entdecken Sie über 1500+ professionell entwickelte WordPress-Templates. Jede Vorlage wird von Experten handgefertigt und für maximale Performance optimiert.'
-                        : 'Discover 1500+ professionally crafted WordPress templates. Each template is handmade by experts and optimized for maximum performance.'
+                        ? 'Entdecken Sie über 1500+ professionell entwickelte WordPress-Templates.'
+                        : 'Discover 1500+ professionally crafted WordPress templates.'
                     }}
                 </p>
 
                 <!-- Stats Counter -->
                 <div class="flex flex-wrap items-center justify-center gap-8 mb-10 animate-fade-in-up animation-delay-400">
                     <div class="text-center">
-                        <div class="text-4xl md:text-5xl font-bold text-gray-900 mb-2">
-                            1500<span class="text-brand">+</span>
+                        <div class="text-4xl md:text-5xl font-bold text-white mb-2">
+                            1500<span class="text-white">+</span>
                         </div>
-                        <div class="text-sm text-gray-600 uppercase tracking-wider font-semibold">
+                        <div class="text-sm text-white/90 uppercase tracking-wider font-semibold">
                             {{ app()->getLocale() === 'de' ? 'Premium Vorlagen' : 'Premium Templates' }}
                         </div>
                     </div>
                     <div class="text-center">
-                        <div class="text-4xl md:text-5xl font-bold text-gray-900 mb-2">
-                            100<span class="text-brand">%</span>
+                        <div class="text-4xl md:text-5xl font-bold text-white mb-2">
+                            100<span class="text-white">%</span>
                         </div>
-                        <div class="text-sm text-gray-600 uppercase tracking-wider font-semibold">
+                        <div class="text-sm text-white/90 uppercase tracking-wider font-semibold">
                             {{ app()->getLocale() === 'de' ? 'Handgefertigt' : 'Handcrafted' }}
                         </div>
                     </div>
                 </div>
 
                 <!-- Features Row -->
-                <div class="flex flex-wrap items-center justify-center gap-6 text-sm text-gray-700 animate-fade-in-up animation-delay-800">
+                <div class="flex flex-wrap items-center justify-center gap-6 text-sm text-white animate-fade-in-up animation-delay-800">
                     <div class="flex items-center gap-2">
-                        <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                        <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                         </svg>
                         <span class="font-semibold">{{ app()->getLocale() === 'de' ? 'Mobile Responsive' : 'Mobile Responsive' }}</span>
                     </div>
                     <div class="flex items-center gap-2">
-                        <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                        <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                         </svg>
                         <span class="font-semibold">{{ app()->getLocale() === 'de' ? 'Schnelle Ladezeit' : 'Fast Loading' }}</span>
                     </div>
                     <div class="flex items-center gap-2">
-                        <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                        <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                         </svg>
                         <span class="font-semibold">{{ app()->getLocale() === 'de' ? 'Einfach Anpassbar' : 'Easy Customization' }}</span>
                     </div>
                     <div class="flex items-center gap-2">
-                        <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                        <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                         </svg>
                         <span class="font-semibold">{{ app()->getLocale() === 'de' ? 'SEO Optimiert' : 'SEO Optimized' }}</span>
@@ -134,12 +135,8 @@
             </div>
         </div>
 
-        <!-- Bottom Wave -->
-        <div class="absolute bottom-0 left-0 right-0">
-            <svg class="w-full h-auto" viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
-                <path d="M0 0L60 10C120 20 240 40 360 46.7C480 53 600 47 720 43.3C840 40 960 40 1080 46.7C1200 53 1320 67 1380 73.3L1440 80V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0V0Z" fill="#F9FAFB"/>
-            </svg>
-        </div>
+        <!-- Bottom Border (Straight) -->
+        <div class="absolute bottom-0 left-0 right-0 h-1 bg-gray-100"></div>
 
         <style>
             @keyframes fade-in-down {
@@ -221,11 +218,6 @@
                 animation: genie-summon 2s ease-out forwards;
                 transform-origin: center;
             }
-
-            .genie-image {
-                animation: genie-float 6s ease-in-out infinite;
-                animation-delay: 2s;
-            }
         </style>
 
         <script>
@@ -283,7 +275,7 @@
     </section>
 
     <!-- Main Content Area (Livewire Reactive) -->
-    <div id="templates-grid" class="relative bg-gray-50 w-full py-16 -mt-20 z-20" style="transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);">
+    <div id="templates-grid" class="relative bg-gray-50 w-full mt-16 -mt-20 z-20" style="transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);">
         <div class="container mx-auto px-4 sm:px-6 lg:px-8">
 
 
@@ -573,14 +565,14 @@
 
             <!-- Results -->
             @if($templates->count())
-            <div class="container mx-auto" style="margin-bottom:50px" wire:key="templates-container">
+            <div class="container mx-auto"  wire:key="templates-container">
 
                 <!-- Grid View -->
                 @if($view === 'grid')
                 <!-- Clean Grid View -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12" wire:key="grid-view">
                     @foreach($templates as $template)
-                    <div wire:key="grid-{{ $template->id ?? $template->slug }}" class="group bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg hover:border-gray-300 transition-all duration-200">
+                    <div wire:key="grid-{{ $template->id ?? $template->slug }}" class="group bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg hover:border-gray-300 transition-all duration-200" style="margin-bottom: 50px">
                         <!-- Screenshot -->
                         <div class="aspect-video bg-gray-100 relative overflow-hidden">
                             @if($template->screenshot_url)
@@ -943,129 +935,145 @@
     </div>
 
 
-    <!-- Modern CTA Section -->
-    <section class="relative bg-gradient-to-r from-[#fff1ed] to-[#ffb0b5] py-24 mt-0 overflow-hidden">
-        <!-- Background Pattern -->
-        <div class="absolute inset-0 opacity-10">
-            <svg class="absolute w-full h-full" xmlns="http://www.w3.org/2000/svg">
-                <defs>
-                    <pattern id="cta-grid" width="50" height="50" patternUnits="userSpaceOnUse">
-                        <circle cx="25" cy="25" r="1.5" fill="#D53741"/>
-                    </pattern>
-                </defs>
-                <rect width="100%" height="100%" fill="url(#cta-grid)"/>
-            </svg>
-        </div>
+    <!-- Modern WordPress CTA Section -->
+    <section class="relative bg-white py-24 mt-0 overflow-hidden">
+  
+    
 
-        <!-- Decorative Elements -->
-        <div class="absolute top-10 left-10 w-20 h-20 bg-white/20 rounded-full blur-2xl"></div>
-        <div class="absolute bottom-10 right-10 w-32 h-32 bg-brand/20 rounded-full blur-3xl"></div>
-
-        <div class="container mx-auto px-4 relative z-10">
-            <div class="max-w-4xl mx-auto text-center">
-                <!-- Badge -->
-                <div class="inline-flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-sm rounded-full text-sm font-semibold text-gray-800 mb-6 shadow-md">
-                    <svg class="w-4 h-4 text-brand" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                    </svg>
-                    {{ app()->getLocale() === 'de' ? 'Starten Sie Jetzt' : 'Get Started Now' }}
-                </div>
-
-                <!-- Main Headline -->
-                <h2 class="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-                    {{ app()->getLocale() === 'de'
-                        ? 'Verwandeln Sie Ihre Vision in'
-                        : 'Transform Your Vision Into'
-                    }}
-                    <span class="block mt-2 bg-gradient-to-r from-brand via-rose-600 to-pink-600 bg-clip-text text-transparent">
-                        {{ app()->getLocale() === 'de' ? 'Digitale Realität' : 'Digital Reality' }}
-                    </span>
-                </h2>
-
-                <!-- Subheadline -->
-                <p class="text-xl md:text-2xl text-gray-700 mb-10 max-w-3xl mx-auto leading-relaxed">
-                    {{ app()->getLocale() === 'de'
-                        ? 'Wählen Sie aus über 1500 professionellen WordPress-Templates oder lassen Sie uns Ihre individuelle Website erstellen.'
-                        : 'Choose from over 1500 professional WordPress templates or let us build your custom website.'
-                    }}
-                </p>
-
-                <!-- CTA Buttons -->
-                <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
-                    <!-- Primary CTA -->
-                    <a href="https://metanow.dev/contact"
-                        class="group relative inline-flex items-center justify-center px-10 py-5 bg-gradient-to-r from-brand to-rose-600 hover:from-brand-dark hover:to-rose-700 text-white text-lg font-bold rounded-2xl transition-all duration-300 shadow-2xl shadow-brand/40 hover:shadow-brand/60 hover:scale-105 overflow-hidden">
-                        <!-- Shimmer effect -->
-                        <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
-                        <svg class="w-6 h-6 mr-3 relative" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+        <div class="container mx-auto px-4 relative z-10" style="padding-top: 100px">
+            <div class="max-w-5xl mx-auto">
+                <!-- Main Content -->
+                <div class="text-center mb-12">
+                    <!-- Badge -->
+                    <div class="inline-flex items-center gap-2 px-4 py-2 bg-brand/10 backdrop-blur-sm border border-brand/20 rounded-full text-sm font-semibold text-brand mb-6 shadow-sm">
+                        <svg class="w-4 h-4" viewBox="0 0 122.52 122.523" fill="currentColor">
+                            <path d="M8.708 61.26c0 20.802 12.089 38.779 29.619 47.298L11.354 35.145a52.695 52.695 0 0 0-2.646 26.115zm87.771-2.474c0-6.494-2.334-10.991-4.335-14.486-2.664-4.332-5.161-7.994-5.161-12.324 0-4.831 3.664-9.328 8.825-9.328.233 0 .454.029.681.042-9.35-8.566-21.807-13.796-35.489-13.796-18.36 0-34.513 9.42-43.91 23.688 1.233.037 2.395.063 3.382.063 5.497 0 14.006-.667 14.006-.667 2.833-.167 3.167 3.994.337 4.329 0 0-2.847.335-6.015.501L48.2 93.547l11.501-34.493-8.188-22.434c-2.83-.166-5.511-.501-5.511-.501-2.832-.166-2.5-4.496.332-4.329 0 0 8.679.667 13.843.667 5.496 0 14.006-.667 14.006-.667 2.835-.167 3.168 3.994.337 4.329 0 0-2.853.335-6.015.501l18.992 56.494 5.242-17.517c2.272-7.269 4.001-12.49 4.001-16.989z"/>
                         </svg>
-                        <span class="relative">{{ app()->getLocale() === 'de' ? 'Kostenlose Beratung' : 'Free Consultation' }}</span>
-                        <svg class="w-5 h-5 ml-3 group-hover:translate-x-1 transition-transform relative" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
-                        </svg>
-                    </a>
-
-                    <!-- Secondary CTA -->
-                    <a href="#templates-grid"
-                        onclick="event.preventDefault(); document.getElementById('templates-grid').scrollIntoView({behavior: 'smooth'})"
-                        class="group inline-flex items-center justify-center px-10 py-5 bg-white/90 backdrop-blur-md border-2 border-gray-300 hover:bg-white hover:border-brand text-gray-900 text-lg font-bold rounded-2xl transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105">
-                        <svg class="w-6 h-6 mr-3 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                        </svg>
-                        <span>{{ app()->getLocale() === 'de' ? 'Templates Ansehen' : 'View Templates' }}</span>
-                    </a>
-                </div>
-
-                <!-- Trust Indicators -->
-                <div class="flex flex-wrap items-center justify-center gap-8 text-sm">
-                    <div class="flex items-center gap-2 text-gray-700">
-                        <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                        </svg>
-                        <span class="font-semibold">{{ app()->getLocale() === 'de' ? 'Keine Kreditkarte nötig' : 'No Credit Card' }}</span>
+                        <span class="uppercase tracking-wide">{{ app()->getLocale() === 'de' ? 'WordPress Experten' : 'WordPress Experts' }}</span>
                     </div>
-                    <div class="flex items-center gap-2 text-gray-700">
-                        <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                        </svg>
-                        <span class="font-semibold">{{ app()->getLocale() === 'de' ? 'Sofortiger Zugang' : 'Instant Access' }}</span>
-                    </div>
-                    <div class="flex items-center gap-2 text-gray-700">
-                        <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                        </svg>
-                        <span class="font-semibold">{{ app()->getLocale() === 'de' ? 'Premium Support' : 'Premium Support' }}</span>
-                    </div>
-                </div>
 
-                <!-- Social Proof -->
-                <div class="mt-12 pt-8 border-t border-gray-300/50">
-                    <p class="text-sm text-gray-600 mb-4 font-medium">
-                        {{ app()->getLocale() === 'de' ? 'Vertraut von über 500+ Unternehmen' : 'Trusted by 500+ businesses worldwide' }}
+                    <!-- Main Headline -->
+                    <h2 class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 mb-6 leading-tight">
+                        {{ app()->getLocale() === 'de'
+                            ? 'Ihr perfektes WordPress'
+                            : 'Your Perfect WordPress'
+                        }}
+                        <span class="block mt-2 bg-gradient-to-r from-brand via-rose-600 to-pink-600 bg-clip-text text-transparent">
+                            {{ app()->getLocale() === 'de' ? 'Template wartet' : 'Template Awaits' }}
+                        </span>
+                    </h2>
+
+                    <!-- Subheadline -->
+                    <p class="text-lg md:text-xl text-gray-600 mb-10 max-w-3xl mx-auto leading-relaxed">
+                        {{ app()->getLocale() === 'de'
+                            ? 'Starten Sie noch heute mit einem professionellen WordPress-Template. Vollständig anpassbar, SEO-optimiert und sofort einsatzbereit.'
+                            : 'Launch your website today with a professional WordPress template. Fully customizable, SEO-optimized, and ready to deploy.'
+                        }}
                     </p>
-                    <div class="flex items-center justify-center gap-1">
-                        <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                        </svg>
-                        <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                        </svg>
-                        <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                        </svg>
-                        <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                        </svg>
-                        <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                        </svg>
-                        <span class="ml-2 text-gray-700 font-semibold">4.9/5</span>
-                        <span class="ml-1 text-gray-600 text-sm">({{ app()->getLocale() === 'de' ? '200+ Bewertungen' : '200+ reviews' }})</span>
+
+                    <!-- CTA Buttons -->
+                    <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
+                        <!-- Primary CTA -->
+                        <a href="https://metanow.dev/contact"
+                            class="group relative inline-flex items-center justify-center px-8 py-4 bg-brand hover:bg-brand-dark text-white text-lg font-bold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105">
+                            <svg class="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                            </svg>
+                            <span>{{ app()->getLocale() === 'de' ? 'Jetzt anfragen' : 'Get Started' }}</span>
+                            <svg class="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+                            </svg>
+                        </a>
+
+                        <!-- Secondary CTA -->
+                        <a href="#templates-grid"
+                            onclick="event.preventDefault(); document.getElementById('templates-grid').scrollIntoView({behavior: 'smooth'})"
+                            class="group inline-flex items-center justify-center px-8 py-4 bg-white hover:bg-gray-50 border-2 border-gray-300 hover:border-brand text-gray-900 hover:text-brand text-lg font-bold rounded-xl transition-all duration-300 shadow-md hover:shadow-lg">
+                            <svg class="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
+                            <span>{{ app()->getLocale() === 'de' ? 'Templates durchsuchen' : 'Browse Templates' }}</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Features Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto" style="padding-bottom: 100px">
+                    <!-- Feature 1: Customization -->
+                    <div class="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-all duration-300 hover:border-brand/30">
+                        <div class="w-12 h-12 bg-brand/10 rounded-lg flex items-center justify-center mb-4">
+                            <svg class="w-6 h-6 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-900 mb-2">
+                            {{ app()->getLocale() === 'de' ? 'Vollständig Anpassbar' : 'Fully Customizable' }}
+                        </h3>
+                        <p class="text-sm text-gray-600 leading-relaxed">
+                            {{ app()->getLocale() === 'de'
+                                ? 'Passen Sie jedes Element an Ihre Marke an mit unserem intuitiven WordPress-Editor.'
+                                : 'Customize every element to match your brand with our intuitive WordPress editor.'
+                            }}
+                        </p>
+                    </div>
+
+                    <!-- Feature 2: Performance -->
+                    <div class="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-all duration-300 hover:border-brand/30">
+                        <div class="w-12 h-12 bg-brand/10 rounded-lg flex items-center justify-center mb-4">
+                            <svg class="w-6 h-6 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-900 mb-2">
+                            {{ app()->getLocale() === 'de' ? 'Blitzschnell' : 'Lightning Fast' }}
+                        </h3>
+                        <p class="text-sm text-gray-600 leading-relaxed">
+                            {{ app()->getLocale() === 'de'
+                                ? 'Optimiert für Geschwindigkeit und Performance. Ihre Besucher werden es lieben.'
+                                : 'Optimized for speed and performance. Your visitors will love the experience.'
+                            }}
+                        </p>
+                    </div>
+
+                    <!-- Feature 3: Support -->
+                    <div class="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-all duration-300 hover:border-brand/30">
+                        <div class="w-12 h-12 bg-brand/10 rounded-lg flex items-center justify-center mb-4">
+                            <svg class="w-6 h-6 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-900 mb-2">
+                            {{ app()->getLocale() === 'de' ? 'Expert Support' : 'Expert Support' }}
+                        </h3>
+                        <p class="text-sm text-gray-600 leading-relaxed">
+                            {{ app()->getLocale() === 'de'
+                                ? 'Unser Team steht Ihnen zur Seite, um Ihre Vision zum Leben zu erwecken.'
+                                : 'Our team is here to help bring your vision to life every step of the way.'
+                            }}
+                        </p>
                     </div>
                 </div>
             </div>
         </div>
+
+        <style>
+            @keyframes float {
+                0%, 100% { transform: translateY(0px) rotate(0deg); }
+                50% { transform: translateY(-20px) rotate(5deg); }
+            }
+
+            .animate-float {
+                animation: float 6s ease-in-out infinite;
+            }
+
+            .animation-delay-2000 {
+                animation-delay: 2s;
+            }
+
+            .animation-delay-4000 {
+                animation-delay: 4s;
+            }
+        </style>
     </section>
 
     <!-- Clean Footer -->
