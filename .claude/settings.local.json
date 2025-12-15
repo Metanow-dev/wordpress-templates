@@ -53,7 +53,12 @@
       "Bash(cat:*)",
       "Read(///**)",
       "Bash(./vendor/bin/sail php artisan view:check:*)",
-      "Bash(git merge:*)"
+      "Bash(git merge:*)",
+      "Bash(./vendor/bin/sail logs:*)",
+      "Bash(./vendor/bin/sail exec laravel.test tail:*)",
+      "Bash(./vendor/bin/sail exec laravel.test ls:*)",
+      "Bash(./vendor/bin/sail artisan:*)",
+      "WebFetch(domain:cloud.metanow.dev)"
     ],
     "deny": []
   }

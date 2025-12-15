@@ -109,7 +109,7 @@ services:
             WORDPRESS_DB_HOST: mysql
             WORDPRESS_DB_USER: '${DB_USERNAME}'
             WORDPRESS_DB_PASSWORD: '${DB_PASSWORD}'
-            WORDPRESS_DB_NAME: wordpress_test
+            WORDPRESS_DB_NAME: '${DB_DATABASE}'
         volumes:
             - 'sail-wordpress:/var/www/html'
         networks:
