@@ -712,7 +712,7 @@
                     <div wire:key="list-{{ $template->id ?? $template->slug }}" class="group bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg hover:border-gray-300 transition-all duration-200">
                         <div class="flex flex-col sm:flex-row">
                             <!-- Screenshot -->
-                            <div class="sm:w-80 aspect-video bg-gray-100 relative overflow-hidden">
+                            <div class="list-screenshot bg-gray-100 relative overflow-hidden">
                                 @if($template->screenshot_url)
                                 @php
                                 $isCritical = $loop->first;
@@ -825,6 +825,24 @@
                 </div>
 
                 <style>
+                    /* List view screenshot fixed width */
+                    .list-screenshot {
+                        width: 100% !important;
+                        aspect-ratio: 16/9 !important;
+                        flex-shrink: 0 !important;
+                    }
+
+                    @media (min-width: 640px) {
+                        .list-screenshot {
+                            width: 320px !important;
+                            min-width: 320px !important;
+                            max-width: 320px !important;
+                            height: 180px !important;
+                            flex-shrink: 0 !important;
+                            flex-grow: 0 !important;
+                        }
+                    }
+
                     /* Hint the browser about offscreen image size to reduce work */
                     .screenshot-img[loading="lazy"] {
                         content-visibility: auto;
