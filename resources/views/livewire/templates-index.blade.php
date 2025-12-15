@@ -940,118 +940,129 @@
   
     
 
-        <div class="container mx-auto px-4 relative z-10" style="padding-top: 100px">
-            <div class="max-w-5xl mx-auto">
-                <!-- Main Content -->
-                <div class="text-center mb-12">
-                    <!-- Badge -->
-                    <div class="inline-flex items-center gap-2 px-4 py-2 bg-brand/10 backdrop-blur-sm border border-brand/20 rounded-lg text-sm font-semibold text-brand mb-6 shadow-sm">
-                        <svg class="w-4 h-4" viewBox="0 0 122.52 122.523" fill="currentColor">
-                            <path d="M8.708 61.26c0 20.802 12.089 38.779 29.619 47.298L11.354 35.145a52.695 52.695 0 0 0-2.646 26.115zm87.771-2.474c0-6.494-2.334-10.991-4.335-14.486-2.664-4.332-5.161-7.994-5.161-12.324 0-4.831 3.664-9.328 8.825-9.328.233 0 .454.029.681.042-9.35-8.566-21.807-13.796-35.489-13.796-18.36 0-34.513 9.42-43.91 23.688 1.233.037 2.395.063 3.382.063 5.497 0 14.006-.667 14.006-.667 2.833-.167 3.167 3.994.337 4.329 0 0-2.847.335-6.015.501L48.2 93.547l11.501-34.493-8.188-22.434c-2.83-.166-5.511-.501-5.511-.501-2.832-.166-2.5-4.496.332-4.329 0 0 8.679.667 13.843.667 5.496 0 14.006-.667 14.006-.667 2.835-.167 3.168 3.994.337 4.329 0 0-2.853.335-6.015.501l18.992 56.494 5.242-17.517c2.272-7.269 4.001-12.49 4.001-16.989z"/>
-                        </svg>
-                        <span class="uppercase tracking-wide">{{ app()->getLocale() === 'de' ? 'WordPress Experten' : 'WordPress Experts' }}</span>
-                    </div>
+        <div class="container mx-auto px-4 relative z-10" style="padding-top: 100px; padding-bottom: 100px;">
+            <div class="max-w-6xl mx-auto">
+                <!-- Two Column Layout -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
 
-                    <!-- Main Headline -->
-                    <h2 class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 mb-6 leading-tight">
-                        {{ app()->getLocale() === 'de'
-                            ? 'Ihr perfektes WordPress'
-                            : 'Your Perfect WordPress'
-                        }}
-                        <span class="block mt-2 bg-gradient-to-r from-brand via-rose-600 to-pink-600 bg-clip-text text-transparent">
-                            {{ app()->getLocale() === 'de' ? 'Template wartet' : 'Template Awaits' }}
-                        </span>
-                    </h2>
-
-                    <!-- Subheadline -->
-                    <p class="text-lg md:text-xl text-gray-600 mb-10 max-w-3xl mx-auto leading-relaxed">
-                        {{ app()->getLocale() === 'de'
-                            ? 'Starten Sie noch heute mit einem professionellen WordPress-Template. Vollständig anpassbar, SEO-optimiert und sofort einsatzbereit.'
-                            : 'Launch your website today with a professional WordPress template. Fully customizable, SEO-optimized, and ready to deploy.'
-                        }}
-                    </p>
-
-                    <!-- CTA Buttons -->
-                    <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
-                        <!-- Primary CTA -->
-                        <a href="https://metanow.com"
-                            class="group relative inline-flex items-center justify-center px-8 py-3 bg-brand hover:bg-brand-dark text-white text-base font-semibold rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105">
-                            <svg class="w-4 h-4 mr-2 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                            </svg>
-                            <span>{{ app()->getLocale() === 'de' ? 'Jetzt anfragen' : 'Get Started' }}</span>
-                            <svg class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
-                            </svg>
-                        </a>
-
-                        <!-- Secondary CTA -->
-                        <a href="#templates-grid"
-                            onclick="event.preventDefault(); document.getElementById('templates-grid').scrollIntoView({behavior: 'smooth'})"
-                            class="group inline-flex items-center justify-center px-8 py-3 bg-white hover:bg-gray-50 border-2 border-gray-300 hover:border-brand text-gray-900 hover:text-brand text-base font-semibold rounded-lg transition-all duration-300 shadow-md hover:shadow-lg">
-                            <svg class="w-4 h-4 mr-2 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                            </svg>
-                            <span>{{ app()->getLocale() === 'de' ? 'Templates durchsuchen' : 'Browse Templates' }}</span>
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Features Grid -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto" style="padding-bottom: 100px">
-                    <!-- Feature 1: Customization -->
-                    <div class="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-all duration-300 hover:border-brand/30">
-                        <div class="w-12 h-12 bg-brand/10 rounded-lg flex items-center justify-center mb-4">
-                            <svg class="w-6 h-6 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/>
-                            </svg>
+                    <!-- Left Column: Features -->
+                    <div class="space-y-6">
+                        <!-- Feature 1: Customization -->
+                        <div class="flex gap-4 items-start">
+                            <div class="w-12 h-12 bg-brand/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <svg class="w-6 h-6 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-900 mb-1">
+                                    {{ app()->getLocale() === 'de' ? 'Vollständig Anpassbar' : 'Fully Customizable' }}
+                                </h3>
+                                <p class="text-sm text-gray-600 leading-relaxed">
+                                    {{ app()->getLocale() === 'de'
+                                        ? 'Passen Sie jedes Element an Ihre Marke an mit unserem intuitiven WordPress-Editor.'
+                                        : 'Customize every element to match your brand with our intuitive WordPress editor.'
+                                    }}
+                                </p>
+                            </div>
                         </div>
-                        <h3 class="text-lg font-bold text-gray-900 mb-2">
-                            {{ app()->getLocale() === 'de' ? 'Vollständig Anpassbar' : 'Fully Customizable' }}
-                        </h3>
-                        <p class="text-sm text-gray-600 leading-relaxed">
+
+                        <!-- Feature 2: Performance -->
+                        <div class="flex gap-4 items-start">
+                            <div class="w-12 h-12 bg-brand/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <svg class="w-6 h-6 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-900 mb-1">
+                                    {{ app()->getLocale() === 'de' ? 'Blitzschnell' : 'Lightning Fast' }}
+                                </h3>
+                                <p class="text-sm text-gray-600 leading-relaxed">
+                                    {{ app()->getLocale() === 'de'
+                                        ? 'Optimiert für Geschwindigkeit und Performance. Ihre Besucher werden es lieben.'
+                                        : 'Optimized for speed and performance. Your visitors will love the experience.'
+                                    }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Feature 3: Support -->
+                        <div class="flex gap-4 items-start">
+                            <div class="w-12 h-12 bg-brand/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <svg class="w-6 h-6 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-900 mb-1">
+                                    {{ app()->getLocale() === 'de' ? 'Expert Support' : 'Expert Support' }}
+                                </h3>
+                                <p class="text-sm text-gray-600 leading-relaxed">
+                                    {{ app()->getLocale() === 'de'
+                                        ? 'Unser Team steht Ihnen zur Seite, um Ihre Vision zum Leben zu erwecken.'
+                                        : 'Our team is here to help bring your vision to life every step of the way.'
+                                    }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: CTA Content -->
+                    <div class="text-center lg:text-left">
+                        <!-- Badge -->
+                        <div class="inline-flex items-center gap-2 px-4 py-2 bg-brand/10 backdrop-blur-sm border border-brand/20 rounded-lg text-sm font-semibold text-brand mb-6 shadow-sm">
+                            <svg class="w-4 h-4" viewBox="0 0 122.52 122.523" fill="currentColor">
+                                <path d="M8.708 61.26c0 20.802 12.089 38.779 29.619 47.298L11.354 35.145a52.695 52.695 0 0 0-2.646 26.115zm87.771-2.474c0-6.494-2.334-10.991-4.335-14.486-2.664-4.332-5.161-7.994-5.161-12.324 0-4.831 3.664-9.328 8.825-9.328.233 0 .454.029.681.042-9.35-8.566-21.807-13.796-35.489-13.796-18.36 0-34.513 9.42-43.91 23.688 1.233.037 2.395.063 3.382.063 5.497 0 14.006-.667 14.006-.667 2.833-.167 3.167 3.994.337 4.329 0 0-2.847.335-6.015.501L48.2 93.547l11.501-34.493-8.188-22.434c-2.83-.166-5.511-.501-5.511-.501-2.832-.166-2.5-4.496.332-4.329 0 0 8.679.667 13.843.667 5.496 0 14.006-.667 14.006-.667 2.835-.167 3.168 3.994.337 4.329 0 0-2.853.335-6.015.501l18.992 56.494 5.242-17.517c2.272-7.269 4.001-12.49 4.001-16.989z"/>
+                            </svg>
+                            <span class="uppercase tracking-wide">{{ app()->getLocale() === 'de' ? 'WordPress Experten' : 'WordPress Experts' }}</span>
+                        </div>
+
+                        <!-- Main Headline -->
+                        <h2 class="text-3xl md:text-4xl lg:text-5xl font-extrabold text-gray-900 mb-4 leading-tight">
                             {{ app()->getLocale() === 'de'
-                                ? 'Passen Sie jedes Element an Ihre Marke an mit unserem intuitiven WordPress-Editor.'
-                                : 'Customize every element to match your brand with our intuitive WordPress editor.'
+                                ? 'Ihr perfektes WordPress'
+                                : 'Your Perfect WordPress'
+                            }}
+                            <span class="block mt-2 bg-gradient-to-r from-brand via-rose-600 to-pink-600 bg-clip-text text-transparent">
+                                {{ app()->getLocale() === 'de' ? 'Template wartet' : 'Template Awaits' }}
+                            </span>
+                        </h2>
+
+                        <!-- Subheadline -->
+                        <p class="text-base md:text-lg text-gray-600 mb-8 leading-relaxed">
+                            {{ app()->getLocale() === 'de'
+                                ? 'Starten Sie noch heute mit einem professionellen WordPress-Template. Vollständig anpassbar, SEO-optimiert und sofort einsatzbereit.'
+                                : 'Launch your website today with a professional WordPress template. Fully customizable, SEO-optimized, and ready to deploy.'
                             }}
                         </p>
+
+                        <!-- CTA Buttons -->
+                        <div class="flex flex-col sm:flex-row items-center lg:items-start justify-center lg:justify-start gap-4">
+                            <!-- Primary CTA -->
+                            <a href="https://metanow.com"
+                                class="group relative inline-flex items-center justify-center px-8 py-3 bg-brand hover:bg-brand-dark text-white text-base font-semibold rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105">
+                                <svg class="w-4 h-4 mr-2 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                                </svg>
+                                <span>{{ app()->getLocale() === 'de' ? 'Jetzt anfragen' : 'Get Started' }}</span>
+                                <svg class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+                                </svg>
+                            </a>
+
+                            <!-- Secondary CTA -->
+                            <a href="#templates-grid"
+                                onclick="event.preventDefault(); document.getElementById('templates-grid').scrollIntoView({behavior: 'smooth'})"
+                                class="group inline-flex items-center justify-center px-8 py-3 bg-white hover:bg-gray-50 border-2 border-gray-300 hover:border-brand text-gray-900 hover:text-brand text-base font-semibold rounded-lg transition-all duration-300 shadow-md hover:shadow-lg">
+                                <svg class="w-4 h-4 mr-2 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                </svg>
+                                <span>{{ app()->getLocale() === 'de' ? 'Templates durchsuchen' : 'Browse Templates' }}</span>
+                            </a>
+                        </div>
                     </div>
 
-                    <!-- Feature 2: Performance -->
-                    <div class="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-all duration-300 hover:border-brand/30">
-                        <div class="w-12 h-12 bg-brand/10 rounded-lg flex items-center justify-center mb-4">
-                            <svg class="w-6 h-6 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-                            </svg>
-                        </div>
-                        <h3 class="text-lg font-bold text-gray-900 mb-2">
-                            {{ app()->getLocale() === 'de' ? 'Blitzschnell' : 'Lightning Fast' }}
-                        </h3>
-                        <p class="text-sm text-gray-600 leading-relaxed">
-                            {{ app()->getLocale() === 'de'
-                                ? 'Optimiert für Geschwindigkeit und Performance. Ihre Besucher werden es lieben.'
-                                : 'Optimized for speed and performance. Your visitors will love the experience.'
-                            }}
-                        </p>
-                    </div>
-
-                    <!-- Feature 3: Support -->
-                    <div class="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-all duration-300 hover:border-brand/30">
-                        <div class="w-12 h-12 bg-brand/10 rounded-lg flex items-center justify-center mb-4">
-                            <svg class="w-6 h-6 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"/>
-                            </svg>
-                        </div>
-                        <h3 class="text-lg font-bold text-gray-900 mb-2">
-                            {{ app()->getLocale() === 'de' ? 'Expert Support' : 'Expert Support' }}
-                        </h3>
-                        <p class="text-sm text-gray-600 leading-relaxed">
-                            {{ app()->getLocale() === 'de'
-                                ? 'Unser Team steht Ihnen zur Seite, um Ihre Vision zum Leben zu erwecken.'
-                                : 'Our team is here to help bring your vision to life every step of the way.'
-                            }}
-                        </p>
-                    </div>
                 </div>
             </div>
         </div>
@@ -1077,7 +1088,7 @@
     </section>
 
     <!-- Clean Footer -->
-    <footer class="bg-white border-t border-gray-200">
+    <footer class="bg-white border-t border-gray-200 py-4">
         <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-6">
 
