@@ -276,7 +276,7 @@
 
     <!-- Main Content Area (Livewire Reactive) -->
     <div id="templates-grid" class="relative bg-gray-50 w-full mt-16 -mt-20 z-20" style="transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);">
-        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
 
 
             <!-- Clean Search & Controls Bar -->
@@ -295,7 +295,7 @@
                                 </div>
                                 <input type="text" wire:model.live.debounce.300ms="search"
                                     placeholder="{{ app()->getLocale() === 'de' ? 'Nach Vorlagen suchen...' : 'Search templates...' }}"
-                                    class="w-full pl-10 pr-10 py-2.5 text-sm border border-gray-300 rounded-lg bg-white focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all placeholder:text-gray-400">
+                                    class="w-full pl-10 pr-10 py-3 text-sm border border-gray-300 rounded-lg bg-white focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all placeholder:text-gray-400">
 
                                 @if($search)
                                 <button wire:click="$set('search', '')" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors">
@@ -313,7 +313,7 @@
                             <button wire:click="toggleFilters"
                                 wire:loading.attr="disabled"
                                 wire:loading.class="opacity-50 cursor-not-allowed"
-                                class="flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors {{ $showFilters ? 'bg-brand text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}">
+                                class="flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-semibold transition-colors {{ $showFilters ? 'bg-brand text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.414A1 1 0 013 6.707V4z" />
                                 </svg>
@@ -329,14 +329,14 @@
                             <!-- View Toggle -->
                             <div class="flex items-center bg-gray-100 p-1 rounded-lg">
                                 <button wire:click="setView('grid')"
-                                    class="flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-semibold transition-colors {{ $view === 'grid' ? 'bg-white text-brand shadow-sm' : 'text-gray-600 hover:text-gray-900' }}">
+                                    class="flex items-center gap-1.5 px-3 py-3 rounded-lg text-sm font-semibold transition-colors {{ $view === 'grid' ? 'bg-white text-brand shadow-sm' : 'text-gray-600 hover:text-gray-900' }}">
                                     <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                                         <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
                                     </svg>
                                     <span class="hidden sm:inline">Grid</span>
                                 </button>
                                 <button wire:click="setView('list')"
-                                    class="flex items-center gap-1.5 px-3 py-2 rounded-md text-sm font-semibold transition-colors {{ $view === 'list' ? 'bg-white text-brand shadow-sm' : 'text-gray-600 hover:text-gray-900' }}">
+                                    class="flex items-center gap-1.5 px-3 py-3 rounded-lg text-sm font-semibold transition-colors {{ $view === 'list' ? 'bg-white text-brand shadow-sm' : 'text-gray-600 hover:text-gray-900' }}">
                                     <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd" />
                                     </svg>
@@ -346,7 +346,7 @@
 
                             <!-- Sort Dropdown -->
                             <select wire:model.live="sort"
-                                class="px-3 py-2.5 rounded-lg border border-gray-300 bg-white hover:border-gray-400 focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all text-sm font-medium cursor-pointer">
+                                class="px-4 py-3 rounded-lg border border-gray-300 bg-white hover:border-gray-400 focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all text-sm font-semibold cursor-pointer">
                                 <option value="recent">{{ app()->getLocale() === 'de' ? 'Neueste' : 'Recent' }}</option>
                                 <option value="az">A → Z</option>
                                 <option value="za">Z → A</option>
@@ -355,7 +355,7 @@
 
                             <!-- Per Page -->
                             <select wire:model.live="perPage"
-                                class="px-3 py-2.5 rounded-lg border border-gray-300 bg-white hover:border-gray-400 focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all text-sm font-medium cursor-pointer">
+                                class="px-4 py-3 rounded-lg border border-gray-300 bg-white hover:border-gray-400 focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all text-sm font-semibold cursor-pointer">
                                 <option value="20">20</option>
                                 <option value="40">40</option>
                                 <option value="80">80</option>
@@ -373,7 +373,7 @@
                         </div>
 
                         <button wire:click="clearFilters"
-                            class="px-4 py-2 rounded-lg text-sm font-semibold transition-colors {{ ($search || !empty($selectedCategories) || !empty($selectedTags) || $onlyWithScreenshots || $onlyClassified) ? 'bg-brand text-white hover:bg-brand-dark' : 'bg-gray-100 text-gray-400 cursor-not-allowed' }}">
+                            class="px-4 py-3 rounded-lg text-sm font-semibold transition-colors {{ ($search || !empty($selectedCategories) || !empty($selectedTags) || $onlyWithScreenshots || $onlyClassified) ? 'bg-brand text-white hover:bg-brand-dark' : 'bg-gray-100 text-gray-400 cursor-not-allowed' }}">
                             {{ app()->getLocale() === 'de' ? 'Alle löschen' : 'Clear all' }}
                         </button>
                     </div>
@@ -945,7 +945,7 @@
                 <!-- Main Content -->
                 <div class="text-center mb-12">
                     <!-- Badge -->
-                    <div class="inline-flex items-center gap-2 px-4 py-2 bg-brand/10 backdrop-blur-sm border border-brand/20 rounded-full text-sm font-semibold text-brand mb-6 shadow-sm">
+                    <div class="inline-flex items-center gap-2 px-4 py-2 bg-brand/10 backdrop-blur-sm border border-brand/20 rounded-lg text-sm font-semibold text-brand mb-6 shadow-sm">
                         <svg class="w-4 h-4" viewBox="0 0 122.52 122.523" fill="currentColor">
                             <path d="M8.708 61.26c0 20.802 12.089 38.779 29.619 47.298L11.354 35.145a52.695 52.695 0 0 0-2.646 26.115zm87.771-2.474c0-6.494-2.334-10.991-4.335-14.486-2.664-4.332-5.161-7.994-5.161-12.324 0-4.831 3.664-9.328 8.825-9.328.233 0 .454.029.681.042-9.35-8.566-21.807-13.796-35.489-13.796-18.36 0-34.513 9.42-43.91 23.688 1.233.037 2.395.063 3.382.063 5.497 0 14.006-.667 14.006-.667 2.833-.167 3.167 3.994.337 4.329 0 0-2.847.335-6.015.501L48.2 93.547l11.501-34.493-8.188-22.434c-2.83-.166-5.511-.501-5.511-.501-2.832-.166-2.5-4.496.332-4.329 0 0 8.679.667 13.843.667 5.496 0 14.006-.667 14.006-.667 2.835-.167 3.168 3.994.337 4.329 0 0-2.853.335-6.015.501l18.992 56.494 5.242-17.517c2.272-7.269 4.001-12.49 4.001-16.989z"/>
                         </svg>
@@ -974,13 +974,13 @@
                     <!-- CTA Buttons -->
                     <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
                         <!-- Primary CTA -->
-                        <a href="https://metanow.dev/contact"
-                            class="group relative inline-flex items-center justify-center px-8 py-4 bg-brand hover:bg-brand-dark text-white text-lg font-bold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105">
-                            <svg class="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <a href="https://metanow.com"
+                            class="group relative inline-flex items-center justify-center px-8 py-3 bg-brand hover:bg-brand-dark text-white text-base font-semibold rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105">
+                            <svg class="w-4 h-4 mr-2 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                             </svg>
                             <span>{{ app()->getLocale() === 'de' ? 'Jetzt anfragen' : 'Get Started' }}</span>
-                            <svg class="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
                             </svg>
                         </a>
@@ -988,8 +988,8 @@
                         <!-- Secondary CTA -->
                         <a href="#templates-grid"
                             onclick="event.preventDefault(); document.getElementById('templates-grid').scrollIntoView({behavior: 'smooth'})"
-                            class="group inline-flex items-center justify-center px-8 py-4 bg-white hover:bg-gray-50 border-2 border-gray-300 hover:border-brand text-gray-900 hover:text-brand text-lg font-bold rounded-xl transition-all duration-300 shadow-md hover:shadow-lg">
-                            <svg class="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            class="group inline-flex items-center justify-center px-8 py-3 bg-white hover:bg-gray-50 border-2 border-gray-300 hover:border-brand text-gray-900 hover:text-brand text-base font-semibold rounded-lg transition-all duration-300 shadow-md hover:shadow-lg">
+                            <svg class="w-4 h-4 mr-2 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                             </svg>
                             <span>{{ app()->getLocale() === 'de' ? 'Templates durchsuchen' : 'Browse Templates' }}</span>
@@ -1000,7 +1000,7 @@
                 <!-- Features Grid -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto" style="padding-bottom: 100px">
                     <!-- Feature 1: Customization -->
-                    <div class="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-all duration-300 hover:border-brand/30">
+                    <div class="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-all duration-300 hover:border-brand/30">
                         <div class="w-12 h-12 bg-brand/10 rounded-lg flex items-center justify-center mb-4">
                             <svg class="w-6 h-6 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/>
@@ -1018,7 +1018,7 @@
                     </div>
 
                     <!-- Feature 2: Performance -->
-                    <div class="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-all duration-300 hover:border-brand/30">
+                    <div class="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-all duration-300 hover:border-brand/30">
                         <div class="w-12 h-12 bg-brand/10 rounded-lg flex items-center justify-center mb-4">
                             <svg class="w-6 h-6 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
@@ -1036,7 +1036,7 @@
                     </div>
 
                     <!-- Feature 3: Support -->
-                    <div class="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-lg transition-all duration-300 hover:border-brand/30">
+                    <div class="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-lg transition-all duration-300 hover:border-brand/30">
                         <div class="w-12 h-12 bg-brand/10 rounded-lg flex items-center justify-center mb-4">
                             <svg class="w-6 h-6 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"/>
