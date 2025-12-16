@@ -6,7 +6,7 @@
                 <!-- Logo Section -->
                 <div class="flex items-center">
                     <a href="https://metanow.dev" class="transition-opacity duration-200 hover:opacity-80">
-                        <img src="{{ asset('storage/img/logo/Metanow.webp') }}"
+                        <img src="{{ asset('img/logo/Metanow.webp') }}"
                             width="140"
                             class="sm:w-[160px]"
                             alt="Metanow Logo">
@@ -1113,7 +1113,7 @@
                 <!-- Copyright Section -->
                 <div class="text-center md:text-left">
                     <div class="flex items-center justify-center md:justify-start gap-2 mb-2">
-                        <img src="{{ asset('storage/img/logo/Metanow.webp') }}" width="90" alt="Metanow Logo">
+                        <img src="{{ asset('img/logo/Metanow.webp') }}" width="90" alt="Metanow Logo">
                     </div>
                     <p class="text-sm text-gray-500">
                         &copy; {{ date('Y') }} Metanow | {{ app()->getLocale() === 'de' ? 'Alle Rechte vorbehalten.' : 'All rights reserved.' }}

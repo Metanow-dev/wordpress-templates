@@ -1,6 +1,22 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
+    # Rewrite /build/* to /public/build/* for Laravel assets
+    RewriteCond %{REQUEST_URI} ^/build/
+    RewriteRule ^build/(.*)$ public/build/$1 [L]
+
+    # Rewrite /img/* to /public/img/* for images
+    RewriteCond %{REQUEST_URI} ^/img/
+    RewriteRule ^img/(.*)$ public/img/$1 [L]
+
+    # Rewrite /vendor/* to /public/vendor/* for vendor assets (Livewire, etc)
+    RewriteCond %{REQUEST_URI} ^/vendor/
+    RewriteRule ^vendor/(.*)$ public/vendor/$1 [L]
+
+    # Rewrite /storage/* to /public/storage/* for storage symlink
+    RewriteCond %{REQUEST_URI} ^/storage/
+    RewriteRule ^storage/(.*)$ public/storage/$1 [L]
+
     # If the request is for an existing file or directory (e.g. /slug WordPress, assets)
     RewriteCond %{REQUEST_FILENAME} -f [OR]
     RewriteCond %{REQUEST_FILENAME} -d

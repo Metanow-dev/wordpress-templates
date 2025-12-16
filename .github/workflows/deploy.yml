@@ -210,10 +210,10 @@ jobs:
           # Clear application cache
           $PHP_BIN artisan cache:clear
           
-          # COMPREHENSIVE deployment fix - handles BOTH TEMPLATES_ROOT and 403 errors
+          # COMPREHENSIVE deployment fix - handles permissions, .htaccess, and configuration
           echo "🚨 Running comprehensive deployment fix..."
-          chmod +x deploy/fix-deployment-403.sh
-          ./deploy/fix-deployment-403.sh || echo "⚠️  Comprehensive fix completed with warnings"
+          chmod +x deploy/fix-deployment-megasandboxs.sh
+          ./deploy/fix-deployment-megasandboxs.sh || echo "⚠️  Comprehensive fix completed with warnings"
           
           echo "✅ Deployment completed successfully!"
           

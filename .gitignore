@@ -57,6 +57,10 @@ Thumbs.db
 !/vite.config.js
 !/README.md
 !/GIT_SERVER_USAGE.md
+!/GIT_SAFETY.md
+!/DEPLOYMENT_GUIDE.md
+!/DEPLOYMENT_FIXES.md
+!/fix-permissions.sh
 
 # Within storage, ignore generated content but keep structure
 /storage/app/*
