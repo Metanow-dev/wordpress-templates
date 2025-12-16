@@ -73,6 +73,7 @@ EOF
 
 chown $SYSUSER:psacln "$APP_PATH/.htaccess"
 chmod 644 "$APP_PATH/.htaccess"
+touch "$APP_PATH/.htaccess"  # Force LiteSpeed to reload the file
 echo "✅ Root .htaccess created (WordPress sites + Laravel routing)"
 
 # Step 2: Fix PUBLIC .htaccess (Laravel app)
@@ -106,6 +107,7 @@ EOF
 
 chown $SYSUSER:psacln "$PUBLIC_PATH/.htaccess"
 chmod 644 "$PUBLIC_PATH/.htaccess"
+touch "$PUBLIC_PATH/.htaccess"  # Force LiteSpeed to reload the file
 echo "✅ Public .htaccess created (Laravel framework routing)"
 
 # Step 3: Fix file ownership and permissions
