@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 120" width="480" height="120" aria-labelledby="title desc" role="img">
+  <title id="title">Metanow Logo</title>
+  <desc id="desc">Simple placeholder for Metanow wordmark in brand color</desc>
+  <rect width="100%" height="100%" fill="white"/>
+  <g transform="translate(20,88)">
+    <text x="0" y="0" font-family="Inter, Helvetica Neue, Arial, sans-serif" font-size="72" font-weight="700" fill="#D53741">Metanow</text>
+  </g>
+</svg>

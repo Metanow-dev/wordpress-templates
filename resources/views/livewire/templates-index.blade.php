@@ -6,10 +6,13 @@
                 <!-- Logo Section -->
                 <div class="flex items-center">
                     <a href="https://metanow.dev" class="transition-opacity duration-200 hover:opacity-80">
-                        <img src="{{ asset('img/logo/Metanow.webp') }}"
-                            width="140"
-                            class="sm:w-[160px]"
-                            alt="Metanow Logo">
+                        <picture>
+                            <source srcset="{{ asset('img/logo/Metanow.webp') }}" type="image/webp">
+                            <img src="{{ asset('img/watermark.png') }}"
+                                width="140"
+                                class="sm:w-[160px]"
+                                alt="Metanow Logo">
+                        </picture>
                     </a>
                 </div>
 
@@ -40,7 +43,7 @@
 
 
     <!-- Hero Section -->
-    <section id="hero-section" class="relative overflow-hidden" style="background: linear-gradient(to right, #00000070, #000000); transition: opacity 0.3s cubic-bezier(0.4, 0.0, 0.2, 1); padding-bottom: 20px;">
+    <section id="hero-section" class="relative overflow-hidden" style="background: radial-gradient(circle at center,  #000000 25%, #00000090 100%); transition: opacity 0.3s cubic-bezier(0.4, 0.0, 0.2, 1); padding-bottom: 10px; min-height: 50vh; display: flex; align-items: center;">
         {{-- Illustration Background with Genie Effect --}}
         <div class="absolute inset-0 overflow-hidden pointer-events-none" style="min-height: 100%;">
             <div class="genie-container" style="width: 100%; height: 100%; min-height: 100%;">
@@ -51,16 +54,14 @@
             </div>
         </div>
 
-        {{-- Overlay to reduce redness and improve readability --}}
-        <div class="absolute inset-0 bg-white/40" style="min-height: 100%;"></div>
-        <div class="absolute inset-0 bg-gradient-to-b from-white/20 via-transparent to-white/10" style="min-height: 100%;"></div>
+        {{-- No overlay so the radial gradient shows as-is --}}
 
         <div class="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div class="flex flex-col items-center justify-center text-center" style="padding-top: 90px; padding-bottom: 90px;">
+            <div class="flex flex-col items-center justify-center text-center" style="padding-top: 48px; padding-bottom: 48px;">
 
                 <!-- Badge -->
-                <div class="mb-8 animate-fade-in-down">
-                    <span class="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-sm border border-white/40 rounded-full text-white text-sm font-medium shadow-sm">
+                <div class="mb-6 animate-fade-in-down text-base">
+                    <span class="hero-badge inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm border border-white/40 rounded-full text-white font-medium shadow-sm">
                         <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
                             <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
                         </svg>
@@ -69,15 +70,15 @@
                 </div>
 
                 <!-- Main Heading -->
-                <h1 class="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight max-w-5xl animate-fade-in-up">
+                <h1 class="hero-title font-bold text-white mb-5 leading-snug max-w-5xl animate-fade-in-up">
                     {{ app()->getLocale() === 'de' ? 'Premium WordPress Designs für Ihr' : 'Premium WordPress Designs for Your' }}
-                    <span class="block mt-2 bg-gradient-to-r from-brand via-rose-600 to-pink-600 bg-clip-text text-transparent animate-gradient">
+                    <span class="block mt-2 text-white">
                         {{ app()->getLocale() === 'de' ? 'Erfolgreiches Business' : 'Successful Business' }}
                     </span>
                 </h1>
 
                 <!-- Subheading -->
-                <p class="text-base md:text-lg text-white mb-8 max-w-3xl mx-auto leading-relaxed animate-fade-in-up animation-delay-200">
+                <p class="hero-subtitle text-white mb-6 max-w-3xl mx-auto leading-relaxed animate-fade-in-up animation-delay-200">
                     {{ app()->getLocale() === 'de'
                         ? 'Entdecken Sie über 1500+ professionell entwickelte WordPress-Projekte .'
                         : 'Discover 1500+ professionally crafted WordPress projects.'
@@ -85,20 +86,20 @@
                 </p>
 
                 <!-- Stats Counter -->
-                <div class="flex flex-wrap items-center justify-center gap-8 mb-10 animate-fade-in-up animation-delay-400">
+                <div class="flex flex-wrap items-center justify-center gap-8 mb-8 animate-fade-in-up animation-delay-400">
                     <div class="text-center">
-                        <div class="text-4xl md:text-5xl font-bold text-white mb-2">
+                        <div class="hero-stat font-bold text-white mb-1.5">
                             1500<span class="text-white">+</span>
                         </div>
-                        <div class="text-sm text-white/90 uppercase tracking-wider font-semibold">
+                        <div class="text-xs text-white/90 uppercase tracking-wider font-semibold">
                             {{ app()->getLocale() === 'de' ? 'Premium Designs' : 'Premium Designs' }}
                         </div>
                     </div>
                     <div class="text-center">
-                        <div class="text-4xl md:text-5xl font-bold text-white mb-2">
+                        <div class="hero-stat font-bold text-white mb-1.5">
                             100<span class="text-white">%</span>
                         </div>
-                        <div class="text-sm text-white/90 uppercase tracking-wider font-semibold">
+                        <div class="text-xs text-white/90 uppercase tracking-wider font-semibold">
                             {{ app()->getLocale() === 'de' ? 'Handgefertigt' : 'Handcrafted' }}
                         </div>
                     </div>
@@ -818,7 +819,7 @@
                 @endif
 
                 <!-- Pagination -->
-                <div class="flex justify-center" style="margin-top: 50px" wire:key="pagination">
+                <div class="flex justify-center" style="margin-top: 50px; margin-bottom: 50;" wire:key="pagination">
                     <div class="pagination-wrapper">
                         {{ $templates->links() }}
                     </div>
@@ -954,7 +955,7 @@
 
 
     <!-- Modern WordPress CTA Section -->
-    <section class="relative bg-white py-24 mt-0 overflow-hidden">
+    <section class="relative bg-white mt-0 overflow-hidden">
   
     
 
@@ -1106,14 +1107,17 @@
     </section>
 
     <!-- Clean Footer -->
-    <footer class="bg-white border-t border-gray-200 py-4">
+    <footer class="bg-white border-t border-gray-200 ">
         <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-6">
 
                 <!-- Copyright Section -->
                 <div class="text-center md:text-left">
                     <div class="flex items-center justify-center md:justify-start gap-2 mb-2">
-                        <img src="{{ asset('img/logo/Metanow.webp') }}" width="90" alt="Metanow Logo">
+                        <picture>
+                            <source srcset="{{ asset('img/logo/Metanow.webp') }}" type="image/webp">
+                            <img src="{{ asset('img/watermark.png') }}" width="90" alt="Metanow Logo">
+                        </picture>
                     </div>
                     <p class="text-sm text-gray-500">
                         &copy; {{ date('Y') }} Metanow | {{ app()->getLocale() === 'de' ? 'Alle Rechte vorbehalten.' : 'All rights reserved.' }}

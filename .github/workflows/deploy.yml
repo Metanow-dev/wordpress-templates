@@ -6,7 +6,7 @@ on:
   workflow_dispatch: # Allow manual triggering
 
 env:
-  NODE_VERSION: '18'
+  NODE_VERSION: '20'
   PHP_VERSION: '8.3'
 
 jobs:
