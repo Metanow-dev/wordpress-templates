@@ -424,3 +424,65 @@ a, button, input, select, textarea {
 /* Feature text inside hero */
 .hero-feature { font-size: 0.75rem; }                                    /* ~text-xs */
 @media (min-width: 768px) { .hero-feature { font-size: 0.875rem; } }    /* ~md:text-sm */
+
+/* Glass glow hover for the "megasandboxs" badge */
+.glass-glow {
+  position: relative;
+  isolation: isolate;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(6px) saturate(130%);
+  -webkit-backdrop-filter: blur(6px) saturate(130%);
+  transition: border-color 180ms ease, transform 180ms ease;
+}
+
+.glass-glow:hover {
+  transform: translateY(-1px);
+  border-color: rgba(213, 55, 65, 0.55);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+}
+
+.glass-glow::before,
+.glass-glow::after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+}
+
+/* No diagonal shine */
+.glass-glow::before { content: none; }
+
+/* Border-only spinning red glow */
+.glass-glow::after { content: none; }
+
+.glass-glow:hover::after { opacity: 1; }
+
+/* Snake border overlay */
+.glass-glow .snake-border {
+  position: absolute;
+  inset: -1px; /* extend by half the stroke so center sits on border */
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+.glass-glow .snake-border rect {
+  stroke: rgba(213, 55, 65, 0.6);
+  stroke-width: 2;
+  fill: none;
+  vector-effect: non-scaling-stroke;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  /* One moving segment around the perimeter */
+  stroke-dasharray: 90 360;
+  stroke-dashoffset: 0;
+  opacity: 0;
+  transition: opacity 160ms ease;
+}
+
+.glass-glow:hover .snake-border rect {
+  opacity: 1;
+  animation: snake-move 1800ms linear infinite;
+}
+
+@keyframes snake-move { to { stroke-dashoffset: -450; } }
