@@ -28,7 +28,7 @@
     <link rel="alternate" hreflang="de" href="{{ route('templates.index.de') }}">
     
     <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="/watermark.png">
+    <link rel="icon" type="image/png" href="{{ asset('img/watermark.png') }}">
     
     <!-- Flag Icons CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css" />
