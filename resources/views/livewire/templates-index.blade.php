@@ -574,9 +574,9 @@
                 <!-- Clean Grid View -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12" wire:key="grid-view">
                     @foreach($templates as $template)
-                    <div wire:key="grid-{{ $template->id ?? $template->slug }}" class="group bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg hover:border-gray-300 transition-all duration-200" style="margin-bottom: 50px">
+                    <div wire:key="grid-{{ $template->id ?? $template->slug }}" class="group bg-white border border-gray-200 rounded-lg hover:shadow-lg hover:border-gray-300 transition-all duration-200 h-full flex flex-col" style="margin-bottom: 50px">
                         <!-- Screenshot -->
-                        <div class="aspect-video bg-gray-100 relative overflow-hidden">
+                        <div class="aspect-video bg-gray-100 relative overflow-hidden rounded-t-lg">
                             @if($template->screenshot_url)
                             @php
                             $isCritical = $loop->first;
@@ -643,7 +643,7 @@
                         </div>
 
                         <!-- Card Content -->
-                        <div class="p-4 flex flex-col">
+                        <div class="p-4 flex flex-col flex-1">
                             <!-- Title -->
                             <a href="{{ $template->demo_url }}" target="_blank" class="block mb-2">
                                 <h3 class="text-base font-semibold text-gray-900 hover:text-brand transition-colors line-clamp-1">
@@ -677,14 +677,14 @@
                                     @endforeach
 
                                     @if($remainingCount > 0)
-                                    <div class="relative group/tags">
+                                    <div class="relative group/tags z-40">
                                         <button class="inline-flex items-center px-2 py-1 text-xs font-medium rounded-md bg-gray-200 text-gray-600 hover:bg-gray-300 transition-colors">
                                             +{{ $remainingCount }}
                                         </button>
 
                                         <!-- Tooltip -->
-                                        <div class="absolute bottom-full left-0 mb-2 hidden group-hover/tags:block z-50">
-                                            <div class="bg-gray-900 text-white text-xs py-2 px-3 rounded-md whitespace-nowrap">
+                                        <div class="absolute bottom-full left-0 mb-2 hidden group-hover/tags:block z-[9999]">
+                                            <div class="bg-gray-900 text-white text-xs py-2 px-3 rounded-md whitespace-nowrap shadow-lg border border-white/10">
                                                 @foreach(array_slice($template->tags, 3) as $tag)
                                                 <span class="inline-block mr-1 mb-1">{{ ucfirst(str_replace('_', ' ', $tag)) }}</span>
                                                 @endforeach
