@@ -133,9 +133,21 @@ jobs:
           # Set permissions and ownership for Plesk
           echo "🔒 Setting permissions and Plesk ownership..."
 
-          # Get Plesk domain user from the path
-          PLESK_USER=$(stat -c '%U' "$APP_PATH")
-          echo "Detected Plesk user: $PLESK_USER"
+          # Get Plesk user from secret or try to detect it
+          if [ -n "${{ secrets.PLESK_USER }}" ]; then
+            PLESK_USER="${{ secrets.PLESK_USER }}"
+            echo "Using Plesk user from secret: $PLESK_USER"
+          else
+            # Try to detect from parent directory (more reliable than APP_PATH)
+            PLESK_USER=$(stat -c '%U' "/var/www/vhosts/${{ secrets.DOMAIN_NAME }}" 2>/dev/null)
+
+            if [ -z "$PLESK_USER" ] || [ "$PLESK_USER" = "UNKNOWN" ]; then
+              echo "❌ Could not detect Plesk user. Please add PLESK_USER secret to GitHub."
+              echo "   Expected format: domainname.com_randomid"
+              exit 1
+            fi
+            echo "Detected Plesk user: $PLESK_USER"
+          fi
 
           # Set ownership to Plesk domain user:psacln
           chown -R "$PLESK_USER:psacln" "$APP_PATH"

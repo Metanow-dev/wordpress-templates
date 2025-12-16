@@ -158,7 +158,8 @@ curl https://megasandboxs.com/en/templates
 Make sure these are configured in GitHub Settings > Secrets:
 
 - `PLESK_HOST` - Server IP
-- `PLESK_USERNAME` - `megasandboxs.com_c9h1nddlyw`
+- `PLESK_USERNAME` - `megasandboxs.com_c9h1nddlyw` (SSH user)
+- `PLESK_USER` - `megasandboxs.com_c9h1nddlyw` (File ownership user)
 - `PLESK_SSH_KEY` - Private SSH key
 - `PLESK_SSH_PORT` - `22`
 - `DOMAIN_NAME` - `megasandboxs.com`

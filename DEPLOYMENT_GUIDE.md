@@ -14,6 +14,7 @@ Make sure these secrets are configured in your GitHub repository (Settings > Sec
 |-------------|-------|-------------|
 | `PLESK_HOST` | Server IP address | Your Plesk server IP |
 | `PLESK_USERNAME` | `megasandboxs.com_c9h1nddlyw` | SSH username (Plesk domain user) |
+| `PLESK_USER` | `megasandboxs.com_c9h1nddlyw` | Plesk domain user for file ownership |
 | `PLESK_SSH_KEY` | `-----BEGIN PRIVATE KEY-----...` | Private SSH key for authentication |
 | `PLESK_SSH_PORT` | `22` | SSH port (default: 22) |
 | `DOMAIN_NAME` | `megasandboxs.com` | Your domain name |
