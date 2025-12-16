@@ -22,3 +22,63 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Server-specific files
+/.htaccess
+/.user.ini
+/.well-known/
+/index.php
+/test.php
+
+# Ignore everything at root level (all WordPress sites and server files)
+/*
+
+# But keep Laravel app directories (whitelist approach)
+!/app/
+!/bootstrap/
+!/config/
+!/database/
+!/deploy/
+!/public/
+!/resources/
+!/routes/
+!/storage/
+!/tests/
+!/.github/
+!/.gitignore
+!/.gitattributes
+!/artisan
+!/composer.json
+!/composer.lock
+!/package.json
+!/package-lock.json
+!/phpunit.xml
+!/vite.config.js
+!/README.md
+!/GIT_SERVER_USAGE.md
+
+# Within storage, ignore generated content but keep structure
+/storage/app/*
+!/storage/app/.gitignore
+!/storage/app/public/
+/storage/framework/cache/*
+!/storage/framework/cache/.gitignore
+/storage/framework/sessions/*
+!/storage/framework/sessions/.gitignore
+/storage/framework/testing/*
+!/storage/framework/testing/.gitignore
+/storage/framework/views/*
+!/storage/framework/views/.gitignore
+/storage/logs/*
+!/storage/logs/.gitignore
+/storage/screenshots/
+
+# Ignore all screenshot images in fixtures (generated files, not source)
+storage/fixtures/**/screenshot.png
+storage/fixtures/**/screenshot.jpg
+storage/fixtures/**/screenshots/
+
+# Public directory - ignore test files
+/public/health.txt
+/public/test.php
+/public/storage
