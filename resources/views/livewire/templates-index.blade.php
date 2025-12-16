@@ -43,7 +43,7 @@
 
 
     <!-- Hero Section -->
-    <section id="hero-section" class="relative overflow-hidden" style="background: radial-gradient(circle at center,  #000000 25%, #00000090 100%); transition: opacity 0.3s cubic-bezier(0.4, 0.0, 0.2, 1); padding-bottom: 10px; min-height: 50vh; display: flex; align-items: center;">
+    <section id="hero-section" class="relative overflow-hidden" style="background: radial-gradient(circle at center,  #000000 25%,  #00000095 100%); transition: opacity 0.3s cubic-bezier(0.4, 0.0, 0.2, 1); padding-bottom: 10px; min-height: 50vh; display: flex; align-items: center;">
         {{-- Illustration Background with Genie Effect --}}
         <div class="absolute inset-0 overflow-hidden pointer-events-none" style="min-height: 100%;">
             <div class="genie-container" style="width: 100%; height: 100%; min-height: 100%;">
@@ -250,7 +250,7 @@
                 const slideEnd = 500;
 
                 if (scrollPosition < slideStart) {
-                    templatesSection.style.transform = 'translateY(60px)';
+                    templatesSection.style.transform = 'translateY(30px)';
                 } else if (scrollPosition >= slideEnd) {
                     templatesSection.style.transform = 'translateY(0)';
                 } else {
@@ -276,7 +276,7 @@
     </section>
 
     <!-- Main Content Area (Livewire Reactive) -->
-    <div id="templates-grid" class="relative bg-gray-50 w-full mt-16 -mt-20 z-20" style="transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);">
+    <div id="templates-grid" class="relative bg-gray-50 w-full mt-8 -mt-20 z-20" style="transition: transform 0.4s cubic-bezier(0.4, 0.3, 0.2, 1);">
         <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
 
 
@@ -964,8 +964,8 @@
                 <!-- Two Column Layout -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
 
-                    <!-- Left Column: Features -->
-                    <div class="space-y-6">
+                    <!-- Left Column: Features (now right on lg) -->
+                    <div class="space-y-6 lg:order-2">
                         <!-- Feature 1: Customization -->
                         <div class="flex gap-4 items-start">
                             <div class="w-12 h-12 bg-brand/10 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -979,8 +979,8 @@
                                 </h3>
                                 <p class="text-sm text-gray-600 leading-relaxed">
                                     {{ app()->getLocale() === 'de'
-                                        ? 'Passen Sie jedes Element an Ihre Marke an mit unserem intuitiven WordPress-Editor.'
-                                        : 'Customize every element to match your brand with our intuitive WordPress editor.'
+                                        ? 'Jedes Detail wird sorgfältig von Grund auf handgefertigt, um perfekt zu Ihrer Marke zu passen.'
+                                        : 'Every detail is carefully hand-crafted from scratch to perfectly match your brand.'
                                     }}
                                 </p>
                             </div>
@@ -1005,6 +1005,26 @@
                                 </p>
                             </div>
                         </div>
+                        
+                        <!-- Feature 3: SEO -->
+                        <div class="flex gap-4 items-start">
+                            <div class="w-12 h-12 bg-brand/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <svg class="w-6 h-6 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-900 mb-1">
+                                    {{ app()->getLocale() === 'de' ? 'SEO‑Optimiert' : 'SEO Optimized' }}
+                                </h3>
+                                <p class="text-sm text-gray-600 leading-relaxed">
+                                    {{ app()->getLocale() === 'de'
+                                        ? 'Sauberes, suchmaschinenfreundliches Markup und Performance‑Best‑Practices für bessere Rankings.'
+                                        : 'Clean, search‑engine‑friendly markup and performance best practices for better rankings.'
+                                    }}
+                                </p>
+                            </div>
+                        </div>
 
                         <!-- Feature 3: Support -->
                         <div class="flex gap-4 items-start">
@@ -1019,16 +1039,16 @@
                                 </h3>
                                 <p class="text-sm text-gray-600 leading-relaxed">
                                     {{ app()->getLocale() === 'de'
-                                        ? 'Unser Team steht Ihnen zur Seite, um Ihre Vision zum Leben zu erwecken.'
-                                        : 'Our team is here to help bring your vision to life every step of the way.'
+                                        ? 'Unser Team ist da, um Ihre Vision während jedes einzelnen Schrittes des Weges zum Leben zu erwecken.'
+                                        : 'Our team is here to help bring your vision to life throughout every step of the journey.'
                                     }}
                                 </p>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Right Column: CTA Content -->
-                    <div class="text-center lg:text-left">
+                    <!-- Right Column: CTA Content (now left on lg) -->
+                    <div class="text-center lg:text-left lg:order-1">
                         <!-- Badge -->
                         <div class="inline-flex items-center gap-2 px-4 py-2 bg-brand/10 backdrop-blur-sm border border-brand/20 rounded-lg text-sm font-semibold text-brand mb-6 shadow-sm">
                             <svg class="w-4 h-4" viewBox="0 0 122.52 122.523" fill="currentColor">
@@ -1108,7 +1128,7 @@
 
     <!-- Clean Footer -->
     <footer class="bg-white border-t border-gray-200 ">
-        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-6">
 
                 <!-- Copyright Section -->
