@@ -643,16 +643,16 @@
                         </div>
 
                         <!-- Card Content -->
-                        <div class="p-4 flex flex-col flex-1">
+                        <div class="px-4 py-2 flex flex-col flex-1">
                             <!-- Title -->
-                            <a href="{{ $template->demo_url }}" target="_blank" class="block mb-2">
+                            <a href="{{ $template->demo_url }}" target="_blank" class="block mb-1">
                                 <h3 class="text-base font-semibold text-gray-900 hover:text-brand transition-colors line-clamp-1">
                                     {{ $template->name ?? ucfirst(str_replace('-', ' ', $template->slug)) }}
                                 </h3>
                             </a>
 
                             <!-- Description -->
-                            <div class="mb-3">
+                            <div class="mb-2">
                                 @if($template->description_en || $template->description_de)
                                 <p class="text-sm text-gray-600 line-clamp-2 leading-relaxed">
                                     {{ app()->getLocale() === 'de' ? $template->description_de : $template->description_en }}
@@ -661,7 +661,7 @@
                             </div>
 
                             <!-- Tags -->
-                            <div class="mb-3">
+                            <div class="mb-2">
                                 @if($template->tags && count($template->tags) > 0)
                                 @php
                                 $visibleTags = array_slice($template->tags, 0, 3);
@@ -697,7 +697,7 @@
                             </div>
 
                             <!-- CTA Button -->
-                            <div class="mt-auto pt-2">
+                            <div class="mt-auto pt-1">
                                 <a href="{{ $template->demo_url }}" target="_blank"
                                     class="block text-center text-sm font-semibold py-2.5 px-4 rounded-lg bg-white border border-gray-300 text-gray-700 hover:bg-brand hover:text-white hover:border-brand transition-all">
                                     {{ app()->getLocale() === 'de' ? 'Demo ansehen' : 'View Demo' }}
