@@ -6,19 +6,19 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     
     <!-- SEO Meta Tags -->
-    <title>{{ app()->getLocale() === 'de' ? 'Premium WordPress Vorlagen Galerie | Entdecken & Wählen Sie Ihr Website Design' : 'Premium WordPress Websites Gallery | Explore & Choose Your Future Website Design' }}</title>
-    <meta name="description" content="{{ app()->getLocale() === 'de' ? 'Entdecken Sie unsere komplette Sammlung professionell gestalteter WordPress-Vorlagen, automatisch aktualisiert von unserem Sandbox-Server. Durchsuchen, Vorschau und Auswahl des perfekten Designs für Ihre Business-Website — schnell, modern und startbereit.' : 'Discover our complete collection of professionally crafted WordPress websites, automatically updated from our sandbox server. Browse, preview, and select the perfect design for your business website — fast, modern, and ready to launch.' }}">
-    
+    <title>{{ app()->getLocale() === 'de' ? 'Premium WordPress Design Repository | Entdecken Sie Unsere Projekte' : 'Premium WordPress Design Repository | Explore Our Projects' }}</title>
+    <meta name="description" content="{{ app()->getLocale() === 'de' ? 'Entdecken Sie unsere komplette Sammlung professionell gestalteter WordPress-Designs und Projekte, automatisch aktualisiert von unserem Sandbox-Server. Durchsuchen, Vorschau und entdecken Sie unsere Design-Repository — schnell, modern und inspirierend.' : 'Discover our complete collection of professionally crafted WordPress designs and projects, automatically updated from our sandbox server. Browse, preview, and explore our design repository — fast, modern, and inspiring.' }}">
+
     <!-- Open Graph / Social Media -->
     <meta property="og:type" content="website">
-    <meta property="og:title" content="{{ app()->getLocale() === 'de' ? 'Premium WordPress Vorlagen Galerie' : 'Premium WordPress Websites Gallery' }}">
-    <meta property="og:description" content="{{ app()->getLocale() === 'de' ? 'Entdecken Sie unsere komplette Sammlung professionell gestalteter WordPress-Vorlagen, automatisch aktualisiert von unserem Sandbox-Server.' : 'Discover our complete collection of professionally crafted WordPress websites, automatically updated from our sandbox server.' }}">
+    <meta property="og:title" content="{{ app()->getLocale() === 'de' ? 'Premium WordPress Design Repository' : 'Premium WordPress Design Repository' }}">
+    <meta property="og:description" content="{{ app()->getLocale() === 'de' ? 'Entdecken Sie unsere komplette Sammlung professionell gestalteter WordPress-Designs und Projekte, automatisch aktualisiert von unserem Sandbox-Server.' : 'Discover our complete collection of professionally crafted WordPress designs and projects, automatically updated from our sandbox server.' }}">
     <meta property="og:url" content="{{ url()->current() }}">
-    
+
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="{{ app()->getLocale() === 'de' ? 'Premium WordPress Vorlagen Galerie' : 'Premium WordPress Websites Gallery' }}">
-    <meta name="twitter:description" content="{{ app()->getLocale() === 'de' ? 'Entdecken Sie professionell gestaltete WordPress-Vorlagen für Ihre Website.' : 'Discover professionally crafted WordPress websites for your project.' }}">
+    <meta name="twitter:title" content="{{ app()->getLocale() === 'de' ? 'Premium WordPress Design Repository' : 'Premium WordPress Design Repository' }}">
+    <meta name="twitter:description" content="{{ app()->getLocale() === 'de' ? 'Entdecken Sie professionell gestaltete WordPress-Designs und Projekte.' : 'Discover professionally crafted WordPress designs and projects.' }}">
     
     <!-- Canonical URL -->
     <link rel="canonical" href="{{ url()->current() }}">

@@ -20,8 +20,8 @@ final class Screenshotter
     }
 
     private function rel(): string { return $this->dir.'/'.$this->slug.'.png'; }
-    private function abs(): string { return storage_path('app/public/'.$this->rel()); }
-    private function publicUrl(): string { return asset('storage/'.$this->rel()); }
+    private function abs(): string { return base_path($this->rel()); }
+    private function publicUrl(): string { return asset($this->rel()); }
 
     private function chromePath(): ?string
     {
@@ -51,6 +51,16 @@ final class Screenshotter
 
     public function capture(int $width = 343, int $height = 192, bool $fullPage = false): string
     {
+        // Force garbage collection before heavy operation
+        gc_collect_cycles();
+
+        // Smart cleanup: only if processes are accumulating dangerously
+        $chromeCount = $this->getChromeProcessCount();
+        if ($chromeCount > 30) {
+            // Emergency: too many processes, clean old ones only
+            $this->cleanupOldChrome();
+        }
+
         File::ensureDirectoryExists(dirname($this->abs()), 0775, true);
 
         // Special handling for problematic sites (continuous network activity, heavy trackers, etc.)
@@ -66,34 +76,35 @@ final class Screenshotter
             ->deviceScaleFactor(1) // 1:1 pixel ratio - no scaling
             ->timeout($isProblematicSite ? 120 : 90) // Allow more time on problematic sites
             ->setDelay($isProblematicSite ? $delayProblemMs : $delayNormalMs) // Longer delays for proper loading
-            ->quality(100) // Maximum quality for text clarity
             ->format('png') // PNG for better text rendering
             ->addChromiumArguments([
-                '--no-sandbox',
-                '--disable-dev-shm-usage',
-                '--ignore-certificate-errors',
-                '--disable-background-timer-throttling',
-                '--disable-backgrounding-occluded-windows',
-                '--disable-renderer-backgrounding',
-                '--disable-extensions',
-                '--disable-plugins',
-                '--disable-web-security', // Help with CORS issues
-                '--force-device-scale-factor=1', // No scaling
-                '--enable-font-antialiasing', // Smooth fonts
-                '--disable-lcd-text', // Better text on screenshots
-                '--force-color-profile=srgb', // Consistent colors
-                '--disable-features=TranslateUI', // Prevent translation overlays
-                '--disable-features=VizDisplayCompositor', // Prevent consent popups
-                '--disable-component-extensions-with-background-pages' // Block consent manager extensions
-            ]);
+                'no-sandbox',
+                'disable-setuid-sandbox',
+                'disable-dev-shm-usage',
+                'disable-gpu',
+                'disable-software-rasterizer',
+                'disable-dbus',
+                'disable-notifications',
+                'disable-background-networking',
+                'disable-background-timer-throttling',
+                'disable-backgrounding-occluded-windows',
+                'disable-breakpad',
+                'disable-extensions',
+                'disable-features=TranslateUI',
+                'disable-ipc-flooding-protection',
+                'disable-renderer-backgrounding',
+                'metrics-recording-only',
+                'mute-audio',
+                'no-first-run',
+                'no-zygote',
+            ])
+            ->ignoreHttpsErrors()
+            ->dismissDialogs();
         
-        // Use different wait strategy for problematic sites
-        if ($isProblematicSite) {
-            // Some sites never reach true network idle; be more lenient
-            $shot->setOption('waitUntil', 'domcontentloaded');
-        } else {
-            $shot->waitUntilNetworkIdle();
-        }
+        // SPEED OPTIMIZATION: Use domcontentloaded instead of network idle
+        // NetworkIdle waits for ALL requests (analytics, ads, etc.) which is too slow
+        // DOMContentLoaded is much faster and usually sufficient
+        $shot->setOption('waitUntil', 'domcontentloaded');
 
         if ($n = $this->nodePath())   $shot->setNodeBinary($n);
         if ($c = $this->chromePath()) $shot->setChromePath($c);
@@ -148,7 +159,6 @@ final class Screenshotter
                     ->deviceScaleFactor(1)
                     ->timeout(120)
                     ->setDelay($delayFallbackMs)
-                    ->quality(100)
                     ->format('png')
                     ->blockDomains([
                         'www.google-analytics.com', 'ssl.google-analytics.com',
@@ -158,14 +168,28 @@ final class Screenshotter
                     ])
                     ->setOption('waitUntil', 'domcontentloaded')
                     ->addChromiumArguments([
-                        '--no-sandbox',
-                        '--disable-dev-shm-usage',
-                        '--ignore-certificate-errors',
-                        '--disable-setuid-sandbox',
-                        '--disable-background-timer-throttling',
-                        '--disable-backgrounding-occluded-windows',
-                        '--disable-renderer-backgrounding',
-                    ]);
+                        'no-sandbox',
+                        'disable-setuid-sandbox',
+                        'disable-dev-shm-usage',
+                        'disable-gpu',
+                        'disable-software-rasterizer',
+                        'disable-dbus',
+                        'disable-notifications',
+                        'disable-background-networking',
+                        'disable-background-timer-throttling',
+                        'disable-backgrounding-occluded-windows',
+                        'disable-breakpad',
+                        'disable-extensions',
+                        'disable-features=TranslateUI',
+                        'disable-ipc-flooding-protection',
+                        'disable-renderer-backgrounding',
+                        'metrics-recording-only',
+                        'mute-audio',
+                        'no-first-run',
+                        'no-zygote',
+                    ])
+                    ->ignoreHttpsErrors()
+                    ->dismissDialogs();
 
                 if ($n = $this->nodePath())   $fallback->setNodeBinary($n);
                 if ($c = $this->chromePath()) $fallback->setChromePath($c);
@@ -202,8 +226,43 @@ final class Screenshotter
         
         // Automatically fix permissions for new screenshots
         $this->fixScreenshotPermissions();
-        
+
+        // Force cleanup after heavy operation
+        gc_collect_cycles();
+
         return $this->publicUrl();
+    }
+
+    /**
+     * Get count of Chrome processes owned by current user
+     */
+    private function getChromeProcessCount(): int
+    {
+        try {
+            $output = shell_exec("ps aux | grep -i chrome | grep -v grep | wc -l");
+            return (int) trim($output);
+        } catch (\Throwable $e) {
+            return 0;
+        }
+    }
+
+    /**
+     * Smart cleanup: Only kill OLD Chrome processes (>5 minutes)
+     * Let recent ones close naturally - they will when Puppeteer finishes
+     * NO SLEEPS = FAST!
+     */
+    private function cleanupOldChrome(): void
+    {
+        try {
+            // Kill Chrome processes older than 5 minutes
+            shell_exec("ps -eo pid,etimes,comm | grep chrome | awk '\$2 > 300 {print \$1}' | xargs -r kill -9 2>/dev/null &");
+
+            // Clean old temp directories (>10 minutes) in background
+            shell_exec("find /tmp -maxdepth 1 -name 'puppeteer_dev_chrome_profile-*' -mmin +10 -exec rm -rf {} \\; 2>/dev/null &");
+
+        } catch (\Throwable $e) {
+            // Ignore - cleanup is best-effort
+        }
     }
 
     /**
@@ -275,7 +334,7 @@ final class Screenshotter
             if (file_exists($screenshotFile)) $applyChown($screenshotFile);
 
             // Fix all variant files permissions (the missing piece!)
-            $basePath = storage_path('app/public/screenshots/');
+            $basePath = base_path('screenshots/');
             $widths = [480, 768, 1024];
             foreach ($widths as $w) {
                 $webpPath = $basePath . $this->slug . "-{$w}.webp";
@@ -311,8 +370,8 @@ final class Screenshotter
         if (! $driver) return; // No image library available
 
         foreach ($widths as $w) {
-            $webpDest = storage_path('app/public/screenshots/'.$this->slug."-{$w}.webp");
-            $pngDest  = storage_path('app/public/screenshots/'.$this->slug."-{$w}.png");
+            $webpDest = base_path('screenshots/'.$this->slug."-{$w}.webp");
+            $pngDest  = base_path('screenshots/'.$this->slug."-{$w}.png");
 
             $srcMtime = filemtime($src) ?: time();
             $webpFresh = file_exists($webpDest) && filemtime($webpDest) >= $srcMtime;

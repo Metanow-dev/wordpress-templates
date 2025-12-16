@@ -26,40 +26,54 @@ The application automatically captures screenshots of WordPress sites and displa
 ## Local Development
 
 ### Requirements
-- Docker + Docker Compose (via [Laravel Sail](https://laravel.com/docs/sail))
-- Node.js 18+ with npm
-- Chrome/Chromium browser (managed automatically by Puppeteer)
+- Docker Desktop (includes Docker + Docker Compose)
+- No PHP or Node.js installation needed on host! (Laravel Sail handles everything via Docker)
 
 ### Quick Start
 
+**Automated Setup (Recommended):**
+
 ```bash
-# Clone repository
-git clone <your-repo-url>
-cd wordpress-templates
+# Linux/Mac
+./setup-new-pc.sh
 
-# Install PHP dependencies
-composer install
+# Windows PowerShell
+./setup-new-pc.ps1
+```
 
-# Install Node.js dependencies (includes Puppeteer)
-npm install
+**Manual Setup:**
 
-# Copy environment file
+```bash
+# 1. Install Composer dependencies via Docker
+docker run --rm \
+    -v "$(pwd):/var/www/html" \
+    -w /var/www/html \
+    laravelsail/php83-composer:latest \
+    composer install --ignore-platform-reqs
+
+# 2. Setup environment
 cp .env.example .env
 
-# Start Docker containers
+# 3. Start Docker containers
 ./vendor/bin/sail up -d
 
-# Generate application key
+# 4. Generate application key
 ./vendor/bin/sail artisan key:generate
 
-# Run database migrations
+# 5. Run database migrations
 ./vendor/bin/sail artisan migrate
 
-# Build frontend assets
+# 6. Install Node.js dependencies and build assets
+./vendor/bin/sail npm install
 ./vendor/bin/sail npm run dev
+
+# 7. Create storage link
+./vendor/bin/sail artisan storage:link
 ```
 
 Access the application at [http://localhost](http://localhost)
+
+**Setting Up on a New PC?** See [SETUP_NEW_PC.md](SETUP_NEW_PC.md) for detailed instructions.
 
 ### Setting up Test Data
 
@@ -84,6 +98,8 @@ Access the application at [http://localhost](http://localhost)
 
 ### Screenshot Commands
 
+#### Single Template Capture
+
 ```bash
 # Capture screenshots for all templates
 ./vendor/bin/sail artisan templates:screenshot
@@ -94,12 +110,48 @@ Access the application at [http://localhost](http://localhost)
 # Capture specific template
 ./vendor/bin/sail artisan templates:screenshot --slug=template-name
 
+# Capture only new templates without captured screenshots
+./vendor/bin/sail artisan templates:screenshot --new-only
+
+# Skip known problematic sites that timeout
+./vendor/bin/sail artisan templates:screenshot --skip-problematic
+
 # Full-page screenshots
 ./vendor/bin/sail artisan templates:screenshot --fullpage
 
 # Custom dimensions
 ./vendor/bin/sail artisan templates:screenshot --w=1920 --h=1080
 ```
+
+#### Batch Capture (Multiple Templates)
+
+```bash
+# Capture multiple templates by slug
+./vendor/bin/sail artisan templates:batch-screenshot --slugs=site1,site2,site3 --force
+
+# From plain text file (one slug per line)
+./vendor/bin/sail artisan templates:batch-screenshot --file=failed_slugs.txt --force
+
+# From CSV file (automatically detects first column)
+./vendor/bin/sail artisan templates:batch-screenshot --file=export.csv --force
+
+# From CSV with specific column
+./vendor/bin/sail artisan templates:batch-screenshot --file=templates.csv --column=slug --force
+
+# Continue processing even if some fail
+./vendor/bin/sail artisan templates:batch-screenshot --file=slugs.txt --force --continue-on-error
+
+# Custom delay between captures (default: 3 seconds)
+./vendor/bin/sail artisan templates:batch-screenshot --slugs=site1,site2 --force --delay=5
+```
+
+**Batch Processing Features:**
+- Progress tracking (X/Y completed)
+- Success/failure reporting
+- Failed slugs are listed for easy retry
+- Supports TXT (one per line) and CSV files
+- Configurable delays between captures
+- Memory-safe with automatic cleanup
 
 ### Variant Commands (Responsive WebP/PNG)
 
@@ -205,13 +257,17 @@ location ~ ^/([a-zA-Z0-9\-_]+)/?(.*)$ {
 #### Scheduled Tasks (Cron)
 ```bash
 # Scan for new WordPress installations every 15 minutes
+# (includes automatic garbage collection)
 */15 * * * * cd /var/www/vhosts/your-domain.com/httpdocs && php artisan templates:scan
 
 # Update screenshots daily at 2 AM
-0 2 * * * cd /var/www/vhosts/your-domain.com/httpdocs && php artisan templates:screenshot
+0 2 * * * cd /var/www/vhosts/your-domain.com/httpdocs && php artisan templates:screenshot --new-only --skip-problematic
 
-# Clean up old files weekly
-0 3 * * 0 cd /var/www/vhosts/your-domain.com/httpdocs && php artisan storage:link
+# Weekly full screenshot refresh (Sundays at 3 AM)
+0 3 * * 0 cd /var/www/vhosts/your-domain.com/httpdocs && php artisan templates:screenshot --force
+
+# Manual garbage collection (optional, scan does this automatically)
+# 0 4 * * 0 cd /var/www/vhosts/your-domain.com/httpdocs && php artisan templates:gc --clean-screenshots
 ```
 
 Permissions and ownership
@@ -287,11 +343,13 @@ NODE_BINARY_PATH=/usr/local/bin/node
 ./vendor/bin/sail up -d                    # Start containers
 ./vendor/bin/sail artisan templates:scan  # Scan for WordPress sites
 ./vendor/bin/sail artisan templates:screenshot --force  # Generate screenshots
+./vendor/bin/sail artisan templates:gc --dry-run  # Preview orphaned templates
 ./vendor/bin/sail npm run dev             # Watch frontend assets
 
 # Production
 php artisan templates:scan                # Scan for new installations
 php artisan templates:screenshot          # Update screenshots
+php artisan templates:gc --clean-screenshots  # Remove orphaned templates
 php artisan config:cache                  # Cache configuration
 php artisan route:cache                   # Cache routes
 ```
@@ -304,7 +362,9 @@ php artisan route:cache                   # Cache routes
 app/
 ├── Console/Commands/
 │   ├── ScanTemplates.php         # WordPress site scanner
-│   └── CaptureTemplateScreenshots.php  # Screenshot generator
+│   ├── CaptureTemplateScreenshots.php  # Screenshot generator
+│   ├── BatchScreenshotTemplates.php    # Batch screenshot capture
+│   └── GarbageCollectTemplates.php     # Cleanup orphaned templates
 ├── Http/
 │   └── Middleware/SetLocale.php  # Language detection
 ├── Livewire/
@@ -340,11 +400,59 @@ routes/api.php                   # API routes
 php artisan templates:fix-permissions --path=storage/app/public/screenshots
 ```
 
+### Database Cleanup
+
+The system automatically maintains database integrity by detecting and removing orphaned templates.
+
+```bash
+# Preview what would be deleted (safe to run)
+php artisan templates:gc --dry-run
+
+# Remove orphaned templates from database
+php artisan templates:gc
+
+# Also remove orphaned screenshot files
+php artisan templates:gc --clean-screenshots
+```
+
+**When to use:**
+- After manually deleting WordPress installations
+- After bulk cleanup of template directories
+- When database and filesystem are out of sync
+
+**Automatic Cleanup:** The `templates:scan` command now automatically runs garbage collection after scanning (disable with `--no-gc` flag).
+
+### Memory Management
+
+The screenshot system includes memory optimization to prevent 503 errors:
+
+**Features:**
+- Garbage collection between captures
+- Configurable memory limits
+- Automatic cleanup after errors
+- Delays between captures to prevent server overload
+
+**Configuration (.env):**
+```env
+# Memory limit before forcing cleanup (MB)
+SCREENSHOT_MEMORY_LIMIT_MB=256
+
+# Delay between screenshot captures (milliseconds)
+SCREENSHOT_DELAY_BETWEEN_MS=3000
+```
+
+**Recommended Settings:**
+- **Shared Hosting:** 256MB limit, 3000ms delay
+- **VPS/Dedicated:** 512MB limit, 2000ms delay
+- **High-Memory Server:** 1024MB limit, 1000ms delay
+
 ### Common Issues
+- **503 Errors during screenshots**: Reduce `SCREENSHOT_MEMORY_LIMIT_MB` and increase `SCREENSHOT_DELAY_BETWEEN_MS`
 - **Memory errors**: Increase PHP memory limit for screenshot generation
 - **Permission issues**: Ensure storage directories are writable
   - Run `php artisan templates:fix-permissions` and verify `.env` has `SCREENSHOT_SYSUSER` and `SCREENSHOT_GROUP`.
 - **Network timeouts**: Adjust timeout settings for slow WordPress sites
+- **Orphaned templates**: Run `php artisan templates:gc` to clean up deleted templates
 
 ---
 
@@ -366,11 +474,47 @@ This project is open-sourced software licensed under the [MIT license](LICENSE).
 
 ## Support
 
-For issues and feature requests, please use the [GitHub issue tracker](https://github.com/your-org/wordpress-templates/issues).# Deployment test
-🚀 **Deployment Status**: Ready for production deployment to wp-templates.metanow.dev
-## Deployment Notes
+For issues and feature requests, please use the [GitHub issue tracker](https://github.com/Metanow-dev/wordpress-templates/issues).
 
-- Fixed .env file format issues with API_TOKEN
-- Database password properly quoted for special characters
-- Ready for successful deployment
-# .env file manually recreated on server Mon Sep  8 10:06:59 CEST 2025
+---
+
+## Current Deployment
+
+**Production Server:** https://megasandboxs.com/
+**Repository Branch:** `server-sync` (server-specific configuration)
+**Main Branch:** `main` (development)
+
+### Server Configuration
+
+The application is deployed on a Plesk/CloudLinux environment with:
+- **PHP Version:** 8.3 (Alt-PHP via CloudLinux)
+- **Document Root:** `/var/www/vhosts/megasandboxs.com/httpdocs`
+- **System User:** `megasandboxs.com_c9h1nddlyw`
+- **Screenshot Storage:** `screenshots/` (at root level)
+- **WordPress Templates:** Located at `/var/www/vhosts/megasandboxs.com/httpdocs/{slug}/`
+
+### Quick Server Commands
+
+```bash
+# Capture screenshots (using wrapper)
+artisan-wp templates:screenshot --slug=SLUG --force
+
+# Scan for WordPress installations
+artisan-wp templates:scan
+
+# Clean up Chrome processes
+artisan-wp chrome:cleanup --force
+
+# Fix screenshot permissions
+artisan-wp templates:fix-permissions
+```
+
+### Additional Documentation
+
+For detailed setup and operations:
+- **[SETUP_NEW_PC.md](SETUP_NEW_PC.md)** - Complete guide for setting up on a new PC
+- **[MAINTENANCE.md](MAINTENANCE.md)** - Database maintenance and memory optimization
+- **[BATCH_SCREENSHOT_GUIDE.md](BATCH_SCREENSHOT_GUIDE.md)** - Batch screenshot processing guide
+- **[MIGRATION_CHECKLIST.md](MIGRATION_CHECKLIST.md)** - Server migration guide
+- **[SCREENSHOT_SETUP_GUIDE.md](SCREENSHOT_SETUP_GUIDE.md)** - Detailed screenshot setup
+- **[SCREENSHOT_QUICK_REFERENCE.md](SCREENSHOT_QUICK_REFERENCE.md)** - Quick troubleshooting reference
